@@ -12,7 +12,7 @@ int main()
 
     mainGame.loadWorld(0);
 
-    app.setFramerateLimit(3);
+    app.setFramerateLimit(20);
     while (app.isOpen())
     {
         Graphics::checkEvents(app);
