@@ -5,6 +5,7 @@
 
 namespace Graphics
 {
+    // Pass render window and have it display events
     void checkEvents(sf::RenderWindow& app);
     void pushRGBA(sf::RenderWindow& app, const unsigned char* pixels);
 };

@@ -21,7 +21,6 @@ class Game
         unsigned char* returnPixels();
 
     private:
-
         int playerX = 5;
         int playerY = 18;
         unsigned int cX = 0;

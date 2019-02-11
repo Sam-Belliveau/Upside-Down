@@ -24,6 +24,7 @@ void Game::reset()
     cX = 0;
 }
 
+// Loading level from
 void Game::loadWorld(const unsigned int w)
 {
     sf::Image img;
@@ -33,6 +34,7 @@ void Game::loadWorld(const unsigned int w)
         {
             for(unsigned int y = 0; y < GAME_HEIGHT; y++)
             {
+                // Detect different game elements
                         if(img.getPixel(x, y).r > 128)  { world[x][y] = type::ground; }
                 else    if(img.getPixel(x, y).b > 128)  { world[x][y] = type::comment; }
                 else    if(img.getPixel(x, y).g > 128)  { world[x][y] = type::trap; }
@@ -45,8 +47,10 @@ void Game::loadWorld(const unsigned int w)
 
 void Game::gameLoop()
 {
+    // Goal Detection
     if(playerX == GAME_LENGTH){ level = (level + 1)%LEVEL_COUNT; loadWorld(level); }
 
+    // Developer Key Combos
     if(sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(0x25)))
     {
         if(sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(0x26)))
@@ -75,29 +79,37 @@ void Game::gameLoop()
         }
     }
 
+    // Trap Detection
     if(playerY == 0 || playerY == GAME_HEIGHT - 1 || world[playerX][playerY] == type::trap)
     { reset(); return; }
 
+    // Jumping
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
-        if(gravity) { if(world[playerX][playerY-1] == type::ground && canJump){ gravity = false; } }
-        else        { if(world[playerX][playerY+1] == type::ground && canJump){ gravity = true;  } }
-        canJump = false;
+        if(world[playerX][playerY+(gravity ? -1 : 1)] == type::ground && canJump)
+        { 
+            gravity = !gravity; 
+            canJump = false; 
+        } 
     } else { canJump = true; }
 
+    // Moving
     if(playerX > 0 && sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     { if(world[playerX-1][playerY] != type::ground) { playerX--; } }
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     { if(world[playerX+1][playerY] != type::ground) { playerX++; } }
 
+    // Gravity
     if(gravity) { if(world[playerX][playerY-1] != type::ground) { playerY--; } }
     else        { if(world[playerX][playerY+1] != type::ground) { playerY++; } }
 
+    // Camera Movement
     if(playerX - cX > (GAME_WIDTH >> 1)){ moveCameraRight(); }
     if(playerX - cX < (GAME_WIDTH >> 2)){ moveCameraLeft(); }
 }
 
+// Render Game
 unsigned char* Game::returnPixels()
 {
     unsigned int pixel = 0;

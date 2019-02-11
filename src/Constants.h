@@ -2,15 +2,13 @@
 #ifndef CONSTANTS_H_INCLUDED
 #define CONSTANTS_H_INCLUDED
 
-const unsigned int GAME_WIDTH = 40;
-const unsigned int GAME_HEIGHT = 24;
-const unsigned int PIXEL_COUNT = GAME_WIDTH*GAME_HEIGHT*4;
-const unsigned int GAME_SCALE = 64;
-const unsigned int GAME_LENGTH = 256;
+static const unsigned int GAME_WIDTH = 40;
+static const unsigned int GAME_HEIGHT = 24;
+static const unsigned int PIXEL_COUNT = GAME_WIDTH*GAME_HEIGHT*4;
+static const unsigned int GAME_SCALE = 64;
+static const unsigned int GAME_LENGTH = 256;
 
-
-const unsigned int LEVEL_COUNT = 12;
-const std::string LEVEL_NAMES[LEVEL_COUNT]
+static const std::string LEVEL_NAMES[]
 {
     "Levels/L1.bmp",
     "Levels/L2.bmp",
@@ -25,5 +23,7 @@ const std::string LEVEL_NAMES[LEVEL_COUNT]
     "Levels/L11.bmp",
     "Levels/L12.bmp"
 };
+
+static const unsigned int LEVEL_COUNT = sizeof(LEVEL_NAMES) / sizeof(std::string);
 
 #endif // CONSTANTS_H_INCLUDED
