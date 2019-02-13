@@ -1,9 +1,10 @@
 #ifndef CONSTANTS_H_INCLUDED
 #define CONSTANTS_H_INCLUDED
+
 #include <string>
 #include <cstdint>
 
-using IntType = std::int_fast32_t ;
+using IntType = std::int_fast32_t;
 
 static const IntType GAME_WIDTH = 40;
 static const IntType GAME_HEIGHT = 24;
@@ -31,6 +32,6 @@ static const std::string LEVEL_NAMES[]
     "Levels/L12.bmp"
 };
 
-static const unsigned int LEVEL_COUNT = sizeof(LEVEL_NAMES) / sizeof(std::string);
+static const IntType LEVEL_COUNT = sizeof(LEVEL_NAMES) / sizeof(std::string);
 
 #endif // CONSTANTS_H_INCLUDED
