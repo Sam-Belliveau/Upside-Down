@@ -16,13 +16,13 @@ public:
     void gameLoop();
     void reset();
 
-    unsigned int level = 0;
-    void loadWorld(const unsigned int w);
+    IntType level = 0;
+    void loadWorld(const IntType w);
 
     unsigned char* returnPixels();
 
 private:
-    std::int_fast32_t playerX = 5, playerY = 18, cX = 0;
+    IntType playerX = 5, playerY = 18, cX = 0, trapX = -24;
     bool gravity = false; // false = down, true = up;
     bool canJump = true, canBounce = true;
 

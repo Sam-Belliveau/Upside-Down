@@ -21,18 +21,19 @@ void Game::reset()
     playerX = 5;
     playerY = 18;
     gravity = false; // false = down, true = up;
+    trapX = -32;
     cX = 0;
 }
 
 // Loading level from
-void Game::loadWorld(const unsigned int w)
+void Game::loadWorld(const IntType w)
 {
     sf::Image img;
     if(img.loadFromFile(LEVEL_NAMES[w]))
     {
-        for(unsigned int x = 0; x < GAME_LENGTH; x++)
+        for(IntType x = 0; x < GAME_LENGTH; x++)
         {
-            for(unsigned int y = 0; y < GAME_HEIGHT; y++)
+            for(IntType y = 0; y < GAME_HEIGHT; y++)
             {
                 // Detect different game elements
                         if(img.getPixel(x, y).r > 128)  { world[x][y] = type::ground; }
@@ -84,6 +85,9 @@ void Game::gameLoop()
     || world[playerX][playerY] == type::trap)
     { reset(); return; }
 
+    if(playerX <= (trapX++)/TRAP_SPEED)
+    { reset(); return; }
+
     // Jumping
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
@@ -122,10 +126,10 @@ void Game::gameLoop()
 // Render Game
 unsigned char* Game::returnPixels()
 {
-    unsigned int pixel = 0;
-    for(int y = 0; y < GAME_HEIGHT; y++)
+    IntType pixel = 0;
+    for(IntType y = 0; y < GAME_HEIGHT; y++)
     {
-        for(unsigned int x = 0; x < GAME_WIDTH; x++)
+        for(IntType x = 0; x < GAME_WIDTH; x++)
         {
             if(playerX == cX+x && playerY == y)
             {
@@ -164,6 +168,11 @@ unsigned char* Game::returnPixels()
                 buffer[pixel + 2] = 200 + brightness;
                 buffer[pixel + 3] = 255;
             }
+
+            if(x + cX <= trapX/TRAP_SPEED) {
+                buffer[pixel] = std::min(255, int(buffer[pixel]) + int(128));
+            }
+
             pixel += 4;
         }
     }
