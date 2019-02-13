@@ -1,41 +1,36 @@
 #include "Constants.h"
-#include <string>
 #include <SFML/Graphics.hpp>
+#include <cstddef>
+#include <string>
 
 #ifndef GAME_H
 #define GAME_H
 
-enum type{ sky, ground, comment, trap};
+enum type{ sky, ground, bounce, trap };
 
 class Game
 {
-    public:
-        Game();
+public:
+    Game();
 
-        void gameLoop();
-        void reset();
+    void gameLoop();
+    void reset();
 
-        unsigned int level = 0;
-        void loadWorld(const unsigned int w);
+    unsigned int level = 0;
+    void loadWorld(const unsigned int w);
 
-        unsigned char* returnPixels();
+    unsigned char* returnPixels();
 
-    private:
-        int playerX = 5;
-        int playerY = 18;
-        unsigned int cX = 0;
-        bool gravity = false; // false = down, true = up;
+private:
+    std::int_fast32_t playerX = 5, playerY = 18, cX = 0;
+    bool gravity = false; // false = down, true = up;
+    bool canJump = true, canBounce = true;
 
-        bool canJump = true;
+    bool moveCameraLeft();
+    bool moveCameraRight();
 
-        bool glow = true;
-        unsigned char redValue = 224;
-
-        bool moveCameraLeft();
-        bool moveCameraRight();
-
-        unsigned char world[GAME_LENGTH][GAME_HEIGHT];
-        unsigned char* buffer = new unsigned char[GAME_HEIGHT*GAME_WIDTH*4];
+    unsigned char world[GAME_LENGTH][GAME_HEIGHT];
+    unsigned char* buffer = new unsigned char[GAME_HEIGHT*GAME_WIDTH*4];
 };
 
 #endif // GAME_H

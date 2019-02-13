@@ -5,7 +5,7 @@
 static const unsigned int GAME_WIDTH = 40;
 static const unsigned int GAME_HEIGHT = 24;
 static const unsigned int PIXEL_COUNT = GAME_WIDTH*GAME_HEIGHT*4;
-static const unsigned int GAME_SCALE = 10;
+static const unsigned int GAME_SCALE = 16;
 static const unsigned int GAME_LENGTH = 256;
 
 static const std::string LEVEL_NAMES[]

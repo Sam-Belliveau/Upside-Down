@@ -36,7 +36,7 @@ void Game::loadWorld(const unsigned int w)
             {
                 // Detect different game elements
                         if(img.getPixel(x, y).r > 128)  { world[x][y] = type::ground; }
-                else    if(img.getPixel(x, y).b > 128)  { world[x][y] = type::comment; }
+                else    if(img.getPixel(x, y).b > 128)  { world[x][y] = type::bounce; }
                 else    if(img.getPixel(x, y).g > 128)  { world[x][y] = type::trap; }
                 else                                    { world[x][y] = type::sky; }
             }
@@ -80,16 +80,17 @@ void Game::gameLoop()
     }
 
     // Trap Detection
-    if(playerY == 0 || playerY == GAME_HEIGHT - 1 || world[playerX][playerY] == type::trap)
+    if(playerY == 0 || playerY == GAME_HEIGHT - 1 
+    || world[playerX][playerY] == type::trap)
     { reset(); return; }
 
     // Jumping
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
-        if(world[playerX][playerY+(gravity ? -1 : 1)] == type::ground && canJump)
+        if(world[playerX][playerY + (gravity ? -1 : 1)] == type::ground && canJump)
         { 
             gravity = !gravity; 
-            canJump = false; 
+            canJump = false;
         } 
     } else { canJump = true; }
 
@@ -99,6 +100,15 @@ void Game::gameLoop()
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     { if(world[playerX+1][playerY] != type::ground) { playerX++; } }
+
+    // Bounce Detection
+    if(world[playerX][playerY + (gravity ? -1 : 1)] == type::bounce 
+    || world[playerX][playerY] == type::bounce)
+    { 
+        if(canBounce) gravity = !gravity; 
+        canBounce = false; 
+    }
+    else canBounce = true;
 
     // Gravity
     if(gravity) { if(world[playerX][playerY-1] != type::ground) { playerY--; } }
@@ -119,9 +129,9 @@ unsigned char* Game::returnPixels()
         {
             if(playerX == cX+x && playerY == y)
             {
-                buffer[pixel + 0] = 255;
-                buffer[pixel + 1] = 160;
-                buffer[pixel + 2] = 224;
+                buffer[pixel + 0] = 200;
+                buffer[pixel + 1] = 255;
+                buffer[pixel + 2] = 200;
                 buffer[pixel + 3] = 255;
             } else if(world[cX+x][y] == type::ground)
             {
@@ -131,11 +141,11 @@ unsigned char* Game::returnPixels()
                 buffer[pixel + 1] = brightness;
                 buffer[pixel + 2] = brightness;
                 buffer[pixel + 3] = 255;
-            } else if(world[cX+x][y] == type::comment)
+            } else if(world[cX+x][y] == type::bounce)
             {
-                buffer[pixel + 0] = 200;
-                buffer[pixel + 1] = 255;
-                buffer[pixel + 2] = 200;
+                buffer[pixel + 0] = 64;
+                buffer[pixel + 1] = 164;
+                buffer[pixel + 2] = 255;
                 buffer[pixel + 3] = 255;
             } else if(world[cX+x][y] == type::trap)
             {
@@ -145,10 +155,10 @@ unsigned char* Game::returnPixels()
                 buffer[pixel + 1] = 32 + brightness;
                 buffer[pixel + 2] = 0;
                 buffer[pixel + 3] = 255;
-            } else // Sky 84,107,171
+            } else // Sky 
             {
                 srand((-(cX/3) - x)*(y+1));
-                const char brightness = rand()%8 - (y << 2);
+                const char brightness = rand()%8 - ((gravity ? GAME_HEIGHT - y : y) << 2);
                 buffer[pixel + 0] = 16 - brightness;
                 buffer[pixel + 1] = 160 + brightness;
                 buffer[pixel + 2] = 200 + brightness;
