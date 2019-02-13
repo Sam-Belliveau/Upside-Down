@@ -22,7 +22,7 @@ public:
     unsigned char* returnPixels();
 
 private:
-    IntType playerX = 5, playerY = 18, cX = 0, trapX = -24;
+    IntType playerX = 5, playerY = 18, cX = 0, trapX = TRAP_START;
     bool gravity = false; // false = down, true = up;
     bool canJump = true, canBounce = true;
 

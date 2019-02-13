@@ -21,7 +21,7 @@ void Game::reset()
     playerX = 5;
     playerY = 18;
     gravity = false; // false = down, true = up;
-    trapX = -32;
+    trapX = TRAP_START;
     cX = 0;
 }
 
@@ -85,8 +85,10 @@ void Game::gameLoop()
     || world[playerX][playerY] == type::trap)
     { reset(); return; }
 
-    if(playerX <= (trapX++)/TRAP_SPEED)
+    if(playerX + TRAP_SMOOTH - 1 <= trapX/TRAP_SPEED)
     { reset(); return; }
+
+    if(playerX > 5) { ++trapX; }
 
     // Jumping
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
@@ -170,7 +172,10 @@ unsigned char* Game::returnPixels()
             }
 
             if(x + cX <= trapX/TRAP_SPEED) {
-                buffer[pixel] = std::min(255, int(buffer[pixel]) + int(128));
+                const double redVal = -(256.0/TRAP_SMOOTH)*(double(x + cX) - trapX/TRAP_SPEED);
+                buffer[pixel + 0] = std::min(255, int(buffer[pixel] + redVal));
+                buffer[pixel + 1] = std::max(0, int(buffer[pixel + 1] - redVal/4.0));
+                buffer[pixel + 2] = std::max(0, int(buffer[pixel + 2] - redVal/4.0));
             }
 
             pixel += 4;

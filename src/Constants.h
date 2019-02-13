@@ -11,8 +11,9 @@ static const IntType PIXEL_COUNT = GAME_WIDTH*GAME_HEIGHT*4;
 static const IntType GAME_SCALE = 16;
 static const IntType GAME_LENGTH = 256;
 
-static const IntType TRAP_START = 8;
-static const double TRAP_SPEED = 2;
+static const IntType TRAP_START = -4;
+static const IntType TRAP_SMOOTH = 8;
+static const double TRAP_SPEED = 2.4;
 
 static const std::string LEVEL_NAMES[]
 {
