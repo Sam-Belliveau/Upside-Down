@@ -11,5 +11,5 @@
 		b. The colors
 			Red = Land
 			Green = Lava
-			Blue = Comment
+			Blue = Bounce
 		c. The end of a level is automatically the end.
