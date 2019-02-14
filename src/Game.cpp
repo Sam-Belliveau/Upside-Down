@@ -82,6 +82,10 @@ void Game::gameLoop()
         }
     }
 
+    // Reset key
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
+    { loadWorld(0); }
+
     // Trap Detection
     if(playerY == 0 || playerY == GAME_HEIGHT - 1 
     || world[playerX][playerY] == type::trap
