@@ -31,7 +31,8 @@ void Game::reset()
 void Game::loadWorld(const IntType w)
 {
     sf::Image img;
-    if(img.loadFromFile(LEVEL_NAMES[w]))
+    level = w;
+    if(img.loadFromFile(LEVEL_NAMES[w % LEVEL_COUNT]))
     {
         for(IntType x = 0; x < GAME_LENGTH; x++)
         {
@@ -51,7 +52,7 @@ void Game::loadWorld(const IntType w)
 void Game::gameLoop()
 {
     // Goal Detection
-    if(playerX == GAME_LENGTH){ level = (level + 1)%LEVEL_COUNT; loadWorld(level); }
+    if(playerX == GAME_LENGTH){ loadWorld(level + 1); }
 
     // Developer Key Combos
     if(sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(0x25)))
