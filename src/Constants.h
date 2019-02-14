@@ -14,10 +14,10 @@ static const IntType GAME_LENGTH = 256;
 static const IntType GAME_FPS = 24;
 static const IntType START_SIZE = 9;
 
-static const IntType TRAP_START = -4;
+static const IntType TRAP_START = 8;
 static const IntType TRAP_SMOOTH = 8;
-static const IntType TRAP_LEAD = IntType(double(GAME_WIDTH)*2.4);
-static const double TRAP_SPEED = 2.4;
+static const IntType TRAP_LEAD = IntType(double(GAME_WIDTH)*1.5*2.4);
+static const double TRAP_SPEED = 2.5;
 
 static const std::string LEVEL_NAMES[]
 {
