@@ -8,11 +8,9 @@ int main()
     sf::RenderWindow app(sf::VideoMode(GAME_WIDTH*GAME_SCALE, GAME_HEIGHT*GAME_SCALE), "Upside Down");
     Game mainGame;
 
-    unsigned long long frame = 0;
-
     mainGame.loadWorld(0);
 
-    app.setFramerateLimit(24);
+    app.setFramerateLimit(GAME_FPS);
     while (app.isOpen())
     {
         Graphics::checkEvents(app);
@@ -21,7 +19,11 @@ int main()
 
         Graphics::pushRGBA(app, mainGame.returnPixels());
 
-        frame++;
+        // Set title to current time
+        app.setTitle
+            ("Upside Down (" 
+            + std::to_string(double(mainGame.frame) / double(GAME_FPS)) 
+            + "s)");
     }
 
     return EXIT_SUCCESS;

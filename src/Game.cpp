@@ -23,6 +23,8 @@ void Game::reset()
     gravity = false; // false = down, true = up;
     trapX = TRAP_START;
     cX = 0;
+
+    if(level == 0) frame = 0;
 }
 
 // Loading level from
@@ -82,16 +84,24 @@ void Game::gameLoop()
 
     // Trap Detection
     if(playerY == 0 || playerY == GAME_HEIGHT - 1 
-    || world[playerX][playerY] == type::trap)
+    || world[playerX][playerY] == type::trap
+    || sf::Keyboard::isKeyPressed(sf::Keyboard::R))
     { reset(); return; }
 
+    // Left wall trap
     if(playerX + TRAP_SMOOTH - 1 <= trapX/TRAP_SPEED)
     { reset(); return; }
 
-    if(playerX > 5) { ++trapX; }
+    // Move trap and start timer if player has moved from start
+    if(playerX > START_SIZE) { ++trapX; ++frame; }
+
+    // Prevent player from getting to huge of a lead on the trap
+    trapX = std::max(trapX, playerX - TRAP_LEAD);
 
     // Jumping
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
+    || (!gravity && sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+    || (gravity  && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)))
     {
         if(world[playerX][playerY + (gravity ? -1 : 1)] == type::ground && canJump)
         { 
@@ -114,7 +124,7 @@ void Game::gameLoop()
         if(canBounce) gravity = !gravity; 
         canBounce = false; 
     }
-    else canBounce = true;
+    else { canBounce = true; }
 
     // Gravity
     if(gravity) { if(world[playerX][playerY-1] != type::ground) { playerY--; } }
@@ -169,6 +179,10 @@ unsigned char* Game::returnPixels()
                 buffer[pixel + 1] = 160 + brightness;
                 buffer[pixel + 2] = 200 + brightness;
                 buffer[pixel + 3] = 255;
+            }
+
+            if(x + cX <= START_SIZE) {
+                buffer[pixel + 1] = std::min(255, buffer[pixel + 1] + 48);
             }
 
             if(x + cX <= trapX/TRAP_SPEED) {

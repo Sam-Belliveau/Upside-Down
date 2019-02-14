@@ -16,7 +16,7 @@ public:
     void gameLoop();
     void reset();
 
-    IntType level = 0;
+    IntType level = 0, frame = 0;
     void loadWorld(const IntType w);
 
     unsigned char* returnPixels();
