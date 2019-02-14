@@ -100,7 +100,7 @@ void Game::gameLoop()
     if(playerX > START_SIZE) { ++trapX; ++frame; }
 
     // Prevent player from getting to huge of a lead on the trap
-    trapX = std::max(trapX, playerX - TRAP_LEAD);
+    trapX = std::max(trapX, IntType(playerX*TRAP_SPEED - TRAP_LEAD - TRAP_SMOOTH));
 
     // Jumping
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
