@@ -51,6 +51,17 @@ void Game::loadWorld(const IntType w)
 
 void Game::gameLoop()
 {
+    const bool left =  sf::Keyboard::isKeyPressed(sf::Keyboard::Left)
+                    || sf::Keyboard::isKeyPressed(sf::Keyboard::A);
+    const bool right = sf::Keyboard::isKeyPressed(sf::Keyboard::Right)
+                    || sf::Keyboard::isKeyPressed(sf::Keyboard::D);
+    const bool up = sf::Keyboard::isKeyPressed(sf::Keyboard::Up)
+                 || sf::Keyboard::isKeyPressed(sf::Keyboard::W);
+    const bool down =  sf::Keyboard::isKeyPressed(sf::Keyboard::Down)
+                    || sf::Keyboard::isKeyPressed(sf::Keyboard::S);
+    const bool jump = sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
+                    || (!gravity && up) || (gravity  && down);
+
     // Goal Detection
     if(playerX == GAME_LENGTH){ loadWorld(level + 1); }
 
@@ -61,10 +72,10 @@ void Game::gameLoop()
         {
             if(sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(0x05)))
             {
-                if(playerX > 0 && sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){ playerX--; }
-                if(playerX < GAME_LENGTH && sf::Keyboard::isKeyPressed(sf::Keyboard::Right)){ playerX++; }
-                if(playerY > 0 && sf::Keyboard::isKeyPressed(sf::Keyboard::Up)){ playerY--; }
-                if(playerY < GAME_HEIGHT - 1 && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)){ playerY++; }
+                if(playerX > 0 && left){ playerX--; }
+                if(playerX < GAME_LENGTH && right){ playerX++; }
+                if(playerY > 0 && up){ playerY--; }
+                if(playerY < GAME_HEIGHT - 1 && down){ playerY++; }
 
                 if(playerX - cX > (GAME_WIDTH >> 1)){ moveCameraRight(); }
                 if(playerX - cX < (GAME_WIDTH >> 2)){ moveCameraLeft(); }
@@ -72,11 +83,17 @@ void Game::gameLoop()
                 return;
             } else if(sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(0x0B)))
             {
-                if(level > 0 && sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-                { level--; while(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){} }
-                if(level < LEVEL_COUNT && sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-                { level++; while(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)){} }
-
+                if(level > 0 && left)
+                { 
+                    level--; 
+                    while(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)
+                       || sf::Keyboard::isKeyPressed(sf::Keyboard::A));
+                } else if(level < LEVEL_COUNT && right)
+                { 
+                    level++; 
+                    while(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)
+                       || sf::Keyboard::isKeyPressed(sf::Keyboard::D));
+                }
                 loadWorld(level);
                 return;
             }
@@ -104,9 +121,7 @@ void Game::gameLoop()
     trapX = std::max(trapX, IntType(playerX*TRAP_SPEED - TRAP_LEAD - TRAP_SMOOTH));
 
     // Jumping
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
-    || (!gravity && sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-    || (gravity  && sf::Keyboard::isKeyPressed(sf::Keyboard::Down)))
+    if(jump)
     {
         if(world[playerX][playerY + (gravity ? -1 : 1)] == type::ground && canJump)
         { 
@@ -116,11 +131,16 @@ void Game::gameLoop()
     } else { canJump = true; }
 
     // Moving
-    if(playerX > 0 && sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-    { if(world[playerX-1][playerY] != type::ground) { playerX--; } }
+    if(playerX > 0 && left)
+    { 
+        if(world[playerX-1][playerY] != type::ground) 
+        { playerX--; } }
 
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-    { if(world[playerX+1][playerY] != type::ground) { playerX++; } }
+    if(right) 
+    { 
+        if(world[playerX+1][playerY] != type::ground) 
+        { playerX++; } 
+    }
 
     // Bounce Detection
     if(world[playerX][playerY + (gravity ? -1 : 1)] == type::bounce 
