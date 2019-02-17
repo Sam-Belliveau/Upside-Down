@@ -176,8 +176,10 @@ unsigned char* Game::returnPixels()
                 buffer[pixel + 3] = 255;
             } else if(world[cX+x][y] == type::ground)
             {
-                srand((cX+x)*(y+1));
-                const char brightness = rand()%24 + 52;
+                std::srand((cX+x)*(y+1));
+                std::rand(); std::rand();
+                std::rand(); std::rand();
+                const char brightness = std::rand()%24 + 52;
                 buffer[pixel + 0] = brightness;
                 buffer[pixel + 1] = brightness;
                 buffer[pixel + 2] = brightness;
@@ -190,16 +192,20 @@ unsigned char* Game::returnPixels()
                 buffer[pixel + 3] = 255;
             } else if(world[cX+x][y] == type::trap)
             {
-                srand((x+1)*(y+1));
-                const char brightness = rand()%32 - 16;
+                std::srand((x+1)*(y+1));
+                std::rand(); std::rand();
+                std::rand(); std::rand();
+                const char brightness = std::rand()%32 - 16;
                 buffer[pixel + 0] = 220 + brightness;
                 buffer[pixel + 1] = 32 + brightness;
                 buffer[pixel + 2] = 0;
                 buffer[pixel + 3] = 255;
             } else // Sky 
             {
-                srand((-(cX/3) - x)*(y+1));
-                const char brightness = rand()%8 - ((gravity ? GAME_HEIGHT - y : y) << 2);
+                std::srand((-(cX/3) - x)*(y+1));
+                std::rand(); std::rand();
+                std::rand(); std::rand();
+                const char brightness = std::rand()%8 - ((gravity ? GAME_HEIGHT - y : y) << 2);
                 buffer[pixel + 0] = 16 - brightness;
                 buffer[pixel + 1] = 160 + brightness;
                 buffer[pixel + 2] = 200 + brightness;
