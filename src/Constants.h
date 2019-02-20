@@ -1,38 +1,42 @@
 #ifndef CONSTANTS_H_INCLUDED
 #define CONSTANTS_H_INCLUDED
 
-#include <string>
-#include <cstdint>
+#include <string> // File Names, Times 
+#include <cstdint> // Fixed Width Types
+#include <sstream> // Building leaderboard
+#include <iomanip> // Building leaderboard
+#include <cmath> // Misc. Math
 
+// Game Types
+using Byte = std::uint8_t;
 using IntType = std::int_fast32_t;
 
-static const IntType GAME_WIDTH = 40;
-static const IntType GAME_HEIGHT = 24;
-static const IntType PIXEL_COUNT = GAME_WIDTH*GAME_HEIGHT*4;
-static const IntType GAME_SCALE = 24;
-static const IntType GAME_LENGTH = 256;
-static const IntType GAME_FPS = 24;
-static const IntType START_SIZE = 9;
+// Game Text
+static constexpr double TEXT_SCALE = 8;
 
-static const IntType TRAP_START = -8;
-static const IntType TRAP_SMOOTH = 8;
-static const double TRAP_SPEED = 3;
-static const IntType TRAP_LEAD = IntType(48*TRAP_SPEED);
+// Game Size / Pixel Measurements
+static constexpr IntType GAME_WIDTH = 40;
+static constexpr IntType GAME_HEIGHT = 24;
+static constexpr IntType GAME_LENGTH = 256;
+static constexpr IntType PIXEL_COUNT = GAME_WIDTH*GAME_HEIGHT*4;
 
-static const std::string LEVEL_NAMES[]
-{
-    "Levels/L1.bmp",
-    "Levels/L2.bmp",
-    "Levels/L3.bmp",
-    "Levels/L4.bmp",
-    "Levels/L5.bmp",
-    "Levels/L6.bmp",
-    "Levels/L7.bmp",
-    "Levels/L8.bmp",
-    "Levels/L9.bmp",
-    "Levels/L10.bmp"
-};
+static constexpr IntType GAME_SCALE = 24;
+static constexpr IntType GAME_FPS = 24;
+static constexpr IntType START_SIZE = 9;
 
-static const IntType LEVEL_COUNT = sizeof(LEVEL_NAMES) / sizeof(std::string);
+// Left Wall Trap
+static constexpr IntType TRAP_START = -8;
+static constexpr IntType TRAP_SMOOTH = 8;
+static constexpr IntType TRAP_SPEED = 3;
+static constexpr IntType TRAP_LEAD = IntType(48*TRAP_SPEED);
+
+// Level Data / Image Processing
+static constexpr IntType MAX_LEVEL_COUNT = 100;
+static constexpr std::uint8_t COLOR_THRESHOLD = 128;
+
+// Random Number Generation
+static constexpr IntType p = 4091;
+static constexpr IntType q = 4093;
+static constexpr IntType M = p*q;
 
 #endif // CONSTANTS_H_INCLUDED
