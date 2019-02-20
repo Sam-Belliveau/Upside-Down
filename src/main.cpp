@@ -1,6 +1,6 @@
-#include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <cmath>
 #include <SFML/Graphics.hpp>
 #include "Window.h"
 #include "Constants.h"
@@ -12,21 +12,18 @@ int main()
     app.setFramerateLimit(GAME_FPS);
 
     // Font used for times
-    sf::Font consolas;
-    const std::string ttfFile = "./src/Consolas.ttf";
-    if(!consolas.loadFromFile(ttfFile))
-    {
-        std::cout << "Error loading \"" << ttfFile << "\", please double check on file and try again!\n";
-    }
+    sf::Font GameFont;
+    const std::string ttfFile = "./src/GameFont.ttf";
+    if(!GameFont.loadFromFile(ttfFile)) { return 0; }
 
     // Text class used to display times
     sf::Text times;
-    times.setFont(consolas);
-    times.setCharacterSize(GAME_SCALE / 1.2);
-    times.setFillColor(sf::Color(255, 255, 255, 255));
-    times.setOutlineColor(sf::Color(0, 0, 0, 255));
-    times.setOutlineThickness(GAME_SCALE/12.0);
-    times.setPosition(0, app.getSize().y/2);
+    times.setFont(GameFont);
+    times.setCharacterSize(GAME_SCALE/1.25);
+    times.setFillColor(sf::Color::White);
+    times.setOutlineColor(sf::Color::Black);
+    times.setOutlineThickness(3);
+    sf::Text currentTime = times;
 
     Game mainGame;
     mainGame.loadWorld(0);
@@ -39,16 +36,32 @@ int main()
 
         Graphics::pushRGBA(app, mainGame.returnPixels());
 
-        std::ostringstream timesStream;
-        timesStream << std::setprecision(3) << std::fixed;
-        for(std::size_t i = 0; i < LEVEL_COUNT; ++i)
+        if(mainGame.cX < START_SIZE)
         {
-            timesStream << " Level " << i+1 << ": ";
-            if(i < 9) { timesStream << " "; }
-            timesStream << double(mainGame.levelFrames[i]) / double(GAME_FPS) << "s\n";
-        }
-        times.setString(timesStream.str());
-        app.draw(times);
+            // Setup string buffer
+            std::ostringstream timesStream;
+            timesStream << std::setprecision(2) << std::fixed;
+
+            for(std::size_t i = 0; i < mainGame.level; ++i)
+            {
+                // Balance Level Sign
+                timesStream << " Level " << i+1 << ": ";
+                if(i < 9) { timesStream << " "; }
+                
+                // Calculate Time
+                timesStream << double(mainGame.levelFrames[i]) / double(GAME_FPS) << "s\n";
+            }
+
+            // Print times to leader board
+            times.setString(timesStream.str());
+            times.setPosition(GAME_SCALE * (1.25 - mainGame.cX), GAME_SCALE * 9);
+            app.draw(times);
+        } 
+
+        // Draw current time in top left corner
+        currentTime.setString(" " + std::to_string(double(mainGame.frame) / double(GAME_FPS)) + "s");
+        app.draw(currentTime);
+        
 
         app.display();
     }

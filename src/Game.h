@@ -18,12 +18,12 @@ public:
 
     IntType level = 0, frame = 0;
     IntType levelFrames[LEVEL_COUNT] = {0};
+    IntType playerX = 5, playerY = 18, cX = 0, trapX = TRAP_START;
     void loadWorld(const IntType w);
 
     unsigned char* returnPixels();
 
 private:
-    IntType playerX = 5, playerY = 18, cX = 0, trapX = TRAP_START;
     bool gravity = false; // false = down, true = up;
     bool canJump = true, canBounce = true;
 

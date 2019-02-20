@@ -30,9 +30,7 @@ static const std::string LEVEL_NAMES[]
     "Levels/L7.bmp",
     "Levels/L8.bmp",
     "Levels/L9.bmp",
-    "Levels/L10.bmp",
-    "Levels/L11.bmp",
-    "Levels/L12.bmp"
+    "Levels/L10.bmp"
 };
 
 static const IntType LEVEL_COUNT = sizeof(LEVEL_NAMES) / sizeof(std::string);
