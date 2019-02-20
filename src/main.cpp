@@ -23,8 +23,8 @@ int main()
     sf::Text times;
     times.setFont(consolas);
     times.setCharacterSize(GAME_SCALE / 1.2);
-    times.setFillColor(sf::Color(255, 255, 255, 192));
-    times.setOutlineColor(sf::Color(0, 0, 0, 192));
+    times.setFillColor(sf::Color(255, 255, 255, 255));
+    times.setOutlineColor(sf::Color(0, 0, 0, 255));
     times.setOutlineThickness(GAME_SCALE/12.0);
     times.setPosition(0, app.getSize().y/2);
 
