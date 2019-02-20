@@ -23,5 +23,4 @@ void Graphics::pushRGBA(sf::RenderWindow& app, const unsigned char* pixels)
     temp.setScale(GAME_SCALE,GAME_SCALE);
 
     app.draw(temp);
-    app.display();
 }

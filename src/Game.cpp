@@ -16,6 +16,12 @@ bool Game::moveCameraRight()
     return cX < GAME_LENGTH - GAME_WIDTH;
 }
 
+IntType Game::randomize(const IntType input)
+{
+    std::srand(input);
+    return std::rand() ^ std::rand() ^ std::rand() ^ std::rand();
+}
+
 void Game::reset()
 {
     playerX = 5;
@@ -24,7 +30,10 @@ void Game::reset()
     trapX = TRAP_START;
     cX = 0;
 
-    if(level == 0) frame = 0;
+    if(level == 0) {
+        frame = 0;
+        for(auto &i : levelFrames) i = 0;
+    }
 }
 
 // Loading level from
@@ -62,8 +71,11 @@ void Game::gameLoop()
     const bool jump = sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
                     || (!gravity && up) || (gravity  && down);
 
+    // Update Times
+    levelFrames[level] = frame;
+
     // Goal Detection
-    if(playerX == GAME_LENGTH){ loadWorld(level + 1); }
+    if(playerX == GAME_LENGTH) { loadWorld(level + 1); }
 
     // Developer Key Combos
     if(sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(0x25)))
@@ -107,11 +119,7 @@ void Game::gameLoop()
     // Trap Detection
     if(playerY == 0 || playerY == GAME_HEIGHT - 1 
     || world[playerX][playerY] == type::trap
-    || sf::Keyboard::isKeyPressed(sf::Keyboard::R))
-    { reset(); return; }
-
-    // Left wall trap
-    if(playerX + TRAP_SMOOTH - 1 <= trapX/TRAP_SPEED)
+    || playerX + TRAP_SMOOTH - 1 <= trapX/TRAP_SPEED)
     { reset(); return; }
 
     // Move trap and start timer if player has moved from start
@@ -176,10 +184,7 @@ unsigned char* Game::returnPixels()
                 buffer[pixel + 3] = 255;
             } else if(world[cX+x][y] == type::ground)
             {
-                std::srand((cX+x)*(y+1));
-                std::rand(); std::rand();
-                std::rand(); std::rand();
-                const char brightness = std::rand()%24 + 52;
+                const char brightness = randomize((cX+x)*(y+1))%24 + 52;
                 buffer[pixel + 0] = brightness;
                 buffer[pixel + 1] = brightness;
                 buffer[pixel + 2] = brightness;
@@ -192,20 +197,14 @@ unsigned char* Game::returnPixels()
                 buffer[pixel + 3] = 255;
             } else if(world[cX+x][y] == type::trap)
             {
-                std::srand((x+1)*(y+1));
-                std::rand(); std::rand();
-                std::rand(); std::rand();
-                const char brightness = std::rand()%32 - 16;
+                const char brightness = randomize((x+1)*(y+1))%32 - 16;
                 buffer[pixel + 0] = 220 + brightness;
                 buffer[pixel + 1] = 32 + brightness;
                 buffer[pixel + 2] = 0;
                 buffer[pixel + 3] = 255;
             } else // Sky 
             {
-                std::srand((-(cX/3) - x)*(y+1));
-                std::rand(); std::rand();
-                std::rand(); std::rand();
-                const char brightness = std::rand()%8 - ((gravity ? GAME_HEIGHT - y : y) << 2);
+                const char brightness = randomize((-(cX/3) - x)*(y+1))%8 - ((gravity ? GAME_HEIGHT - y : y) << 2);
                 buffer[pixel + 0] = 16 - brightness;
                 buffer[pixel + 1] = 160 + brightness;
                 buffer[pixel + 2] = 200 + brightness;

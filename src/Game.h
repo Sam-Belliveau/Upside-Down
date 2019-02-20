@@ -17,6 +17,7 @@ public:
     void reset();
 
     IntType level = 0, frame = 0;
+    IntType levelFrames[LEVEL_COUNT] = {0};
     void loadWorld(const IntType w);
 
     unsigned char* returnPixels();
@@ -28,6 +29,8 @@ private:
 
     bool moveCameraLeft();
     bool moveCameraRight();
+
+    IntType randomize(const IntType input);
 
     unsigned char world[GAME_LENGTH][GAME_HEIGHT];
     unsigned char* buffer = new unsigned char[GAME_HEIGHT*GAME_WIDTH*4];
