@@ -50,6 +50,7 @@ public:
     IntType getLevelFrame(IntType) const;
     bool getWinner() const;
     bool getCheater() const;
+    void setCheater();
 
 private:
     // Game Loop

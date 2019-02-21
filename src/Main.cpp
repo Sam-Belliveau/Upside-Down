@@ -1,6 +1,7 @@
 #include "./Extras/Window.h"
 #include "./Extras/Constants.h"
 #include "./Extras/Game.h"
+#include "./Extras/LevelBuilder.h"
 
 int main()
 {
@@ -35,6 +36,21 @@ int main()
         mainGame.gameLoop();
 
         Graphics::pushRGBA(app, mainGame.returnWorldPixels());
+
+        // Game Editor
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
+        && sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)
+        && sf::Keyboard::isKeyPressed(sf::Keyboard::E))
+        {
+            mainGame.loadWorld(
+                LevelBuilder::Loop(
+                    app, 
+                    mainGame.getLevel(), 
+                    mainGame.getCameraX()
+                )
+            );
+            mainGame.setCheater();
+        }
 
         // Leader Board
         if(mainGame.getCameraX() < START_SIZE 
@@ -79,20 +95,13 @@ int main()
             
             // Print times to leader board
             times.setString(timesStream.str());
-        } 
+        } else if(mainGame.getLevel() == START_LEVEL)
+        { times.setString(""); }
 
         // Leaderboard for times
-        if(mainGame.getWinner())
-        {
-            times.setScale(sf::Vector2f(1.25/TEXT_SCALE,1.25/TEXT_SCALE));
-            times.setPosition(GAME_SCALE * (GAME_WIDTH/2 - mainGame.getCameraX()), GAME_SCALE * 4);
-            app.draw(times);
-        } else 
-        {
-            times.setScale(sf::Vector2f(1/TEXT_SCALE,1/TEXT_SCALE));
-            times.setPosition(GAME_SCALE * (1 - mainGame.getCameraX()), GAME_SCALE * 9);
-            app.draw(times);
-        }
+        times.setScale(sf::Vector2f(1/TEXT_SCALE,1/TEXT_SCALE));
+        times.setPosition(GAME_SCALE * (1 - mainGame.getCameraX()), GAME_SCALE * 9);
+        app.draw(times);
 
         // Draw current time in top left corner
         // Cheating Indicator

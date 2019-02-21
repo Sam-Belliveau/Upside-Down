@@ -94,7 +94,8 @@ void Game::trapLoop()
     if(player.x > START_SIZE && !getWinner()) { ++trapX; }
 
     // Prevent player from getting to huge of a lead on the trap
-    trapX = std::max(trapX, IntType(player.x*TRAP_SPEED - TRAP_LEAD - TRAP_SMOOTH));
+    if(!getWinner())
+    { trapX = std::max(trapX, IntType(player.x*TRAP_SPEED - TRAP_LEAD - TRAP_SMOOTH)); }
 }
 
 void Game::jumpLoop()
@@ -295,20 +296,14 @@ Byte* Game::returnWorldPixels()
                 B = 0;
             } else // Sky 
             {
-                const IntType rVal[3] = // Random Values to Average
-                {
-                    randomize((-((cameraX + 2)/3) - x)*(y+1))%8,
-                    randomize((-((cameraX + 1)/3) - x)*(y+1))%8,
-                    randomize((-((cameraX + 0)/3) - x)*(y+1))%8
-                };
-                const int brightness = (rVal[0] + rVal[1] + rVal[2])/3;
+                const int brightness = randomize((-((cameraX)/3) - x)*(y+1))%8;
                 const int redBoost = 4 * (gravity == GravityType::Up ? GAME_HEIGHT - y : y);
                 R = 0   + brightness + redBoost;
                 G = 160 + brightness - redBoost;
                 B = 200 + brightness - redBoost;
             }
 
-            if(x + cameraX <= START_SIZE) { G += 64; }
+            if(x + cameraX <= START_SIZE) { G += 48; }
 
             if(x + cameraX <= trapX/TRAP_SPEED) {
                 const double redVal = -(256.0/TRAP_SMOOTH)*(double(x + cameraX) - double(trapX/TRAP_SPEED));
@@ -332,8 +327,9 @@ IntType Game::getCameraX() const { return cameraX; }
 IntType Game::getLevel() const { return level; }
 IntType Game::getFrame() const { return frame; }
 IntType Game::getLevelFrame(IntType level) const { return levelFrames[level]; }
-bool Game::getCheater() const  { return hasCheated; }
-bool Game::getWinner() const  { return level == 0; }
+bool Game::getCheater() const { return hasCheated; }
+void Game::setCheater() { hasCheated = true; }
+bool Game::getWinner() const { return level == 0; }
 
 void Game::reset()
 {
