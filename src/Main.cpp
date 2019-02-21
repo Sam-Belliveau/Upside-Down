@@ -51,7 +51,7 @@ int main()
 
             if(mainGame.getWinner())
             {
-                for(std::size_t i = std::max(lastLevel - 10, IntType(1)); i <= 10; ++i)
+                for(std::size_t i = std::max(lastLevel - 10, IntType(1)); i <= lastLevel; ++i)
                 {
                     // Balance Level Sign
                     timesStream << "Level " << i << ": ";
