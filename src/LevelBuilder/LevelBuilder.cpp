@@ -23,7 +23,12 @@ bool loadWorld(const IntType inLevel, Game::GameType* world)
             }
         }
         return false;
-    } else { world = {}; return true; }
+    } else 
+    {
+        for(IntType i = 0; i < GAME_HEIGHT*GAME_LENGTH; ++i)
+            world[i] = Game::GameType::Sky;
+        return true; 
+    }
 
 }
 
@@ -253,10 +258,12 @@ int main()
         // Saving 
         if(!edits)
         {
-            SavedIcon.setString("(Level " + std::to_string(level) + " Saved!)");
+            if(level == 0) SavedIcon.setString("(End Level Saved!)");
+            else SavedIcon.setString("(Level " + std::to_string(level) + " Saved!)");
             SavedIcon.setFillColor(sf::Color::Green);
         } else {
-            SavedIcon.setString("(Level " + std::to_string(level) + " Not Saved!)");
+            if(level == 0) SavedIcon.setString("(End Level Not Saved!)");
+            else SavedIcon.setString("(Level " + std::to_string(level) + " Not Saved!)");
             SavedIcon.setFillColor(sf::Color::Red);
 
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
