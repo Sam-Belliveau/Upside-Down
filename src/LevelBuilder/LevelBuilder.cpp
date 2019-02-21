@@ -275,16 +275,21 @@ int main()
         mouseCoords.x += cameraX;
 
         // Mouse and Updating screen
+        
         if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
-            edits |= world[mouseCoords.x*GAME_HEIGHT + mouseCoords.y] != peices[item];
-            world[mouseCoords.x*GAME_HEIGHT + mouseCoords.y] = peices[item];
-            updateBuffer(buffer, world, cameraX, peices[item], mouseCoords);
-        } else {
-            updateBuffer(buffer, world, cameraX, peices[item], mouseCoords);
-        }
+            if(mouseCoords.x - cameraX >= 0 && mouseCoords.x - cameraX < GAME_WIDTH)
+            {
+                if(mouseCoords.y >= 0 && mouseCoords.y < GAME_HEIGHT)
+                {
+                    edits |= world[mouseCoords.x*GAME_HEIGHT + mouseCoords.y] != peices[item];
+                    world[mouseCoords.x*GAME_HEIGHT + mouseCoords.y] = peices[item];
+                }
+            }
+        } 
 
         // Draw World
+        updateBuffer(buffer, world, cameraX, peices[item], mouseCoords);
         Graphics::pushRGBA(app, buffer);
 
         // Draw Text
