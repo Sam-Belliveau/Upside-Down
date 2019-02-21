@@ -3,10 +3,7 @@
 #include "../Extras/Constants.h"
 #include "../Extras/Game.h"
 
-using WorldArray = std::array<Game::GameType, GAME_HEIGHT*GAME_LENGTH>;
-using BufferArray = std::array<Byte, GAME_HEIGHT*GAME_WIDTH*4>;
-
-bool loadWorld(const IntType inLevel, WorldArray& world)
+bool loadWorld(const IntType inLevel, Game::GameType* world)
 {
     sf::Image img;
     if(img.loadFromFile("./Levels/L" + std::to_string(inLevel) + ".bmp"))
@@ -30,7 +27,7 @@ bool loadWorld(const IntType inLevel, WorldArray& world)
 
 }
 
-void saveWorld(const IntType inLevel, WorldArray& world)
+void saveWorld(const IntType inLevel, Game::GameType* world)
 {
     sf::Image img;
     img.create(GAME_LENGTH, GAME_HEIGHT);
@@ -52,7 +49,7 @@ void saveWorld(const IntType inLevel, WorldArray& world)
     img.saveToFile("./Levels/L" + std::to_string(inLevel) + ".bmp");
 }
 
-void updateBuffer(BufferArray& buffer, const WorldArray& world, IntType cameraX, 
+void updateBuffer(Byte* buffer, const Game::GameType* world, IntType cameraX, 
                   Game::GameType userItem, sf::Vector2i mousePos)
 {
     for(IntType y = 0; y < GAME_HEIGHT; y++)
@@ -137,8 +134,8 @@ int main()
         "\nLeft Click = Place Block"
     );
 
-    WorldArray world;
-    BufferArray buffer;
+    Game::GameType world[GAME_HEIGHT*GAME_LENGTH] = {};
+    Byte buffer[GAME_HEIGHT*GAME_WIDTH*4] = {};
     IntType blinkCounter = 0;
     IntType level = 0;
     IntType cameraX = 0;
@@ -255,7 +252,7 @@ int main()
         }
 
         // Draw World
-        Graphics::pushRGBA(app, buffer.data());
+        Graphics::pushRGBA(app, buffer);
 
         // Draw Text
         app.draw(SavedIcon);
