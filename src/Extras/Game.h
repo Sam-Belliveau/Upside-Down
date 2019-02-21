@@ -1,12 +1,12 @@
-#include "Constants.h"
-#include <SFML/Graphics.hpp>
-
 #ifndef GAME_H
 #define GAME_H
 
+#include "Constants.h"
+
 class Game
 {
-private: // Static Objects
+public: // Static methods and enums
+    // Enums and static methods
     static IntType randomize(IntType n)
     {
         // 12 Rounds of Blum Blum Shub with a 
@@ -48,15 +48,40 @@ public:
     IntType getLevel() const;
     IntType getFrame() const;
     IntType getLevelFrame(IntType) const;
+    bool getWinner() const;
+    bool getCheater() const;
 
 private:
-    bool moveCameraLeft();
-    bool moveCameraRight();
-    void flipGravity();
+    // Game Loop
+    void resetKeyLoop();
+    void frameTimeLoop();
+    void goalLoop();
+    bool cheatLoop();
+    void trapLoop();
+    void jumpLoop();
+    void bounceLoop();
+    void movementLoop();
+    void cameraLoop();
+    void gravityLoop();
+
+    // Controls
+    bool isJoystickConnected();
+    float joyXAxis();
+    float joyYAxis();
+
+    bool upKey();
+    bool downKey();
+    bool leftKey();
+    bool rightKey();
+    bool jumpKey();
+
+    bool cheatKey();
+    bool flyCheatKey();
+    bool levelCheatKey();
 
     void reset();
 
-    IntType level = 0, frame = 0;
+    IntType level = START_LEVEL, frame = 0;
     IntType levelFrames[MAX_LEVEL_COUNT] = {0};
 
     sf::Vector2<IntType> player = sf::Vector2<IntType>(5, 18); 
@@ -64,9 +89,11 @@ private:
     
     GravityType gravity = GravityType::Down; 
     bool canJump = true, canBounce = true;
+    bool hasCheated = false;
 
     GameType world[GAME_LENGTH][GAME_HEIGHT];
     Byte buffer[GAME_HEIGHT*GAME_WIDTH*4];
+    
 };
 
 #endif // GAME_H

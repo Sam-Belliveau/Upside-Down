@@ -1,66 +1,89 @@
-#include "Game.h"
-#include <stdlib.h> /// RNG (ONLY FOR COLORS, NO GAME PLAY IN RNG)
+#include "./Extras/Game.h"
 
-Game::Game()
-{ }
+Game::Game() { }
 
 void Game::gameLoop()
 {
-    const bool left =  sf::Keyboard::isKeyPressed(sf::Keyboard::Left)
-                    || sf::Keyboard::isKeyPressed(sf::Keyboard::A);
-    const bool right = sf::Keyboard::isKeyPressed(sf::Keyboard::Right)
-                    || sf::Keyboard::isKeyPressed(sf::Keyboard::D);
-    const bool up = sf::Keyboard::isKeyPressed(sf::Keyboard::Up)
-                 || sf::Keyboard::isKeyPressed(sf::Keyboard::W);
-    const bool down =  sf::Keyboard::isKeyPressed(sf::Keyboard::Down)
-                    || sf::Keyboard::isKeyPressed(sf::Keyboard::S);
-    const bool jump = sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
-                    || (gravity == GravityType::Down && up) 
-                    || (gravity == GravityType::Up && down);
+    // Check for game reset command
+    resetKeyLoop();
 
-    // Update Times
-    levelFrames[level] = frame;
+    // Update times
+    frameTimeLoop();
 
-    // Goal Detection
-    if(player.x == GAME_LENGTH) { loadWorld(level + 1); }
+    // Check to see if user has reached goal
+    goalLoop();
 
-    // Developer Key Combos
-    if(sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(0x25)))
-    {
-        if(sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(0x26)))
-        {
-            if(sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(0x05)))
-            {
-                if(player.x > 0 && left){ player.x--; }
-                if(player.x < GAME_LENGTH && right){ player.x++; }
-                if(player.y > 0 && up){ player.y--; }
-                if(player.y < GAME_HEIGHT - 1 && down){ player.y++; }
+    // Check for debug tools
+    if(cheatLoop()) { return; }
 
-                if(player.x - cameraX > (GAME_WIDTH >> 1)){ moveCameraRight(); }
-                if(player.x - cameraX < (GAME_WIDTH >> 2)){ moveCameraLeft(); }
+    // Check for lava and the red wall
+    trapLoop();
 
-                return;
-            } else if(sf::Keyboard::isKeyPressed(static_cast<sf::Keyboard::Key>(0x0B)))
-            {
-                if(left)
-                { 
-                    level--; 
-                    while(sf::Keyboard::isKeyPressed(sf::Keyboard::Left));
-                } else if(right)
-                { 
-                    level++; 
-                    while(sf::Keyboard::isKeyPressed(sf::Keyboard::Right));
-                }
-                loadWorld(level);
-                return;
-            }
-        }
-    }
+    // Check for bouncing blocks
+    bounceLoop();
 
-    // Reset key
+    // Update Joystick before moving
+    sf::Joystick::update();
+
+    // Check for user jump
+    jumpLoop();
+
+    // Check for user movement
+    movementLoop();
+
+    // Update camera to follow player
+    cameraLoop();
+
+    // Update player using gravity
+    gravityLoop();
+}
+
+void Game::resetKeyLoop()
+{
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-    { loadWorld(0); }
+    { loadWorld(START_LEVEL); }
+}
 
+void Game::frameTimeLoop()
+{
+    levelFrames[level] = frame;
+    if(player.x > START_SIZE && !getWinner()) { ++frame; }
+    else if(level == START_LEVEL) { frame = 0; }
+}
+
+void Game::goalLoop()
+{
+    if(player.x >= GAME_LENGTH) { loadWorld(level + 1); }
+}
+
+// Return if player has cheated
+bool Game::cheatLoop()
+{
+    // Developer Key Combos
+    if(flyCheatKey())
+    {
+        hasCheated = true;
+        if(player.x > 0 && leftKey()){ player.x -= CHEAT_SPEED; }
+        if(player.x <= GAME_LENGTH && rightKey()){ player.x += CHEAT_SPEED; }
+        if(player.y > 0 && upKey()){ player.y -= 1; }
+        if(player.y < GAME_HEIGHT - 1 && downKey()){ player.y += 1; }
+        
+        cameraLoop();
+        return true;
+    } else if(levelCheatKey())
+    {
+        hasCheated = true;
+        if(leftKey()) { level--; while(leftKey()); } 
+        else if(rightKey()) { level++; while(rightKey()); }
+        loadWorld(level);
+        return true;
+    } 
+
+    return false;
+}
+
+void Game::trapLoop()
+{
     // Trap Detection
     if(player.y == 0 || player.y == GAME_HEIGHT - 1 
     || world[player.x][player.y] == GameType::Trap
@@ -68,48 +91,142 @@ void Game::gameLoop()
     { reset(); return; }
 
     // Move trap and start timer if player has moved from start
-    if(player.x > START_SIZE) { ++trapX; ++frame; }
+    if(player.x > START_SIZE && !getWinner()) { ++trapX; }
 
     // Prevent player from getting to huge of a lead on the trap
     trapX = std::max(trapX, IntType(player.x*TRAP_SPEED - TRAP_LEAD - TRAP_SMOOTH));
+}
 
-    // Jumping
-    if(jump)
+void Game::jumpLoop()
+{
+    if(jumpKey())
     {
         if(world[player.x][player.y + gravity] == GameType::Ground)
         { 
-            if(canJump) flipGravity();
+            if(canJump) gravity = GravityType(-gravity);
             canJump = false;
         } 
     } else { canJump = true; }
+}
 
-    // Bounce Detection
+void Game::bounceLoop()
+{
     if(world[player.x][player.y + gravity] == GameType::Bounce 
     || world[player.x][player.y] == GameType::Bounce)
     { 
-        if(canBounce) flipGravity();
+        if(canBounce) gravity = GravityType(-gravity);
         canBounce = false; 
     }
     else { canBounce = true; }
+}
 
-    // Moving
-    if(player.x > 0 && left)
+void Game::movementLoop()
+{
+    if(player.x > 0 && leftKey())
     { 
         if(world[player.x - 1][player.y] != GameType::Ground) 
         { player.x--; } 
-    } if(right) 
+    } 
+    if(rightKey()) 
     { 
         if(world[player.x + 1][player.y] != GameType::Ground) 
         { player.x++; } 
     }
+}
 
-    // Gravity
+void Game::cameraLoop()
+{
+    // Check for right border (377/987 is inverse golden ratio)
+    while(player.x - cameraX > RIGHT_CAMERA_BOARDER) // Move Camera Right
+    { 
+        if(cameraX < GAME_LENGTH - GAME_WIDTH)
+        { ++cameraX; } 
+        else { break; }
+    }
+    
+    while(player.x - cameraX < LEFT_CAMERA_BOARDER) // Move Camera Left
+    { 
+        if(cameraX > 0)
+        { --cameraX; } 
+        else { break; }
+    }
+}
+
+void Game::gravityLoop()
+{
     if(world[player.x][player.y + gravity] != GameType::Ground) 
     { player.y += gravity; } 
+}
 
-    // Camera Movement
-    if(player.x - cameraX > (GAME_WIDTH >> 1)){ moveCameraRight(); }
-    if(player.x - cameraX < (GAME_WIDTH >> 2)){ moveCameraLeft(); }
+// Controls
+float Game::joyXAxis()
+{ 
+    return sf::Joystick::getAxisPosition(DEFAULT_JOYSTICK_PORT, sf::Joystick::X)
+         + sf::Joystick::getAxisPosition(DEFAULT_JOYSTICK_PORT, sf::Joystick::PovX); 
+}
+
+float Game::joyYAxis()
+{ 
+    return sf::Joystick::getAxisPosition(DEFAULT_JOYSTICK_PORT, sf::Joystick::Y)
+         + sf::Joystick::getAxisPosition(DEFAULT_JOYSTICK_PORT, sf::Joystick::PovY); 
+}
+
+bool Game::upKey()
+{
+    return sf::Keyboard::isKeyPressed(sf::Keyboard::Up)
+        || sf::Keyboard::isKeyPressed(sf::Keyboard::W)
+        || joyYAxis() < -Y_JOYSTICK_DEAD_ZONE; 
+}
+
+bool Game::downKey()
+{
+    return sf::Keyboard::isKeyPressed(sf::Keyboard::Down)
+        || sf::Keyboard::isKeyPressed(sf::Keyboard::S)
+        || joyYAxis() > Y_JOYSTICK_DEAD_ZONE; 
+}
+
+bool Game::leftKey() 
+{ 
+    return sf::Keyboard::isKeyPressed(sf::Keyboard::Left)
+        || sf::Keyboard::isKeyPressed(sf::Keyboard::A)
+        || joyXAxis() < -X_JOYSTICK_DEAD_ZONE; 
+}
+
+bool Game::rightKey()
+{
+    return sf::Keyboard::isKeyPressed(sf::Keyboard::Right)
+        || sf::Keyboard::isKeyPressed(sf::Keyboard::D)
+        || joyXAxis() > X_JOYSTICK_DEAD_ZONE; 
+}
+
+bool Game::jumpKey()
+{
+    for(auto ID : JUMP_BUTTONS)
+    {
+        if(sf::Joystick::isButtonPressed(DEFAULT_JOYSTICK_PORT, ID))
+        { return true; }
+    }
+
+    return sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
+        || (gravity == GravityType::Down && upKey()) 
+        || (gravity == GravityType::Up && downKey());
+}
+
+// Cheat Keys
+bool Game::cheatKey()
+{
+    return sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
+        && sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
+}
+
+bool Game::flyCheatKey()
+{
+    return cheatKey() && sf::Keyboard::isKeyPressed(sf::Keyboard::F);
+}
+
+bool Game::levelCheatKey()
+{
+    return cheatKey() && sf::Keyboard::isKeyPressed(sf::Keyboard::L);
 }
 
 // Loading level from
@@ -117,7 +234,10 @@ IntType Game::loadWorld(const IntType inLevel)
 {
     sf::Image img;
     level = inLevel % MAX_LEVEL_COUNT;
-    if(img.loadFromFile("./Levels/L" + std::to_string(++level) + ".bmp"))
+
+    //if(level == 0 && hasCheated) ++level;
+
+    if(img.loadFromFile("./Levels/L" + std::to_string(level) + ".bmp"))
     {
         for(IntType x = 0; x < GAME_LENGTH; x++)
         {
@@ -133,7 +253,7 @@ IntType Game::loadWorld(const IntType inLevel)
                 world[x][y] = static_cast<GameType>(out);
             }
         }
-    } else { return loadWorld(level+1); }
+    } else { return loadWorld(level + 1); }
     reset();
 
     return level;
@@ -165,8 +285,8 @@ Byte* Game::returnWorldPixels()
             } else if(gamePixel == GameType::Bounce) // Bounces
             {
                 R = 64; 
-                G = 164; 
-                B = 255;
+                G = 255; 
+                B = 164;
             } else if(gamePixel == GameType::Trap) // Traps
             {
                 const int brightness = randomize((x+1)*(y+1))%32 - 16;
@@ -191,7 +311,7 @@ Byte* Game::returnWorldPixels()
             if(x + cameraX <= START_SIZE) { G += 64; }
 
             if(x + cameraX <= trapX/TRAP_SPEED) {
-                const double redVal = -(256.0/TRAP_SMOOTH)*(double(x + cameraX) - trapX/TRAP_SPEED);
+                const double redVal = -(256.0/TRAP_SMOOTH)*(double(x + cameraX) - double(trapX/TRAP_SPEED));
                 R += redVal;
                 G -= redVal/4.0;
                 B -= redVal/4.0;
@@ -211,26 +331,9 @@ Byte* Game::returnWorldPixels()
 IntType Game::getCameraX() const { return cameraX; }
 IntType Game::getLevel() const { return level; }
 IntType Game::getFrame() const { return frame; }
-IntType Game::getLevelFrame(IntType level) const 
-{ return levelFrames[level]; }
-
-bool Game::moveCameraLeft()
-{
-    if(cameraX > 0){ cameraX--; }
-    return cameraX > 0;
-}
-
-bool Game::moveCameraRight()
-{
-    if(cameraX < GAME_LENGTH - GAME_WIDTH){ cameraX++; }
-    return cameraX < GAME_LENGTH - GAME_WIDTH;
-}
-
-void Game::flipGravity()
-{
-    if (gravity == GravityType::Down) { gravity = GravityType::Up; } 
-    else { gravity = GravityType::Down; }
-}
+IntType Game::getLevelFrame(IntType level) const { return levelFrames[level]; }
+bool Game::getCheater() const  { return hasCheated; }
+bool Game::getWinner() const  { return level == 0; }
 
 void Game::reset()
 {
@@ -239,9 +342,9 @@ void Game::reset()
     trapX = TRAP_START;
     cameraX = 0;
 
-    if(level <= 1) {
+    if(level == START_LEVEL) {
+        hasCheated = false;
         frame = 0;
-        for(auto &i : levelFrames) i = 0;
     }
 }
 
