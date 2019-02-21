@@ -6,7 +6,7 @@
 using WorldArray = std::array<Game::GameType, GAME_HEIGHT*GAME_LENGTH>;
 using BufferArray = std::array<Byte, GAME_HEIGHT*GAME_WIDTH*4>;
 
-IntType loadWorld(const IntType inLevel, WorldArray& world)
+bool loadWorld(const IntType inLevel, WorldArray& world)
 {
     sf::Image img;
     if(img.loadFromFile("./Levels/L" + std::to_string(inLevel) + ".bmp"))
@@ -25,9 +25,9 @@ IntType loadWorld(const IntType inLevel, WorldArray& world)
                 world[x*GAME_HEIGHT + y] = static_cast<Game::GameType>(out);
             }
         }
-    } else { world = {}; }
+        return false;
+    } else { world = {}; return true; }
 
-    return inLevel;
 }
 
 void saveWorld(const IntType inLevel, WorldArray& world)
@@ -110,7 +110,7 @@ void updateBuffer(BufferArray& buffer, const WorldArray& world, IntType cameraX,
 
 int main()
 {
-    sf::RenderWindow app(sf::VideoMode(GAME_WIDTH*GAME_SCALE, GAME_HEIGHT*GAME_SCALE), "Upside Down (Level Editor)");
+    sf::RenderWindow app(sf::VideoMode(GAME_WIDTH*GAME_SCALE, GAME_HEIGHT*GAME_SCALE), "Upside Down Level Editor");
     app.setFramerateLimit(48);
 
     // Font used for times
@@ -194,8 +194,7 @@ int main()
         // Reverting
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
         { 
-            loadWorld(level, world); 
-            edits = false;
+            edits = loadWorld(level, world); 
         }
 
         // Change Worlds
@@ -203,8 +202,7 @@ int main()
         { 
             cameraX = 0;
             --level;
-            loadWorld(level, world); 
-            edits = false;
+            edits = loadWorld(level, world); 
             while(sf::Keyboard::isKeyPressed(sf::Keyboard::Left));
         }
 
@@ -212,8 +210,7 @@ int main()
         { 
             cameraX = 0;
             ++level;
-            loadWorld(level, world); 
-            edits = false;
+            edits = loadWorld(level, world); 
             while(sf::Keyboard::isKeyPressed(sf::Keyboard::Right));
         }
 
@@ -263,6 +260,10 @@ int main()
         // Draw Text
         app.draw(SavedIcon);
         app.draw(Help);
+
+        // Update Title
+        if(level == 0) app.setTitle("Upside Down Level Editor (End Level)");
+        else app.setTitle("Upside Down Level Editor (Level " + std::to_string(level) + ")");
 
         // Show To User
         app.display();
