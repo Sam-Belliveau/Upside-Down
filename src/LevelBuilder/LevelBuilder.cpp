@@ -123,15 +123,15 @@ int main()
     SavedIcon.setFillColor(sf::Color::White);
     SavedIcon.setOutlineColor(sf::Color::Black);
     SavedIcon.setOutlineThickness(2*TEXT_SCALE);
-    SavedIcon.setCharacterSize(TEXT_SCALE*GAME_SCALE/1.25);
+    SavedIcon.setCharacterSize(TEXT_SCALE*GAME_SCALE/1.5);
     SavedIcon.setScale(sf::Vector2f(1/TEXT_SCALE,1/TEXT_SCALE));
-    SavedIcon.setPosition(6,0);
+    SavedIcon.setPosition(6,GAME_SCALE*9);
 
     sf::Text Help = SavedIcon;
-    Help.setString(
-        "\n Ctrl+S = Save"  
-        "\n Escape = Revert to last save" 
+    Help.setString( 
         "\n A + D = Move Camera" 
+        "\n Ctrl+S = Save"  
+        "\n Escape = Revert to last save"
         "\n Arrows = Change Level" 
         "\n Scroll = Change Block"  
         "\n Left Click = Place Block"
