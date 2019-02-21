@@ -129,12 +129,12 @@ int main()
 
     sf::Text Help = SavedIcon;
     Help.setString( 
-        "\n A + D = Move Camera" 
-        "\n Ctrl+S = Save"  
-        "\n Escape = Revert to last save"
-        "\n Arrows = Change Level" 
-        "\n Scroll = Change Block"  
-        "\n Left Click = Place Block"
+        "\nA + D = Move Camera" 
+        "\nCtrl+S = Save"  
+        "\nEscape = Revert to last save"
+        "\nArrows = Change Level" 
+        "\nScroll = Change Block"  
+        "\nLeft Click = Place Block"
     );
 
     WorldArray world;
