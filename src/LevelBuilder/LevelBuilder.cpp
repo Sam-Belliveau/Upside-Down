@@ -128,11 +128,14 @@ int main()
     Help.setString( 
         "\nA + D = Move Camera" 
         "\nCtrl+S = Save"  
-        "\nEscape = Revert to last save"
-        "\nArrows = Change Level" 
-        "\nScroll = Change Block"  
+        "\nEscape = Revert to save"
+        "\nScroll = Change Block"
+        "\nUp + Down = Change Block"   
         "\nLeft Click = Place Block"
+        "\nLeft + Right = Change Level" 
     );
+
+    sf::Text Block = SavedIcon;
 
     Game::GameType world[GAME_HEIGHT*GAME_LENGTH] = {};
     Byte buffer[GAME_HEIGHT*GAME_WIDTH*4] = {};
@@ -174,6 +177,42 @@ int main()
                     else ++item;
                 }
             }
+        }
+
+        // Keyboard switching blocks
+        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        {
+            if(item == 0) item = 3;
+            else --item;
+            while(sf::Keyboard::isKeyPressed(sf::Keyboard::Up));
+        } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+            if(item == 3) item = 0;
+            else ++item;
+            while(sf::Keyboard::isKeyPressed(sf::Keyboard::Down));
+        }
+
+        // Block Text
+        switch (item)
+        {
+            case 0:
+                Block.setString("\n\n\n\n\n\n\n\n(Sky)");
+                Block.setFillColor(sf::Color(0,160,255));
+                break;
+            case 1:
+                Block.setString("\n\n\n\n\n\n\n\n(Ground)");
+                Block.setFillColor(sf::Color(64,64,64));
+                break;
+            case 2:
+                Block.setString("\n\n\n\n\n\n\n\n(Trap)");
+                Block.setFillColor(sf::Color(220,32,0));
+                break;
+            case 3:
+                Block.setString("\n\n\n\n\n\n\n\n(Bouncer)");
+                Block.setFillColor(sf::Color(64,255,164));
+                break;
+            default:
+                Block.setString("\n\n\n\n\n\n\n\n(ERROR)");
+                break;
         }
 
         // Moving Camera
@@ -236,13 +275,7 @@ int main()
         mouseCoords.x += cameraX;
 
         // Mouse and Updating screen
-        if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
-        {
-            edits |= world[mouseCoords.x*GAME_HEIGHT + mouseCoords.y] != Game::GameType::Sky;
-            world[mouseCoords.x*GAME_HEIGHT + mouseCoords.y] = Game::GameType::Sky;
-            updateBuffer(buffer, world, cameraX, Game::GameType::Sky, mouseCoords);
-        } 
-        else if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
         {
             edits |= world[mouseCoords.x*GAME_HEIGHT + mouseCoords.y] != peices[item];
             world[mouseCoords.x*GAME_HEIGHT + mouseCoords.y] = peices[item];
@@ -257,6 +290,7 @@ int main()
         // Draw Text
         app.draw(SavedIcon);
         app.draw(Help);
+        app.draw(Block);
 
         // Update Title
         if(level == 0) app.setTitle("Upside Down Level Editor (End Level)");
