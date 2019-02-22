@@ -9,17 +9,18 @@ public: // Static methods and enums
     // Enums and static methods
     static IntType randomize(IntType n);
 
-    static constexpr IntType GameTypeCount = 7;
+    static constexpr IntType GameTypeCount = 8;
     enum GameType : Byte 
     { 
         //////// 0bRGB
-        Sky    = 0b000, 
-        Ground = 0b010, 
-        Trap   = 0b100,
-        Bounce = 0b001,
-        Mud    = 0b101,
-        Water  = 0b011,
-        Smog   = 0b110
+        Sky        = 0b000, 
+        Ground     = 0b010, 
+        Trap       = 0b100,
+        Bounce     = 0b001,
+        Mud        = 0b101,
+        Water      = 0b011,
+        Smog       = 0b110,
+        LowGravity = 0b111
     };
 
     struct GameTypeData

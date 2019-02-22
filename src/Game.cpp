@@ -106,6 +106,16 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Bounce
             true   // Smog
         }
+    }, {
+        GameType::LowGravity, 
+        {"Low Gravity", sf::Color(100, 0, 100), 8, 3, 
+            false, // Solid
+            true,  // Liquid
+            false, // Trap
+            false, // Jump
+            false, // Bounce
+            false  // Smog
+        }
     }
 };
 

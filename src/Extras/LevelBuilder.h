@@ -109,9 +109,9 @@ namespace LevelBuilder
 
         sf::Text Help = SavedIcon;
         Help.setString( 
-            "\n      Escape = Goto Game"
+            "\n      Escape = Exit Editor"
             "\n    Ctrl + S = Save Level"  
-            "\n    Ctrl + Z = Undo changes"
+            "\n    Ctrl + Z = Undo Changes"
             "\n   Up + Down = Change Block"
             "\n  Left Click = Place Block"
             "\nLeft + Right = Move Camera" 
