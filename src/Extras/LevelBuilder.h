@@ -34,7 +34,7 @@ namespace LevelBuilder
             for(IntType x = 0; x < GAME_LENGTH; ++x)
                 for(IntType y = 0; y < GAME_HEIGHT; ++y)
                     if(y < GAME_HEIGHT-3) world[x][y] = Game::GameType::Sky;
-                    else world[x][y] = Game::GameType::Sky;
+                    else world[x][y] = Game::GameType::Ground;
             return true; 
         }
 
