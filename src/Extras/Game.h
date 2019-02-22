@@ -12,15 +12,15 @@ public: // Static methods and enums
     static constexpr IntType GameTypeCount = 8;
     enum GameType : Byte 
     { 
-        //////// 0bRGB
-        Sky        = 0b000, 
-        Ground     = 0b010, 
-        Trap       = 0b100,
-        Bounce     = 0b001,
-        Mud        = 0b101,
-        Water      = 0b011,
-        Smog       = 0b110,
-        LowGravity = 0b111
+        ////////     0bRGBA
+        Sky        = 0b0001, 
+        Ground     = 0b0101, 
+        Trap       = 0b1001,
+        Bounce     = 0b0011,
+        Mud        = 0b1011,
+        Water      = 0b0111,
+        Smog       = 0b1101,
+        LowGravity = 0b1111
     };
 
     struct GameTypeData

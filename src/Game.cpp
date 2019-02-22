@@ -422,9 +422,10 @@ IntType Game::loadWorld(const IntType inLevel)
                 const sf::Color pixel = img.getPixel(x, y);
                 
                 Byte out = 0;
-                if(pixel.r > COLOR_THRESHOLD) { out |= 0b100; }
-                if(pixel.g > COLOR_THRESHOLD) { out |= 0b010; }
-                if(pixel.b > COLOR_THRESHOLD) { out |= 0b001; }
+                if(pixel.r > COLOR_THRESHOLD) { out |= 0b1000; }
+                if(pixel.g > COLOR_THRESHOLD) { out |= 0b0100; }
+                if(pixel.b > COLOR_THRESHOLD) { out |= 0b0010; }
+                if(pixel.a > COLOR_THRESHOLD) { out |= 0b0001; }
                 world[x][y] = static_cast<GameType>(out);
             }
         }

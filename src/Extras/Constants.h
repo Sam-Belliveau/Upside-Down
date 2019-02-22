@@ -36,7 +36,7 @@ static const IntType LEFT_CAMERA_BOARDER = double(GAME_WIDTH) / 4;
 // Controls 
 static const IntType DEFAULT_JOYSTICK_PORT = 0;
 static const IntType JUMP_BUTTONS[] = {0, 1};
-static const float Y_JOYSTICK_DEAD_ZONE = 60;
+static const float Y_JOYSTICK_DEAD_ZONE = 80;
 static const float X_JOYSTICK_DEAD_ZONE = 40;
 
 // Smog Measurements

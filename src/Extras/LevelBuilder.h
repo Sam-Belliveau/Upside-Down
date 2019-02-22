@@ -22,9 +22,10 @@ namespace LevelBuilder
                     const sf::Color pixel = img.getPixel(x, y);
                     
                     Byte out = 0;
-                    if(pixel.r > COLOR_THRESHOLD) { out |= 0b100; }
-                    if(pixel.g > COLOR_THRESHOLD) { out |= 0b010; }
-                    if(pixel.b > COLOR_THRESHOLD) { out |= 0b001; }
+                    if(pixel.r > COLOR_THRESHOLD) { out |= 0b1000; }
+                    if(pixel.g > COLOR_THRESHOLD) { out |= 0b0100; }
+                    if(pixel.b > COLOR_THRESHOLD) { out |= 0b0010; }
+                    if(pixel.a > COLOR_THRESHOLD) { out |= 0b0001; }
                     world[x][y] = static_cast<Game::GameType>(out);
                 }
             }
@@ -48,10 +49,11 @@ namespace LevelBuilder
         {
             for(IntType y = 0; y < GAME_HEIGHT; y++)
             {
-                sf::Color out = sf::Color(0,0,0,255);
-                if(IntType(world[x][y]) & 0b100) { out.r = 255; }
-                if(IntType(world[x][y]) & 0b010) { out.g = 255; }
-                if(IntType(world[x][y]) & 0b001) { out.b = 255; }
+                sf::Color out = sf::Color(0,0,0,0);
+                if(IntType(world[x][y]) & 0b1000) { out.r = 255; }
+                if(IntType(world[x][y]) & 0b0100) { out.g = 255; }
+                if(IntType(world[x][y]) & 0b0010) { out.b = 255; }
+                if(IntType(world[x][y]) & 0b0001) { out.a = 255; }
                 img.setPixel(x, y, out);
             }
         }
