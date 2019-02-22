@@ -309,12 +309,15 @@ void Game::trapLoop()
     || player.x + TRAP_SMOOTH - 1 <= trapX/TRAP_SPEED)
     { reset(); return; }
 
-    // Move trap and start timer if player has moved from start
-    if(player.x > START_SIZE && !getWinner()) { ++trapX; }
+    if(!getWinner() && !GetGameTypeData(world[player.x][player.y]).smog)
+    {
+        // Move trap and start timer if player has moved from start
+        if(player.x > START_SIZE) { ++trapX; }
 
-    // Prevent player from getting to huge of a lead on the trap
-    if(!getWinner())
-    { trapX = std::max(trapX, IntType(player.x*TRAP_SPEED - TRAP_LEAD - TRAP_SMOOTH)); }
+        // Prevent player from getting to huge of a lead on the trap
+        if(!getWinner())
+        { trapX = std::max(trapX, IntType(player.x*TRAP_SPEED - TRAP_LEAD - TRAP_SMOOTH)); }
+    }
 }
 
 void Game::jumpLoop()

@@ -45,7 +45,7 @@ static const double SMOG_SIZE = 4;
 // Left Wall Trap
 static const IntType TRAP_START = -8;
 static const double TRAP_SMOOTH = 8;
-static const double TRAP_SPEED = 4;
+static const double TRAP_SPEED = 3;
 static const IntType TRAP_LEAD = IntType(48*TRAP_SPEED);
 
 // Level Data / Image Processing
