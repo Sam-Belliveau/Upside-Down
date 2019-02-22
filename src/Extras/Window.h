@@ -1,7 +1,6 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <SFML/Graphics.hpp>
 #include "Constants.h"
 
 namespace Graphics
@@ -18,7 +17,7 @@ namespace Graphics
         }
     }
 
-    void pushRGBA(sf::RenderWindow& app, const unsigned char* pixels)
+    void pushRGBA(sf::RenderWindow& app, const Byte* pixels)
     {
         app.clear();
 
