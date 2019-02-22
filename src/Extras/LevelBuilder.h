@@ -103,7 +103,7 @@ namespace LevelBuilder
 
     static IntType Loop(sf::RenderWindow &app, IntType level, IntType cameraX)
     {
-        app.setFramerateLimit(36);
+        app.setFramerateLimit(60);
         sf::Text SavedIcon = GET_DEFAULT_TEXT();
         SavedIcon.setPosition((GAME_WIDTH-12)*GAME_SCALE,GAME_SCALE*16);
 
@@ -125,6 +125,7 @@ namespace LevelBuilder
         Game::GameType world[GAME_LENGTH][GAME_HEIGHT] = {};
         Byte buffer[GAME_HEIGHT][GAME_WIDTH][4] = {};
         IntType item = 0;
+        bool moveFrame = true;
         bool edits = false;
 
         loadWorld(level, world);
@@ -132,6 +133,9 @@ namespace LevelBuilder
         sf::Vector2i mouseCoords(0,0);
         while (app.isOpen())
         {
+            // Half Moving Speed 
+            moveFrame = !moveFrame;
+
             // Game Events
             sf::Event event;
             while (app.pollEvent(event))
@@ -190,7 +194,7 @@ namespace LevelBuilder
                         while(Game::leftKey());
                     }
                 } else {
-                    if(cameraX > 0) --cameraX; 
+                    if(cameraX > 0 && moveFrame) --cameraX; 
                 }
             }
 
@@ -207,7 +211,7 @@ namespace LevelBuilder
                         while(Game::rightKey());
                     }
                 } else {    
-                    if(cameraX < GAME_LENGTH - GAME_WIDTH) ++cameraX; 
+                    if(cameraX < GAME_LENGTH - GAME_WIDTH && moveFrame) ++cameraX; 
                 }
             }
 

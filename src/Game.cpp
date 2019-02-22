@@ -44,7 +44,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Liquid
             false, // Trap
             false, // Jump
-            false  // Bounce
+            false, // Bounce
+            false // Smog
         }
     }, {
         GameType::Ground, 
@@ -53,7 +54,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Liquid
             false, // Trap
             true,  // Jump
-            false  // Bounce
+            false, // Bounce
+            false // Smog
         }
     }, {
         GameType::Trap, 
@@ -62,7 +64,7 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Liquid
             true,  // Trap
             false, // Jump
-            false  // Bounce
+            false // Smog
         }
     }, {
         GameType::Bounce, 
@@ -71,7 +73,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Liquid
             false, // Trap
             false, // Jump
-            true   // Bounce
+            true,  // Bounce
+            false // Smog
         }
     }, {
         GameType::Mud, 
@@ -80,7 +83,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Liquid
             false, // Trap
             false, // Jump
-            false  // Bounce
+            false, // Bounce
+            false  // Smog
         }
     }, {
         GameType::Water, 
@@ -89,7 +93,18 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             true,  // Liquid
             false, // Trap
             true,  // Jump
-            false  // Bounce
+            false, // Bounce
+            false  // Smog
+        }
+    }, {
+        GameType::Smog, 
+        {"Smog", sf::Color(128, 128, 128), 8, 6, 
+            false, // Solid
+            false, // Liquid
+            false, // Trap
+            false, // Jump
+            false, // Bounce
+            true   // Smog
         }
     }
 };
@@ -410,6 +425,7 @@ IntType Game::loadWorld(const IntType inLevel)
 // Render Game
 const Byte* Game::returnWorldPixels()
 {
+    const bool smog = GetGameTypeData(world[player.x][player.y]).smog;    
     for(IntType y = 0; y < GAME_HEIGHT; y++)
     {
         for(IntType x = 0; x < GAME_WIDTH; x++)
@@ -432,13 +448,26 @@ const Byte* Game::returnWorldPixels()
                 // Randomize Color
                 IntType random = pixelData.randomize(cameraX, x, y);
                 R += random; G += random; B += random;
+
+                // Smog
+                if(smog)
+                {
+                    double dis = std::max(
+                        1.0, 
+                        std::hypot(double(player.x - (x + cameraX)), double(player.y - y)) - SMOG_SIZE
+                    );
+                    R /= dis*dis;  G /= dis*dis;  B /= dis*dis;
+                    IntType random = randomize(frame*(x+1)*(y+1))%4;
+                    R += random; G += random; B += random; 
+                } 
             }
 
             // Start Area
             if(x + cameraX <= START_SIZE) G += 48;
 
             // Trap Wall
-            if(x + cameraX <= trapX/TRAP_SPEED) {
+            if(x + cameraX <= trapX/TRAP_SPEED) 
+            {
                 const double red = -(256.0/TRAP_SMOOTH)*(x + cameraX - trapX/TRAP_SPEED);
                 R += red;
                 G -= red/4.0;
