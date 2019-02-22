@@ -35,12 +35,8 @@ static const IntType LEFT_CAMERA_BOARDER = double(GAME_WIDTH) / 4;
 
 // Controls 
 static const IntType DEFAULT_JOYSTICK_PORT = 0;
-static const IntType JUMP_BUTTONS[] = {3};
-static const IntType CHEAT_BUTTONS[] = {8, 7};
-static const IntType FLY_CHEAT_BUTTON = 1;
-static const IntType LEVEL_CHEAT_BUTTON = 4;
-static const IntType EDITOR_CHEAT_BUTTON = 4;
-static const float Y_JOYSTICK_DEAD_ZONE = 40;
+static const IntType JUMP_BUTTONS[] = {0,1};
+static const float Y_JOYSTICK_DEAD_ZONE = 60;
 static const float X_JOYSTICK_DEAD_ZONE = 40;
 
 // Left Wall Trap

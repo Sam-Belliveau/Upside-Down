@@ -163,40 +163,23 @@ bool Game::jumpKey()
 
 bool Game::cheatKey()
 {
-    bool joystickCheat = true;
-    for(auto ID : CHEAT_BUTTONS)
-    {
-        if(!sf::Joystick::isButtonPressed(DEFAULT_JOYSTICK_PORT, ID))
-        { joystickCheat = false; }
-    }
-    if(joystickCheat == true) return true;
-
     return sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
         && sf::Keyboard::isKeyPressed(sf::Keyboard::LShift);
 }
 
 bool Game::flyCheatKey()
 {
-    return cheatKey() && (
-        sf::Keyboard::isKeyPressed(sf::Keyboard::F) ||
-        sf::Joystick::isButtonPressed(DEFAULT_JOYSTICK_PORT, FLY_CHEAT_BUTTON)
-    );
+    return cheatKey() && sf::Keyboard::isKeyPressed(sf::Keyboard::F);
 }
 
 bool Game::levelCheatKey()
 {
-    return cheatKey() && (
-        sf::Keyboard::isKeyPressed(sf::Keyboard::L) ||
-        sf::Joystick::isButtonPressed(DEFAULT_JOYSTICK_PORT, LEVEL_CHEAT_BUTTON)
-    );
+    return cheatKey() && sf::Keyboard::isKeyPressed(sf::Keyboard::L);
 }
 
 bool Game::editorCheatKey()
 {
-    return cheatKey() && (
-        sf::Keyboard::isKeyPressed(sf::Keyboard::E) ||
-        sf::Joystick::isButtonPressed(DEFAULT_JOYSTICK_PORT, EDITOR_CHEAT_BUTTON)
-    );
+    return cheatKey() && sf::Keyboard::isKeyPressed(sf::Keyboard::E);
 }
 
 /********************/
