@@ -6,32 +6,39 @@
 
 IntType Game::randomize(IntType n)
 {
-    // 24 Rounds of Blum Blum Shub with a 
-    // 24 bit M setup. Should be pretty random
-    n = n*n % M; n = n*n % M; n = n*n % M;
-    n = n*n % M; n = n*n % M; n = n*n % M;
-    n = n*n % M; n = n*n % M; n = n*n % M;
-    n = n*n % M; n = n*n % M; n = n*n % M;
-    n = n*n % M; n = n*n % M; n = n*n % M;
-    n = n*n % M; n = n*n % M; n = n*n % M;
-    n = n*n % M; n = n*n % M; n = n*n % M;
-    n = n*n % M; n = n*n % M; n = n*n % M;
+    // The output will be the sum
+    // of every round of RNG
+    IntType pool = 0;
 
-    // Blum Blum Shub only produces positive numbers, 
-    // but I use std::abs incase the RNG changes
-    return std::abs(n);
+    // 256 rounds of Modified Blum Blum Shub
+    for(IntType i = 0; i < 256; ++i)
+    {
+        // Blum Blum Shub (N = N^2 % M)
+        n = n*n % BBS_RNG_M;
+
+        // Salt is used to fix issue around 0
+        n += BBS_RNG_SALT[i%16];
+
+        // Add to entropy pool
+        pool += n;
+    }
+    
+    return std::abs(pool);
 }
 
 IntType Game::GameTypeData::randomize(IntType cx, IntType x, IntType y) const
 {
     if(randomness != 0) 
     {
-        // If Camera Speed is 0, then don't divide
-        if(cameraSpeed == 0) 
-        { return Game::randomize((x+1) * (y+1)) % randomness; } 
+        IntType XRand, YRand = Game::randomize(y);
         
-        return Game::randomize((cx / cameraSpeed + x) * (y+1)) % randomness;
+        // If Camera Speed is 0, then don't divide
+        if(cameraSpeed == 0) XRand = Game::randomize(x); 
+        else XRand = Game::randomize(cx / cameraSpeed + x);
+        
+        return Game::randomize(XRand + YRand) % randomness;
     }
+
     return IntType(0);
 }
 
@@ -45,7 +52,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Trap
             false, // Jump
             false, // Bounce
-            false // Smog
+            false, // Smog
+            true   // Move Storm
         }
     }, {
         GameType::Ground, 
@@ -55,7 +63,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Trap
             true,  // Jump
             false, // Bounce
-            false // Smog
+            false, // Smog
+            true   // Move Storm
         }
     }, {
         GameType::Trap, 
@@ -64,7 +73,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Liquid
             true,  // Trap
             false, // Jump
-            false // Smog
+            false, // Smog
+            true   // Move Storm
         }
     }, {
         GameType::Bounce, 
@@ -74,7 +84,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Trap
             false, // Jump
             true,  // Bounce
-            false // Smog
+            false, // Smog
+            true   // Move Storm
         }
     }, {
         GameType::Mud, 
@@ -84,7 +95,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Trap
             false, // Jump
             false, // Bounce
-            false  // Smog
+            false, // Smog
+            true   // Move Storm
         }
     }, {
         GameType::Water, 
@@ -94,7 +106,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Trap
             true,  // Jump
             false, // Bounce
-            false  // Smog
+            false, // Smog
+            true   // Move Storm
         }
     }, {
         GameType::Smog, 
@@ -104,7 +117,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Trap
             false, // Jump
             false, // Bounce
-            true   // Smog
+            true,  // Smog
+            false  // Move Storm
         }
     }, {
         GameType::LowGravity, 
@@ -114,7 +128,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Trap
             false, // Jump
             false, // Bounce
-            false  // Smog
+            false, // Smog
+            true   // Move Storm
         }
     }
 };
@@ -123,7 +138,7 @@ const Game::GameTypeData Game::GetGameTypeData(Game::GameType input)
 {
     for(const GameTypeLink& entry : GameTypeList)
         if(input == entry.type) return entry.data;
-    return GameTypeList[0].data;
+    return {"Error", (time(0)&1) ? sf::Color(255,0,255) : sf::Color(0,0,0), 0, 0};
 }
 
 /****************************/
@@ -146,6 +161,12 @@ float Game::joyYAxis()
 { 
     return sf::Joystick::getAxisPosition(DEFAULT_JOYSTICK_PORT, sf::Joystick::Y)
          + sf::Joystick::getAxisPosition(DEFAULT_JOYSTICK_PORT, sf::Joystick::PovY); 
+}
+
+bool Game::resetKey()
+{
+    return sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)
+        || sf::Joystick::isButtonPressed(DEFAULT_JOYSTICK_PORT, RESET_BUTTON); 
 }
 
 bool Game::upKey()
@@ -176,14 +197,15 @@ bool Game::rightKey()
         || joyXAxis() > X_JOYSTICK_DEAD_ZONE; 
 }
 
-bool Game::jumpKey()
+bool Game::jumpKey(GravityType gravity)
 {
     for(auto ID : JUMP_BUTTONS)
         if(sf::Joystick::isButtonPressed(DEFAULT_JOYSTICK_PORT, ID))
             return true; 
 
     return sf::Keyboard::isKeyPressed(sf::Keyboard::Space)
-        || upKey() || downKey();
+        || (upKey() && gravity == GravityType::Down) 
+        || (downKey() && gravity == GravityType::Up);
 }
 
 bool Game::cheatKey()
@@ -253,8 +275,7 @@ void Game::gameLoop()
 
 void Game::resetKeyLoop()
 {
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape))
-        loadWorld(START_LEVEL); 
+    if(resetKey()) loadWorld(START_LEVEL); 
 }
 
 void Game::frameTimeLoop()
@@ -319,7 +340,7 @@ void Game::trapLoop()
     || player.x + TRAP_SMOOTH - 1 <= trapX/TRAP_SPEED)
     { reset(); return; }
 
-    if(!getWinner() && !GetGameTypeData(world[player.x][player.y]).smog)
+    if(!getWinner() && GetGameTypeData(world[player.x][player.y]).storm)
     {
         // Move trap and start timer if player has moved from start
         if(player.x > START_SIZE) { ++trapX; }
@@ -332,7 +353,7 @@ void Game::trapLoop()
 
 void Game::jumpLoop()
 {
-    if(jumpKey())
+    if(jumpKey(gravity))
     {
         if(GetGameTypeData(world[player.x][player.y + gravity]).jump)
         { 
@@ -409,26 +430,12 @@ void Game::reset()
 
 IntType Game::loadWorld(const IntType inLevel)
 {
-    sf::Image img;
+    std::ifstream levelFile(LEVEL_FOLDER + LEVEL_PREFIX + std::to_string(inLevel) + LEVEL_EXTENTION);
     level = inLevel % MAX_LEVEL_COUNT;
 
-    if(img.loadFromFile("./Levels/L" + std::to_string(level) + ".bmp"))
+    if(levelFile.good())
     {
-        for(IntType x = 0; x < GAME_LENGTH; x++)
-        {
-            for(IntType y = 0; y < GAME_HEIGHT; y++)
-            {
-                // Detect different game elements
-                const sf::Color pixel = img.getPixel(x, y);
-                
-                Byte out = 0;
-                if(pixel.r > COLOR_THRESHOLD) { out |= 0b1000; }
-                if(pixel.g > COLOR_THRESHOLD) { out |= 0b0100; }
-                if(pixel.b > COLOR_THRESHOLD) { out |= 0b0010; }
-                if(pixel.a > COLOR_THRESHOLD) { out |= 0b0001; }
-                world[x][y] = static_cast<GameType>(out);
-            }
-        }
+        levelFile.read(reinterpret_cast<char*>(world), GAME_LENGTH*GAME_HEIGHT*sizeof(Game::GameType));
     } else { return loadWorld(level + 1); }
     reset();
 

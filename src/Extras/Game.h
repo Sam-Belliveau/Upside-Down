@@ -12,15 +12,14 @@ public: // Static methods and enums
     static constexpr IntType GameTypeCount = 8;
     enum GameType : Byte 
     { 
-        ////////     0bRGBA
-        Sky        = 0b0001, 
-        Ground     = 0b0101, 
-        Trap       = 0b1001,
-        Bounce     = 0b0011,
-        Mud        = 0b1011,
-        Water      = 0b0111,
-        Smog       = 0b1101,
-        LowGravity = 0b1111
+        Sky        = 0x00, 
+        Ground     = 0x01, 
+        Trap       = 0x02,
+        Bounce     = 0x03,
+        Mud        = 0x04,
+        Water      = 0x05,
+        Smog       = 0x06,
+        LowGravity = 0x07
     };
 
     struct GameTypeData
@@ -34,12 +33,13 @@ public: // Static methods and enums
         const bool jump;   // Player can jump off of
         const bool bounce; // Player bounces off of
         const bool smog;   // Hinders Visibility
+        const bool storm;  // Stops the storm from moving
         IntType randomize(IntType cx, IntType x, IntType y) const;
     };
 
     struct GameTypeLink { GameType type; GameTypeData data; };
     static const GameTypeLink GameTypeList[GameTypeCount];
-    static const GameTypeData GetGameTypeData(GameType input);
+    static const GameTypeData GetGameTypeData(GameType);
         
     enum GravityType : IntType { Up = -1, Down = 1 };
 
@@ -51,11 +51,13 @@ public:
     static float joyXAxis();
     static float joyYAxis();
 
+    static bool resetKey();
+
     static bool upKey();
     static bool downKey();
     static bool leftKey();
     static bool rightKey();
-    static bool jumpKey();
+    static bool jumpKey(GravityType);
 
     static bool cheatKey();
     static bool flyCheatKey();

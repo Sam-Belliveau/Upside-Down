@@ -9,56 +9,32 @@
 
 namespace LevelBuilder
 {
-    static bool loadWorld(const IntType inLevel, Game::GameType world[][GAME_HEIGHT])
+    static void loadWorld(const IntType inLevel, Game::GameType world[][GAME_HEIGHT])
     {
-        sf::Image img;
-        if(img.loadFromFile("./Levels/L" + std::to_string(inLevel) + ".bmp"))
+        std::ifstream levelFile(LEVEL_FOLDER + LEVEL_PREFIX + std::to_string(inLevel) + LEVEL_EXTENTION);
+        if(levelFile.good())
         {
-            for(IntType x = 0; x < GAME_LENGTH; x++)
-            {
-                for(IntType y = 0; y < GAME_HEIGHT; y++)
-                {
-                    // Detect different game elements
-                    const sf::Color pixel = img.getPixel(x, y);
-                    
-                    Byte out = 0;
-                    if(pixel.r > COLOR_THRESHOLD) { out |= 0b1000; }
-                    if(pixel.g > COLOR_THRESHOLD) { out |= 0b0100; }
-                    if(pixel.b > COLOR_THRESHOLD) { out |= 0b0010; }
-                    if(pixel.a > COLOR_THRESHOLD) { out |= 0b0001; }
-                    world[x][y] = static_cast<Game::GameType>(out);
-                }
-            }
-            return false;
+            levelFile.read(reinterpret_cast<char*>(world), GAME_LENGTH*GAME_HEIGHT*sizeof(Game::GameType));
+            levelFile.close();
         } else 
         {
+            levelFile.close();
+
+            // Generate template level
             for(IntType x = 0; x < GAME_LENGTH; ++x)
                 for(IntType y = 0; y < GAME_HEIGHT; ++y)
-                    if(y < GAME_HEIGHT-3) world[x][y] = Game::GameType::Sky;
-                    else world[x][y] = Game::GameType::Ground;
-            return true; 
+                    if(y >= GAME_HEIGHT-3 && x <= GAME_WIDTH) 
+                        world[x][y] = Game::GameType::Ground;
+                    else world[x][y] = Game::GameType::Sky;
         }
 
     }
 
     static void saveWorld(const IntType inLevel, Game::GameType world[][GAME_HEIGHT])
     {
-        sf::Image img;
-        img.create(GAME_LENGTH, GAME_HEIGHT);
-        for(IntType x = 0; x < GAME_LENGTH; x++)
-        {
-            for(IntType y = 0; y < GAME_HEIGHT; y++)
-            {
-                sf::Color out = sf::Color(0,0,0,0);
-                if(IntType(world[x][y]) & 0b1000) { out.r = 255; }
-                if(IntType(world[x][y]) & 0b0100) { out.g = 255; }
-                if(IntType(world[x][y]) & 0b0010) { out.b = 255; }
-                if(IntType(world[x][y]) & 0b0001) { out.a = 255; }
-                img.setPixel(x, y, out);
-            }
-        }
-
-        img.saveToFile("./Levels/L" + std::to_string(inLevel) + ".bmp");
+        std::ofstream levelFile(LEVEL_FOLDER + LEVEL_PREFIX + std::to_string(inLevel) + LEVEL_EXTENTION, std::ios::binary);
+        levelFile.write(reinterpret_cast<const char*>(world), GAME_LENGTH*GAME_HEIGHT*sizeof(Game::GameType));
+        levelFile.close();
     }
 
     static void updateBuffer(Byte buffer[][GAME_WIDTH][4], const Game::GameType world[][GAME_HEIGHT], 
@@ -103,40 +79,50 @@ namespace LevelBuilder
         }
     }
 
+    struct UndoData
+    {
+        sf::Vector2i pos;
+        Game::GameType oldBlock;
+    };
+
     static IntType Loop(sf::RenderWindow &app, IntType level, IntType cameraX)
     {
         app.setFramerateLimit(60);
         sf::Text SavedIcon = GET_DEFAULT_TEXT();
-        SavedIcon.setPosition((GAME_WIDTH-12)*GAME_SCALE,GAME_SCALE*16);
+        SavedIcon.setPosition((GAME_WIDTH-11)*GAME_SCALE,GAME_SCALE*14);
 
         sf::Text Help = SavedIcon;
+        Help.setPosition((GAME_WIDTH-14)*GAME_SCALE,GAME_SCALE*14);
         Help.setString( 
-            "\n      Escape = Exit Editor"
-            "\n    Ctrl + S = Save Level"  
-            "\n    Ctrl + Z = Undo Changes"
-            "\n   Up + Down = Change Block"
-            "\n  Left Click = Place Block"
-            "\nLeft + Right = Move Camera" 
-            "\nCtrl + L + R = Change Level"    
+            "\n             Escape = Exit Editor"
+            "\n      Ctrl + Escape = Force Exit"
+            "\n           Ctrl + S = Save Level"  
+            "\n           Ctrl + Z = Undo"
+            "\n   Ctrl + Shift + Z = Revert To Save"
+            "\n          Up + Down = Change Block"
+            "\n         Left Click = Place Block"
+            "\n       Left + Right = Move Camera" 
+            "\nCtrl + Left + Right = Change Level"    
         );
 
         sf::Text Block = SavedIcon;
-        Block.setPosition((GAME_WIDTH-8)*GAME_SCALE,GAME_SCALE*22.25);
-        Block.setScale(sf::Vector2f(1.5/TEXT_SCALE, 1.5/TEXT_SCALE));
+        Block.setPosition(GAME_SCALE/2,GAME_SCALE*(GAME_HEIGHT-2));
+        Block.setScale(sf::Vector2f(2/TEXT_SCALE, 2/TEXT_SCALE));
 
+        std::stack<UndoData> undoList;
         Game::GameType world[GAME_LENGTH][GAME_HEIGHT] = {};
         Byte buffer[GAME_HEIGHT][GAME_WIDTH][4] = {};
         IntType item = 0;
-        bool moveFrame = true;
+        IntType frame = 0;
         bool edits = false;
 
         loadWorld(level, world);
 
-        sf::Vector2i mouseCoords(0,0);
+        sf::Vector2i mouse(0,0);
         while (app.isOpen())
         {
-            // Half Moving Speed 
-            moveFrame = !moveFrame;
+            // Frame Counter
+            ++frame;
 
             // Game Events
             sf::Event event;
@@ -153,19 +139,35 @@ namespace LevelBuilder
                     else ++item;
                 } 
                 
-                // Scroll switching blocks with up and down
+                // Buttons which are count sensitive
                 else if(event.type == sf::Event::KeyPressed)
                 {            
                     if(Game::upKey()) --item;
-                    else if(Game::downKey() && !sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) 
+                    else if(Game::downKey() // Save has the same key press
+                    && !sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)) 
                         ++item;
-                    
+
+                    // Undoing
+                    if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
+                    && sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+                    {
+                        if(undoList.empty())
+                        {
+                            edits = false;
+                        } else {
+                            const sf::Vector2i pos = undoList.top().pos;
+                            world[pos.x][pos.y] = undoList.top().oldBlock;
+                            undoList.pop();
+                        }
+                    }
                 }
             }
 
             // Exiting
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && !edits)
-            { break; }
+            { 
+                break; 
+            }
 
             // Loop Items
             item += Game::GameTypeCount;
@@ -177,9 +179,12 @@ namespace LevelBuilder
 
             // Reverting
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
-            && sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+            && sf::Keyboard::isKeyPressed(sf::Keyboard::LShift)
+            && sf::Keyboard::isKeyPressed(sf::Keyboard::Z)
+            && edits)
             {
                 edits = false;
+                undoList = std::stack<UndoData>();
                 loadWorld(level, world); 
             }
 
@@ -196,7 +201,9 @@ namespace LevelBuilder
                         while(Game::leftKey());
                     }
                 } else {
-                    if(cameraX > 0 && moveFrame) --cameraX; 
+                    if(cameraX > 0 
+                    && frame % EDITOR_CAMERA_SPEED == 0) 
+                        --cameraX; 
                 }
             }
 
@@ -213,7 +220,9 @@ namespace LevelBuilder
                         while(Game::rightKey());
                     }
                 } else {    
-                    if(cameraX < GAME_LENGTH - GAME_WIDTH && moveFrame) ++cameraX; 
+                    if(cameraX < GAME_LENGTH - GAME_WIDTH 
+                    && frame % EDITOR_CAMERA_SPEED == 0) 
+                        ++cameraX; 
                 }
             }
 
@@ -237,10 +246,10 @@ namespace LevelBuilder
             }
 
             // Calculate mouse pixel
-            mouseCoords = sf::Mouse::getPosition(app);
-            mouseCoords.x /= app.getSize().x/double(GAME_WIDTH);
-            mouseCoords.y /= app.getSize().y/double(GAME_HEIGHT);
-            mouseCoords.x += cameraX;
+            mouse = sf::Mouse::getPosition(app);
+            mouse.x /= app.getSize().x/double(GAME_WIDTH);
+            mouse.y /= app.getSize().y/double(GAME_HEIGHT);
+            mouse.x += cameraX;
 
             // Mouse and Updating screen
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
@@ -251,14 +260,19 @@ namespace LevelBuilder
                     if(sf::Mouse::getPosition(app).y >= 0 
                     && sf::Mouse::getPosition(app).y < app.getSize().y)
                     {
-                        edits |= world[mouseCoords.x][mouseCoords.y] != Game::GameTypeList[item].type;
-                        world[mouseCoords.x][mouseCoords.y] = Game::GameTypeList[item].type;
+                        // Only update if block is different
+                        if(world[mouse.x][mouse.y] != Game::GameTypeList[item].type)
+                        {
+                            edits = true;
+                            undoList.push({mouse, world[mouse.x][mouse.y]});
+                            world[mouse.x][mouse.y] = Game::GameTypeList[item].type;
+                        }
                     }
                 }
             } 
 
             // Draw World
-            updateBuffer(buffer, world, cameraX, Game::GameTypeList[item].type, mouseCoords);
+            updateBuffer(buffer, world, cameraX, Game::GameTypeList[item].type, mouse);
             Graphics::pushRGBA(app, reinterpret_cast<const Byte*>(buffer));
 
             // Draw Text
