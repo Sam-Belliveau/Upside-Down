@@ -392,10 +392,11 @@ void Game::cameraLoop()
 
 void Game::gravityLoop()
 {
+    liquidState = !liquidState; // You move in liquid every other frame
     if(!GetTypeData(world[player.x][player.y + gravity]).getProp(TypeProps::Solid))
     {
         if(GetTypeData(world[player.x][player.y + gravity]).getProp(TypeProps::Liquid)) 
-        { if(GET_GLOBAL_FRAME() % 2 == 0) player.y += gravity; }
+        { if(liquidState) player.y += gravity; }
         else player.y += gravity; 
     } 
 }

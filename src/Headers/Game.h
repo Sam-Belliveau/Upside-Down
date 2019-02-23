@@ -107,7 +107,7 @@ private: // Member Variables
     
     GravityType gravity = GravityType::Down; 
     bool canJump = true, canBounce = true;
-    bool hasCheated = false;
+    bool hasCheated = false, liquidState = false;
 
     GameTypeData playerTypeData;
     GameType world[GAME_LENGTH][GAME_HEIGHT];
