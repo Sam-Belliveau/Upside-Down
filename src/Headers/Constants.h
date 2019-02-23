@@ -17,13 +17,13 @@ using IntType = std::int_fast32_t;
 using UIntType = std::uint_fast32_t;
 
 // Game Size / Pixel Measurements
-static const UIntType GAME_WIDTH = 42;
+static const IntType GAME_WIDTH = 42;
 static const UIntType GAME_HEIGHT = 24;
 static const UIntType GAME_LENGTH = 256;
 
-static const UIntType GAME_SCALE = 24;
-static const UIntType GAME_FPS = 24;
-static const UIntType START_SIZE = 9;
+static const IntType GAME_SCALE = 24;
+static const IntType GAME_FPS = 24;
+static const IntType START_SIZE = 9;
 
 // Game Peices / File Loading
 static const UIntType MAGIC_NUMBER = 0x01020304;
