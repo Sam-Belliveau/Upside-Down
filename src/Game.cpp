@@ -109,6 +109,11 @@ const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
             TypeProps::MoveLeft
         }
     }, {
+        GameType::SafeZone, 
+        {"Safe Zone", sf::Color(0, 196, 255), 8, 1.0/3.0, 1.0/GAME_FPS,
+            TypeProps::StopStorm
+        }
+    }, {
         GameType::Goal, 
         {"Goal", sf::Color(255, 255, 0), 0, 0.0, 0.0,
             TypeProps::Goal
@@ -324,7 +329,7 @@ bool Game::cheatLoop()
 void Game::trapLoop()
 {
     // Trap Detection
-    if(player.y < 0 || player.y >= GAME_HEIGHT
+    if(player.y <= 0 || player.y == GAME_HEIGHT - 1
     || playerTypeData.getProp(TypeProps::Trap)
     || player.x - 1 <= trapX/TRAP_SPEED - TRAP_SMOOTH)
     { ++deaths; reset(); return; }
@@ -431,7 +436,7 @@ IntType Game::loadWorld(const IntType inLevel)
 }
 
 // Render Game
-const Byte* Game::returnWorldPixels()
+const Byte* Game::returnWorldPixels(bool focus)
 {
     const bool smog = GetTypeData(world[player.x][player.y]).getProp(TypeProps::Smog);    
     for(IntType y = 0; y < GAME_HEIGHT; y++)
@@ -482,6 +487,13 @@ const Byte* Game::returnWorldPixels()
                 R += red;
                 G -= red/4.0;
                 B -= red/4.0;
+            }
+
+            if(!focus)
+            {
+                R = (R + 256.0*(LOST_FOCUS_COLOR - 1.0)) / LOST_FOCUS_COLOR;
+                G = (G + 256.0*(LOST_FOCUS_COLOR - 1.0)) / LOST_FOCUS_COLOR;
+                B = (B + 256.0*(LOST_FOCUS_COLOR - 1.0)) / LOST_FOCUS_COLOR;
             }
 
             // Cap RGB Values

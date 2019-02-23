@@ -84,7 +84,7 @@ private: // Subunits of Game Loop
 
 public: // World/Rendering
     IntType loadWorld(const IntType);
-    const Byte* returnWorldPixels();
+    const Byte* returnWorldPixels(bool);
 
 public: // Getters
     IntType getCameraX() const;

@@ -72,7 +72,7 @@ namespace LevelBuilder
         SavedIcon.setPosition((GAME_WIDTH-11)*GAME_SCALE,GAME_SCALE*14);
 
         sf::Text Help = SavedIcon;
-        Help.setPosition((GAME_WIDTH-14)*GAME_SCALE,GAME_SCALE*14);
+        Help.setPosition((GAME_WIDTH-14)*GAME_SCALE,GAME_SCALE * (GAME_HEIGHT - 8));
         Help.setString( 
             "\n             Escape = Exit Editor"
             "\n      Ctrl + Escape = Force Exit"

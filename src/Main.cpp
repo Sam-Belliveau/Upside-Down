@@ -16,15 +16,23 @@ int main()
     timer.setPosition(6, 0);
 
     Game game;
+    bool focus = false;
     game.loadWorld(START_LEVEL);
 
     while (app.isOpen())
     {
-        Graphics::checkEvents(app);
+        sf::Event event;
+        while (app.pollEvent(event))
+        {
+            // Close window : exit
+            if (event.type == sf::Event::Closed) app.close();
+            if (event.type == sf::Event::GainedFocus) focus = true;
+            if (event.type == sf::Event::LostFocus) focus = false;
+        }
 
-        game.gameLoop();
+        if(focus) game.gameLoop();
 
-        Graphics::pushRGBA(app, game.returnWorldPixels());
+        Graphics::pushRGBA(app, game.returnWorldPixels(focus));
 
         if(Game::editorCheatKey())
         {

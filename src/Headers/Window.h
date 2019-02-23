@@ -5,18 +5,6 @@
 
 namespace Graphics
 {
-    // Pass render window and have it display events
-    void checkEvents(sf::RenderWindow& app)
-    {
-        sf::Event event;
-        while (app.pollEvent(event))
-        {
-            // Close window : exit
-            if (event.type == sf::Event::Closed)
-                app.close();
-        }
-    }
-
     void pushRGBA(sf::RenderWindow& app, const Byte* pixels)
     {
         app.clear();

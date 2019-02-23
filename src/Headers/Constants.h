@@ -25,6 +25,7 @@ static const RawIntType GAME_LENGTH = 256;
 static const IntType GAME_SCALE = 24;
 static const IntType GAME_FPS = 24;
 static const IntType START_SIZE = 9;
+static const double LOST_FOCUS_COLOR = 1.5;
 static const sf::Color PLAYER_COLOR = sf::Color(196, 255, 196);
 
 // Global frames
@@ -40,7 +41,7 @@ static IntType GET_GLOBAL_FRAME()
 
 // Game Peices / File Loading
 static const RawIntType MAGIC_NUMBER = 0x53616d42; // "SamB"
-static constexpr IntType GameTypeCount = 11;
+static constexpr IntType GameTypeCount = 12;
 enum GameType : Byte 
 { 
     // Here are the IDs for each block
@@ -54,6 +55,7 @@ enum GameType : Byte
     LowGravity = 7,
     MoveRight  = 8,
     MoveLeft   = 9,
+    SafeZone   = 10,
     Goal       = 0xff
 };
 
