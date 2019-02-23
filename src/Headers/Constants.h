@@ -14,7 +14,7 @@
 // Game Types
 using Byte = std::uint8_t;
 using IntType = std::int_fast32_t;
-using UIntType = std::int_fast32_t;
+using UIntType = std::uint_fast32_t;
 
 // Game Size / Pixel Measurements
 static const UIntType GAME_WIDTH = 42;
