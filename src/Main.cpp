@@ -16,7 +16,7 @@ int main()
     timer.setPosition(6, 0);
 
     Game game;
-    bool focus = false;
+    bool focus = true;
     game.loadWorld(START_LEVEL);
 
     while (app.isOpen())
