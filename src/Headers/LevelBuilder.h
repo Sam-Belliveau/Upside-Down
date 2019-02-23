@@ -11,7 +11,7 @@
 namespace LevelBuilder
 {
     static void updateBuffer(Byte buffer[][GAME_WIDTH][4], const GameType world[][GAME_HEIGHT], 
-        const IntType cameraX, const GameType userItem, const sf::Vector2i mousePos)
+                             const IntType cameraX, const GameType userItem, const sf::Vector2i mousePos)
     {
         for(IntType y = 0; y < GAME_HEIGHT; y++)
         {
