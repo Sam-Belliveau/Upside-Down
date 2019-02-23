@@ -22,7 +22,7 @@ public: // Static methods and enums
         const bool jump;   // Player can jump off of
         const bool bounce; // Player bounces off of
         const bool smog;   // Hinders Visibility
-        const bool storm;  // Stops the storm from moving
+        const bool storm;  // Moves the storm
         const bool goal;   // Goes To Next Level
         IntType randomize(IntType cx, IntType x, IntType y) const;
     };
