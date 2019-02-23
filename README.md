@@ -6,9 +6,9 @@ Linux: `clang++ -o UpsideDown.out ./src/*.cpp -lsfml-window -lsfml-system -lsfml
 
 Mac: `clang++ -o UpsideDown.out ./src/*.cpp -framework sfml-window -framework sfml-graphics -framework sfml-system -std=c++17 -O3`
 
-## To run the game run `./UpsideDown.o` for the level builder
+To run the game run `./UpsideDown.out` 
 
-### You will need https://www.sfml-dev.org/download.php
+#### You will need https://www.sfml-dev.org/download.php
 
 ## What is a `.udl`
 
