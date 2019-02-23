@@ -2,9 +2,9 @@
 
 ## To compile, run this command at the root of the folder
 
-**Linux (SFML REQUIRED):** `clang++ -o UpsideDown ./src/*.cpp -lsfml-window -lsfml-system -lsfml-graphics -std=c++17 -O3` 
+**Linux (SFML REQUIRED):** `clang++ -o UpsideDown.out ./src/*.cpp -lsfml-window -lsfml-system -lsfml-graphics -std=c++17 -O3` 
 
-**Mac (SFML REQUIRED):** `clang++ -o UpsideDown ./src/*.cpp -framework sfml-window -framework sfml-graphics -framework sfml-system -std=c++17 -O3`
+**Mac (SFML REQUIRED):** `clang++ -o UpsideDown.out ./src/*.cpp -framework sfml-window -framework sfml-graphics -framework sfml-system -std=c++17 -O3`
 
 **Windows:** Extract the DLLs into the root of the project and run the exe.
 

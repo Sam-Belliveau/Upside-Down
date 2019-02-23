@@ -109,11 +109,6 @@ const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
             TypeProps::MoveLeft
         }
     }, {
-        GameType::SafeZone, 
-        {"Safe Zone", sf::Color(0, 196, 255), 8, 1.0/3.0, 1.0/GAME_FPS,
-            TypeProps::StopStorm
-        }
-    }, {
         GameType::Goal, 
         {"Goal", sf::Color(255, 255, 0), 0, 0.0, 0.0,
             TypeProps::Goal

@@ -41,7 +41,7 @@ static IntType GET_GLOBAL_FRAME()
 
 // Game Peices / File Loading
 static const RawIntType MAGIC_NUMBER = 0x53616d42; // "SamB"
-static constexpr IntType GameTypeCount = 12;
+static constexpr IntType GameTypeCount = 11;
 enum GameType : Byte 
 { 
     // Here are the IDs for each block
@@ -55,7 +55,6 @@ enum GameType : Byte
     LowGravity = 7,
     MoveRight  = 8,
     MoveLeft   = 9,
-    SafeZone   = 10,
     Goal       = 0xff
 };
 
@@ -111,7 +110,7 @@ static sf::Text GET_DEFAULT_TEXT()
 
 // Level Editor
 static const IntType EDITOR_CAMERA_SPEED = 2;
-static const IntType BLOCK_LIST_SIZE = 8;
+static const IntType BLOCK_LIST_SIZE = 6;
 
 // Random Number Generation
 static const IntType BBS_RNG_P = 4091;

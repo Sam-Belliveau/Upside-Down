@@ -69,7 +69,7 @@ namespace LevelBuilder
     {
         app.setFramerateLimit(60);
         sf::Text SavedIcon = GET_DEFAULT_TEXT();
-        SavedIcon.setPosition((GAME_WIDTH-11)*GAME_SCALE,GAME_SCALE*14);
+        SavedIcon.setPosition((GAME_WIDTH-11)*GAME_SCALE,GAME_SCALE * (GAME_HEIGHT - 8));
 
         sf::Text Help = SavedIcon;
         Help.setPosition((GAME_WIDTH-14)*GAME_SCALE,GAME_SCALE * (GAME_HEIGHT - 8));
@@ -103,8 +103,7 @@ namespace LevelBuilder
         std::stack<UndoData> undoList;
         GameType world[GAME_LENGTH][GAME_HEIGHT] = {};
         Byte buffer[GAME_HEIGHT][GAME_WIDTH][4] = {};
-        IntType item = 0;
-        IntType frame = 0;
+        IntType item = 0, frame = 0;
         bool edits = false;
 
         Loader::LoadWorld(level, world);
@@ -112,7 +111,7 @@ namespace LevelBuilder
         sf::Vector2i mouse(0,0);
         while (app.isOpen())
         {
-            // Frame Counter
+            // Slow Movement with a frame counter
             ++frame;
 
             // Game Events
