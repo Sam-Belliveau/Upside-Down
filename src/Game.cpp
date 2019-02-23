@@ -1,4 +1,4 @@
-#include "./Extras/Game.h"
+#include "./Headers/Game.h"
 
 /**************************/
 /***** STATIC MEMBERS *****/
@@ -43,7 +43,7 @@ IntType Game::GameTypeData::randomize(IntType cx, IntType x, IntType y) const
 }
 
 // Game types and their propertys
-const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
+const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
     {
         GameType::Sky, 
         {"Sky", sf::Color(0, 160, 200), 8, 3, 
@@ -53,7 +53,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Jump
             false, // Bounce
             false, // Smog
-            true   // Move Storm
+            true,  // Move Storm
+            false  // Goal
         }
     }, {
         GameType::Ground, 
@@ -64,7 +65,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             true,  // Jump
             false, // Bounce
             false, // Smog
-            true   // Move Storm
+            true,  // Move Storm
+            false  // Goal
         }
     }, {
         GameType::Trap, 
@@ -73,8 +75,10 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Liquid
             true,  // Trap
             false, // Jump
+            false, // Bounce
             false, // Smog
-            true   // Move Storm
+            true,  // Move Storm
+            false  // Goal
         }
     }, {
         GameType::Bounce, 
@@ -85,7 +89,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Jump
             true,  // Bounce
             false, // Smog
-            true   // Move Storm
+            true,  // Move Storm
+            false  // Goal
         }
     }, {
         GameType::Mud, 
@@ -96,7 +101,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Jump
             false, // Bounce
             false, // Smog
-            true   // Move Storm
+            true,  // Move Storm
+            false  // Goal
         }
     }, {
         GameType::Water, 
@@ -107,7 +113,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             true,  // Jump
             false, // Bounce
             false, // Smog
-            true   // Move Storm
+            true,  // Move Storm
+            false  // Goal
         }
     }, {
         GameType::Smog, 
@@ -118,7 +125,8 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Jump
             false, // Bounce
             true,  // Smog
-            false  // Move Storm
+            false, // Move Storm
+            false  // Goal
         }
     }, {
         GameType::LowGravity, 
@@ -129,12 +137,25 @@ const Game::GameTypeLink Game::GameTypeList[Game::GameTypeCount] = {
             false, // Jump
             false, // Bounce
             false, // Smog
-            true   // Move Storm
+            true,  // Move Storm
+            false  // Goal
+        }
+    }, {
+        GameType::Goal, 
+        {"Goal", sf::Color(255, 255, 0), 0, 0, 
+            false, // Solid
+            false, // Liquid
+            false, // Trap
+            false, // Jump
+            false, // Bounce
+            false, // Smog
+            true,  // Move Storm
+            true   // Goal
         }
     }
 };
 
-const Game::GameTypeData Game::GetGameTypeData(Game::GameType input) 
+const Game::GameTypeData Game::GetGameTypeData(GameType input) 
 {
     for(const GameTypeLink& entry : GameTypeList)
         if(input == entry.type) return entry.data;
@@ -288,7 +309,7 @@ void Game::frameTimeLoop()
 
 void Game::goalLoop()
 {
-    if(player.x >= GAME_LENGTH) 
+    if(player.x >= GAME_LENGTH || GetGameTypeData(world[player.x][player.y]).goal) 
         loadWorld(level + 1);
 }
 
@@ -300,10 +321,10 @@ bool Game::cheatLoop()
     {
         setCheater();
         if(player.x > 0 && leftKey())
-            player.x -= CHEAT_SPEED; 
+            player.x -= 1; 
 
         if(player.x <= GAME_LENGTH && rightKey())
-            player.x += CHEAT_SPEED; 
+            player.x += 1; 
 
         if(player.y > 0 && upKey())
             player.y -= 1; 
@@ -433,10 +454,8 @@ IntType Game::loadWorld(const IntType inLevel)
     std::ifstream levelFile(LEVEL_FOLDER + LEVEL_PREFIX + std::to_string(inLevel) + LEVEL_EXTENTION);
     level = inLevel % MAX_LEVEL_COUNT;
 
-    if(levelFile.good())
-    {
-        levelFile.read(reinterpret_cast<char*>(world), GAME_LENGTH*GAME_HEIGHT*sizeof(Game::GameType));
-    } else { return loadWorld(level + 1); }
+    if(!Loader::LoadWorld(level, world, false))
+        return loadWorld(level + 1);
     reset();
 
     if(level != 0) finalLevel = level;

@@ -1,26 +1,15 @@
 #ifndef GAME_H
 #define GAME_H
 
+// File Loader uses this part of the game file
 #include "Constants.h"
+#include "FileLoader.h"
 
 class Game
 {
 public: // Static methods and enums
     // Enums and static methods
     static IntType randomize(IntType n);
-
-    static constexpr IntType GameTypeCount = 8;
-    enum GameType : Byte 
-    { 
-        Sky        = 0x00, 
-        Ground     = 0x01, 
-        Trap       = 0x02,
-        Bounce     = 0x03,
-        Mud        = 0x04,
-        Water      = 0x05,
-        Smog       = 0x06,
-        LowGravity = 0x07
-    };
 
     struct GameTypeData
     {
@@ -34,13 +23,14 @@ public: // Static methods and enums
         const bool bounce; // Player bounces off of
         const bool smog;   // Hinders Visibility
         const bool storm;  // Stops the storm from moving
+        const bool goal;   // Goes To Next Level
         IntType randomize(IntType cx, IntType x, IntType y) const;
     };
 
     struct GameTypeLink { GameType type; GameTypeData data; };
     static const GameTypeLink GameTypeList[GameTypeCount];
     static const GameTypeData GetGameTypeData(GameType);
-        
+
     enum GravityType : IntType { Up = -1, Down = 1 };
 
 public:

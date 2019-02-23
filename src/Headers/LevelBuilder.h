@@ -6,46 +6,19 @@
 #include "./Window.h"
 #include "./Constants.h"
 #include "./Game.h"
+#include "./FileLoader.h"
 
 namespace LevelBuilder
 {
-    static void loadWorld(const IntType inLevel, Game::GameType world[][GAME_HEIGHT])
-    {
-        std::ifstream levelFile(LEVEL_FOLDER + LEVEL_PREFIX + std::to_string(inLevel) + LEVEL_EXTENTION);
-        if(levelFile.good())
-        {
-            levelFile.read(reinterpret_cast<char*>(world), GAME_LENGTH*GAME_HEIGHT*sizeof(Game::GameType));
-            levelFile.close();
-        } else 
-        {
-            levelFile.close();
-
-            // Generate template level
-            for(IntType x = 0; x < GAME_LENGTH; ++x)
-                for(IntType y = 0; y < GAME_HEIGHT; ++y)
-                    if(y >= GAME_HEIGHT-3 && x <= GAME_WIDTH) 
-                        world[x][y] = Game::GameType::Ground;
-                    else world[x][y] = Game::GameType::Sky;
-        }
-
-    }
-
-    static void saveWorld(const IntType inLevel, Game::GameType world[][GAME_HEIGHT])
-    {
-        std::ofstream levelFile(LEVEL_FOLDER + LEVEL_PREFIX + std::to_string(inLevel) + LEVEL_EXTENTION, std::ios::binary);
-        levelFile.write(reinterpret_cast<const char*>(world), GAME_LENGTH*GAME_HEIGHT*sizeof(Game::GameType));
-        levelFile.close();
-    }
-
-    static void updateBuffer(Byte buffer[][GAME_WIDTH][4], const Game::GameType world[][GAME_HEIGHT], 
-        const IntType cameraX, const Game::GameType userItem, const sf::Vector2i mousePos)
+    static void updateBuffer(Byte buffer[][GAME_WIDTH][4], const GameType world[][GAME_HEIGHT], 
+        const IntType cameraX, const GameType userItem, const sf::Vector2i mousePos)
     {
         for(IntType y = 0; y < GAME_HEIGHT; y++)
         {
             for(IntType x = 0; x < GAME_WIDTH; x++)
             {
                 // Current Pixel
-                Game::GameType gamePixel = world[cameraX + x][y];
+                GameType gamePixel = world[cameraX + x][y];
 
                 // Mouse Pointer
                 if(x + cameraX == mousePos.x && y == mousePos.y)
@@ -82,7 +55,7 @@ namespace LevelBuilder
     struct UndoData
     {
         sf::Vector2i pos;
-        Game::GameType oldBlock;
+        GameType oldBlock;
     };
 
     static IntType Loop(sf::RenderWindow &app, IntType level, IntType cameraX)
@@ -110,13 +83,13 @@ namespace LevelBuilder
         Block.setScale(sf::Vector2f(2/TEXT_SCALE, 2/TEXT_SCALE));
 
         std::stack<UndoData> undoList;
-        Game::GameType world[GAME_LENGTH][GAME_HEIGHT] = {};
+        GameType world[GAME_LENGTH][GAME_HEIGHT] = {};
         Byte buffer[GAME_HEIGHT][GAME_WIDTH][4] = {};
         IntType item = 0;
         IntType frame = 0;
         bool edits = false;
 
-        loadWorld(level, world);
+        Loader::LoadWorld(level, world);
 
         sf::Vector2i mouse(0,0);
         while (app.isOpen())
@@ -170,8 +143,8 @@ namespace LevelBuilder
             }
 
             // Loop Items
-            item += Game::GameTypeCount;
-            item %= Game::GameTypeCount;
+            item += GameTypeCount;
+            item %= GameTypeCount;
 
             // Indicate Item
             Block.setString(Game::GameTypeList[item].data.name);
@@ -185,7 +158,7 @@ namespace LevelBuilder
             {
                 edits = false;
                 undoList = std::stack<UndoData>();
-                loadWorld(level, world); 
+                Loader::LoadWorld(level, world); 
             }
 
             // Change Worlds / Moving Camera
@@ -197,7 +170,7 @@ namespace LevelBuilder
                     { 
                         cameraX = 0; --level;
                         edits = false;
-                        loadWorld(level, world); 
+                        Loader::LoadWorld(level, world); 
                         while(Game::leftKey());
                     }
                 } else {
@@ -216,7 +189,7 @@ namespace LevelBuilder
                     { 
                         cameraX = 0; ++level;
                         edits = false;
-                        loadWorld(level, world); 
+                        Loader::LoadWorld(level, world); 
                         while(Game::rightKey());
                     }
                 } else {    
@@ -227,6 +200,13 @@ namespace LevelBuilder
             }
 
             // Saving 
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
+            && sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+            {
+                Loader::SaveWorld(level, world);
+                edits = false;
+            }
+            
             if(!edits)
             {
                 if(level == 0) SavedIcon.setString("      (End Level Saved)");
@@ -236,13 +216,6 @@ namespace LevelBuilder
                 if(level == 0) SavedIcon.setString("      (End Level Not Saved)");
                 else SavedIcon.setString("      (Level " + std::to_string(level) + " Not Saved)");
                 SavedIcon.setFillColor(sf::Color::Red);
-
-                if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
-                    if(sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-                    {
-                        saveWorld(level, world);
-                        edits = false;
-                    }
             }
 
             // Calculate mouse pixel

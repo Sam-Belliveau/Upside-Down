@@ -1,8 +1,8 @@
-#include "./Extras/Constants.h"
-#include "./Extras/Window.h"
-#include "./Extras/Game.h"
-#include "./Extras/LevelBuilder.h"
-#include "./Extras/TextTimes.h"
+#include "./Headers/Constants.h"
+#include "./Headers/Window.h"
+#include "./Headers/Game.h"
+#include "./Headers/LevelBuilder.h"
+#include "./Headers/TextTimes.h"
 
 int main()
 {

@@ -14,20 +14,36 @@
 // Game Types
 using Byte = std::uint8_t;
 using IntType = std::int_fast32_t;
+using UIntType = std::int_fast32_t;
+
+// Game Size / Pixel Measurements
+static const UIntType GAME_WIDTH = 42;
+static const UIntType GAME_HEIGHT = 24;
+static const UIntType GAME_LENGTH = 256;
+
+static const UIntType GAME_SCALE = 24;
+static const UIntType GAME_FPS = 24;
+static const UIntType START_SIZE = 9;
+
+// Game Peices / File Loading
+static const UIntType MAGIC_NUMBER = 0x01020304;
+static constexpr IntType GameTypeCount = 9;
+enum GameType : Byte 
+{ 
+    // Here are the IDs for each block
+    Sky        = 0x00, 
+    Ground     = 0x01, 
+    Trap       = 0x02,
+    Bounce     = 0x03,
+    Mud        = 0x04,
+    Water      = 0x05,
+    Smog       = 0x06,
+    LowGravity = 0x07,
+    Goal       = 0x08,
+};
 
 // Game Text
 static const double TEXT_SCALE = 4;
-
-// Game Size / Pixel Measurements
-static const IntType GAME_WIDTH = 40;
-static const IntType GAME_HEIGHT = 24;
-static const IntType GAME_LENGTH = 256;
-static const IntType PIXEL_COUNT = GAME_WIDTH*GAME_HEIGHT*4;
-
-static const IntType GAME_SCALE = 24;
-static const IntType GAME_FPS = 24;
-static const IntType CHEAT_SPEED = 1;
-static const IntType START_SIZE = 9;
 
 // Game Camera Measurements
 static const IntType RIGHT_CAMERA_BOARDER = double(GAME_WIDTH) / (std::sqrt(2) + 1);
@@ -47,7 +63,7 @@ static const double SMOG_SIZE = 4;
 static const IntType TRAP_START = -8;
 static const double TRAP_SMOOTH = 8;
 static const double TRAP_SPEED = 4;
-static const IntType TRAP_LEAD = IntType(48*TRAP_SPEED);
+static const IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED);
 
 // Level Data / Image Processing
 static const IntType START_LEVEL = 1;
@@ -63,7 +79,7 @@ static sf::Font DEFAULT_GAME_FONT;
 
 static sf::Text GET_DEFAULT_TEXT()
 {
-    const std::string ttfFile = "./src/Extras/GameFont.ttf";
+    const std::string ttfFile = "./GameFont.ttf";
     if(!DEFAULT_GAME_FONT.loadFromFile(ttfFile)) { return sf::Text(); }
 
     sf::Text defaultText;
