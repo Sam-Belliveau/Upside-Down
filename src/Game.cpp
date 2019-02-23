@@ -85,7 +85,7 @@ const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
         }
     }, {
         GameType::Water, 
-        {"Water", sf::Color(0, 64, 255), 8, -1.0/2.0, 0.2,
+        {"Water", sf::Color(0, 64, 255), 8, -1.0/2.0, 0.1,
             TypeProps::Liquid | TypeProps::Jumpable
         }
     }, {
@@ -100,12 +100,12 @@ const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
         }
     }, {
         GameType::MoveRight, 
-        {"Move Right", sf::Color(64, 196, 0), 64, 0, 0.5,
+        {"Move Right", sf::Color(64, 196, 0), 64, 0, 1.0/3.0,
             TypeProps::MoveRight
         }
     }, {
         GameType::MoveLeft, 
-        {"Move Left", sf::Color(64, 196, 0), 64, 0, -0.5,
+        {"Move Left", sf::Color(64, 196, 0), 64, 0, -1.0/3.0,
             TypeProps::MoveLeft
         }
     }, {
@@ -410,6 +410,7 @@ void Game::reset()
     if(level == START_LEVEL) {
         hasCheated = false;
         frame = 0; deaths = 0;
+        for(IntType& t : levelFrames) t = 0;
     }
 }
 

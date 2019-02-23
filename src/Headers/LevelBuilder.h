@@ -2,7 +2,6 @@
 #define LEVEL_BUILDER_H
 
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include "./Window.h"
 #include "./Constants.h"
 #include "./Game.h"
@@ -192,9 +191,12 @@ namespace LevelBuilder
             {
                 if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
                 {
-                    if(!edits && level > 0)
+                    if(!edits)
                     { 
-                        cameraX = 0; --level;
+                        cameraX = 0; 
+                        if(level == 0) level = MAX_LEVEL_COUNT - 1;
+                        else --level;
+                        
                         edits = false;
                         Loader::LoadWorld(level, world); 
                         while(Game::leftKey());
@@ -211,9 +213,11 @@ namespace LevelBuilder
             {
                 if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
                 {
-                    if(!edits && level < MAX_LEVEL_COUNT-1)
+                    if(!edits)
                     { 
-                        cameraX = 0; ++level;
+                        cameraX = 0; 
+                        ++level; level %= MAX_LEVEL_COUNT;
+
                         edits = false;
                         Loader::LoadWorld(level, world); 
                         while(Game::rightKey());

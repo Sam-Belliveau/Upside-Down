@@ -90,9 +90,20 @@ namespace Loader
         } else 
         {
             if(clearWorld)
+            {
                 for(RawIntType x = 0; x < GAME_LENGTH; ++x)
+                {
                     for(RawIntType y = 0; y < GAME_HEIGHT; ++y)
-                        world[x][y] = GameType::Sky;
+                    {
+                        if(x <= START_SIZE && y <= 7)
+                        {
+                            if(x == START_SIZE || y == 7)
+                                world[x][y] = GameType::Trap;
+                            else world[x][y] = GameType::Sky;
+                        } else world[x][y] = (y >= GAME_HEIGHT-3) ? GameType::Ground : GameType::Sky;
+                    }
+                }
+            }
             levelFile.close();
             return false;
         }

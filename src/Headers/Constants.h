@@ -83,7 +83,7 @@ static const IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED);
 
 // Level Data / Image Processing
 static const IntType START_LEVEL = 1;
-static const IntType MAX_LEVEL_COUNT = 100;
+static const IntType MAX_LEVEL_COUNT = 256;
 static const std::uint8_t COLOR_THRESHOLD = 128;
 
 // Text
