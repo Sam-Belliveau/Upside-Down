@@ -23,7 +23,7 @@ public: // Static methods and enums
         StopStorm = RawIntType(1) << 6, // Moves the storm
         MoveRight = RawIntType(1) << 7, // Moves player right
         MoveLeft  = RawIntType(1) << 8, // Moves player left
-        Goal      = RawIntType(1) << 30 // Goes To Next Level
+        Goal      = RawIntType(1) << 31 // Goes To Next Level
     };
 
     struct GameTypeData
@@ -33,7 +33,7 @@ public: // Static methods and enums
         IntType randomness; // randomness of block color
         double cameraSpeed; // paralax
         double textureSpeed; // how fast block color moves
-        IntType propertys; // game propertys
+        RawIntType propertys; // game propertys
 
         bool getProp(RawIntType) const;
         IntType randomize(IntType, IntType, IntType) const;
