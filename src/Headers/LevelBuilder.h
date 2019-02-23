@@ -124,13 +124,13 @@ namespace LevelBuilder
                     if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
                     && sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
                     {
-                        if(undoList.empty())
+                        if(!undoList.empty())
                         {
-                            edits = false;
-                        } else {
                             const sf::Vector2i pos = undoList.top().pos;
                             world[pos.x][pos.y] = undoList.top().oldBlock;
                             undoList.pop();
+
+                            edits = true;
                         }
                     }
                 }
@@ -138,9 +138,11 @@ namespace LevelBuilder
 
             // Exiting
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) && !edits)
-            { 
-                break; 
-            }
+            {  break; }
+
+            if(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape) 
+            && sf::Keyboard::isKeyPressed(sf::Keyboard::LControl))
+            { break; }
 
             // Loop Items
             item += GameTypeCount;
@@ -206,7 +208,7 @@ namespace LevelBuilder
                 Loader::SaveWorld(level, world);
                 edits = false;
             }
-            
+
             if(!edits)
             {
                 if(level == 0) SavedIcon.setString("      (End Level Saved)");
