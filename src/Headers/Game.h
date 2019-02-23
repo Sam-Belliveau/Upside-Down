@@ -11,25 +11,37 @@ public: // Static methods and enums
     // Enums and static methods
     static IntType randomize(IntType n);
 
+    enum TypeProps : RawIntType 
+    { 
+        None = 0x00, // Blank
+        Solid     = RawIntType(1) << 0, // Stops player from passing through
+        Liquid    = RawIntType(1) << 1, // Slows gravity to 1/2
+        Trap      = RawIntType(1) << 2, // Kills Player
+        Jumpable  = RawIntType(1) << 3, // Player can jump off of
+        Bounce    = RawIntType(1) << 4, // Player bounces off of
+        Smog      = RawIntType(1) << 5, // Hinders Visibility
+        StopStorm = RawIntType(1) << 6, // Moves the storm
+        MoveRight = RawIntType(1) << 7, // Moves player right
+        MoveLeft  = RawIntType(1) << 8, // Moves player left
+        Goal      = RawIntType(1) << 30 // Goes To Next Level
+    };
+
     struct GameTypeData
     {
-        const char* name;
-        const sf::Color color;
-        const IntType randomness, cameraSpeed;
-        const bool solid;  // Stops player from passing through
-        const bool liquid; // Slows gravity to 1/2
-        const bool trap;   // Kills Player
-        const bool jump;   // Player can jump off of
-        const bool bounce; // Player bounces off of
-        const bool smog;   // Hinders Visibility
-        const bool storm;  // Moves the storm
-        const bool goal;   // Goes To Next Level
-        IntType randomize(IntType cx, IntType x, IntType y) const;
+        const char* name; // block name
+        sf::Color color; // block color
+        IntType randomness; // randomness of block color
+        double cameraSpeed; // paralax
+        double textureSpeed; // how fast block color moves
+        IntType propertys; // game propertys
+
+        bool getProp(RawIntType) const;
+        IntType randomize(IntType, IntType, IntType) const;
     };
 
     struct GameTypeLink { GameType type; GameTypeData data; };
     static const GameTypeLink GameTypeList[GameTypeCount];
-    static const GameTypeData GetGameTypeData(GameType);
+    static const GameTypeData GetTypeData(GameType);
 
     enum GravityType : IntType { Up = -1, Down = 1 };
 
@@ -97,6 +109,7 @@ private: // Member Variables
     bool canJump = true, canBounce = true;
     bool hasCheated = false;
 
+    GameTypeData playerTypeData;
     GameType world[GAME_LENGTH][GAME_HEIGHT];
     Byte buffer[GAME_HEIGHT][GAME_WIDTH][4];
 };

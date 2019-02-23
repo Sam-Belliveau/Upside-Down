@@ -26,15 +26,19 @@ IntType Game::randomize(IntType n)
     return std::abs(pool);
 }
 
+bool Game::GameTypeData::getProp(RawIntType prop) const
+{
+    // This allows for testing of more than
+    // One property at a time
+    return (propertys & prop) == prop;
+}
+
 IntType Game::GameTypeData::randomize(IntType cx, IntType x, IntType y) const
 {
     if(randomness != 0) 
     {
-        IntType XRand, YRand = Game::randomize(y);
-        
-        // If Camera Speed is 0, then don't divide
-        if(cameraSpeed == 0) XRand = Game::randomize(x); 
-        else XRand = Game::randomize(cx / cameraSpeed + x);
+        const IntType XRand = Game::randomize(IntType(cx * cameraSpeed - GET_GLOBAL_FRAME() * textureSpeed + 0.5) + x);
+        const IntType YRand = Game::randomize(y);
         
         return Game::randomize(XRand + YRand) % randomness;
     }
@@ -42,131 +46,91 @@ IntType Game::GameTypeData::randomize(IntType cx, IntType x, IntType y) const
     return IntType(0);
 }
 
-// Game types and their propertys
+// Game types and their propertys    
+/* ***** TYPE DATA STRUCTURE *****
+ * GameType::XXXXX, <--- Game Type
+ * {"[Block Name]", [Block Color], [1*], [2*], [3*],
+ *      [Type Propertys] | [Type Propertys]
+ * }
+ * 
+ * 1* = Texture Randomness
+ * 2* = How Fast Texture Moves With Camera (Paralax)
+ * 3* = How Fast Texture Moves On Its Own
+ */ 
 const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
     {
         GameType::Sky, 
-        {"Sky", sf::Color(0, 160, 200), 8, 3, 
-            false, // Solid
-            false, // Liquid
-            false, // Trap
-            false, // Jump
-            false, // Bounce
-            false, // Smog
-            true,  // Move Storm
-            false  // Goal
+        {"Sky", sf::Color(0, 160, 200), 8, 1.0/3.0, 1.0/GAME_FPS,
+            TypeProps::None
         }
     }, {
         GameType::Ground, 
-        {"Ground", sf::Color(52, 52, 52), 24, 1, 
-            true,  // Solid
-            false, // Liquid
-            false, // Trap
-            true,  // Jump
-            false, // Bounce
-            false, // Smog
-            true,  // Move Storm
-            false  // Goal
+        {"Ground", sf::Color(52, 52, 52), 24, 1.0, 0.0,
+            TypeProps::Solid | TypeProps::Jumpable 
         }
     }, {
         GameType::Trap, 
-        {"Trap", sf::Color(220, 32, 0), 32, 0, 
-            false, // Solid
-            false, // Liquid
-            true,  // Trap
-            false, // Jump
-            false, // Bounce
-            false, // Smog
-            true,  // Move Storm
-            false  // Goal
+        {"Trap", sf::Color(220, 32, 0), 32, 0.0, 0,
+            TypeProps::Trap
         }
     }, {
         GameType::Bounce, 
-        {"Bounce", sf::Color(64, 255, 164), 0, 0, 
-            false, // Solid
-            false, // Liquid
-            false, // Trap
-            false, // Jump
-            true,  // Bounce
-            false, // Smog
-            true,  // Move Storm
-            false  // Goal
+        {"Bounce", sf::Color(64, 255, 164), 0, 0.0, 0.0,
+            TypeProps::Bounce
         }
     }, {
         GameType::Mud, 
-        {"Mud", sf::Color(130, 60, 10), -12, 1, 
-            true,  // Solid
-            false, // Liquid
-            false, // Trap
-            false, // Jump
-            false, // Bounce
-            false, // Smog
-            true,  // Move Storm
-            false  // Goal
+        {"Mud", sf::Color(130, 60, 10), -12, 1.0, 0.0,
+            TypeProps::Solid
         }
     }, {
         GameType::Water, 
-        {"Water", sf::Color(0, 64, 255), 8, -2, 
-            false, // Solid
-            true,  // Liquid
-            false, // Trap
-            true,  // Jump
-            false, // Bounce
-            false, // Smog
-            true,  // Move Storm
-            false  // Goal
+        {"Water", sf::Color(0, 64, 255), 8, -1.0/2.0, 0.2,
+            TypeProps::Liquid | TypeProps::Jumpable
         }
     }, {
         GameType::Smog, 
-        {"Smog", sf::Color(128, 128, 128), 8, 6, 
-            false, // Solid
-            false, // Liquid
-            false, // Trap
-            false, // Jump
-            false, // Bounce
-            true,  // Smog
-            false, // Move Storm
-            false  // Goal
+        {"Smog", sf::Color(128, 128, 128), 8, 1.0/6.0, 0.5/GAME_FPS,
+            TypeProps::Smog | TypeProps::StopStorm
         }
     }, {
         GameType::LowGravity, 
-        {"Low Gravity", sf::Color(100, 0, 100), 8, 3, 
-            false, // Solid
-            true,  // Liquid
-            false, // Trap
-            false, // Jump
-            false, // Bounce
-            false, // Smog
-            true,  // Move Storm
-            false  // Goal
+        {"Low Gravity", sf::Color(100, 0, 100), 8, 1.0/3.0, 1.0/GAME_FPS,
+            TypeProps::Liquid
+        }
+    }, {
+        GameType::MoveRight, 
+        {"Move Right", sf::Color(64, 196, 0), 64, 0, 0.5,
+            TypeProps::MoveRight
+        }
+    }, {
+        GameType::MoveLeft, 
+        {"Move Left", sf::Color(64, 196, 0), 64, 0, -0.5,
+            TypeProps::MoveLeft
         }
     }, {
         GameType::Goal, 
-        {"Goal", sf::Color(255, 255, 0), 0, 0, 
-            false, // Solid
-            false, // Liquid
-            false, // Trap
-            false, // Jump
-            false, // Bounce
-            false, // Smog
-            true,  // Move Storm
-            true   // Goal
+        {"Goal", sf::Color(255, 255, 0), 0, 0.0, 0.0,
+            TypeProps::Goal
         }
     }
 };
 
-const Game::GameTypeData Game::GetGameTypeData(GameType input) 
+const Game::GameTypeData Game::GetTypeData(GameType input) 
 {
     for(const GameTypeLink& entry : GameTypeList)
         if(input == entry.type) return entry.data;
-    return {"Error", (time(0)&1) ? sf::Color(255,0,255) : sf::Color(0,0,0), 0, 0};
+    return {"Error", (time(0)&1) ? sf::Color(255,0,255) : sf::Color(0,0,0), 0, 0, 0};
 }
 
 /****************************/
 /***** INSTANCE MEMBERS *****/
 /****************************/
 
-Game::Game() { loadWorld(START_LEVEL); }
+Game::Game() 
+{
+    loadWorld(START_LEVEL); 
+}
 
 /********************/
 /***** CONTROLS *****/
@@ -256,6 +220,9 @@ bool Game::editorCheatKey()
 
 void Game::gameLoop()
 {
+    // Update Type data for player block
+    playerTypeData = GetTypeData(world[player.x][player.y]);
+
     // Check for game reset command
     resetKeyLoop();
 
@@ -309,7 +276,8 @@ void Game::frameTimeLoop()
 
 void Game::goalLoop()
 {
-    if(player.x >= GAME_LENGTH || GetGameTypeData(world[player.x][player.y]).goal) 
+    if(player.x >= GAME_LENGTH 
+    || playerTypeData.getProp(TypeProps::Goal)) 
         loadWorld(level + 1);
 }
 
@@ -356,12 +324,12 @@ bool Game::cheatLoop()
 void Game::trapLoop()
 {
     // Trap Detection
-    if(player.y == 0 || player.y == GAME_HEIGHT - 1 
-    || GetGameTypeData(world[player.x][player.y]).trap
-    || player.x + TRAP_SMOOTH - 1 <= trapX/TRAP_SPEED)
+    if(player.y < 0 || player.y >= GAME_HEIGHT
+    || playerTypeData.getProp(TypeProps::Trap)
+    || player.x - 1 <= trapX/TRAP_SPEED - TRAP_SMOOTH)
     { ++deaths; reset(); return; }
 
-    if(!getWinner() && GetGameTypeData(world[player.x][player.y]).storm)
+    if(!getWinner() && !playerTypeData.getProp(TypeProps::StopStorm))
     {
         // Move trap and start timer if player has moved from start
         if(player.x > START_SIZE) { ++trapX; }
@@ -376,7 +344,7 @@ void Game::jumpLoop()
 {
     if(jumpKey(gravity))
     {
-        if(GetGameTypeData(world[player.x][player.y + gravity]).jump)
+        if(GetTypeData(world[player.x][player.y + gravity]).getProp(TypeProps::Jumpable))
         { 
             if(canJump) gravity = GravityType(-gravity);
             canJump = false;
@@ -386,8 +354,8 @@ void Game::jumpLoop()
 
 void Game::bounceLoop()
 {
-    if(GetGameTypeData(world[player.x][player.y + gravity]).bounce
-    || GetGameTypeData(world[player.x][player.y]).bounce)
+    if(GetTypeData(world[player.x][player.y + gravity]).getProp(TypeProps::Bounce)
+    || playerTypeData.getProp(TypeProps::Bounce))
     { 
         if(canBounce) gravity = GravityType(-gravity);
         canBounce = false; 
@@ -397,12 +365,12 @@ void Game::bounceLoop()
 
 void Game::movementLoop()
 {
-    if(player.x > 0 && leftKey())
-        if(!GetGameTypeData(world[player.x - 1][player.y]).solid) 
+    if((player.x > 0 && leftKey()) || playerTypeData.getProp(TypeProps::MoveLeft))
+        if(!GetTypeData(world[player.x - 1][player.y]).getProp(TypeProps::Solid)) 
             player.x--;
 
-    if(rightKey()) 
-        if(!GetGameTypeData(world[player.x + 1][player.y]).solid) 
+    if(rightKey() || playerTypeData.getProp(TypeProps::MoveRight)) 
+        if(!GetTypeData(world[player.x + 1][player.y]).getProp(TypeProps::Solid)) 
             player.x++; 
 }
 
@@ -424,10 +392,10 @@ void Game::cameraLoop()
 
 void Game::gravityLoop()
 {
-    if(!GetGameTypeData(world[player.x][player.y + gravity]).solid)
+    if(!GetTypeData(world[player.x][player.y + gravity]).getProp(TypeProps::Solid))
     {
-        if(GetGameTypeData(world[player.x][player.y + gravity]).liquid) 
-        { if(frame % 2 == 0) player.y += gravity; }
+        if(GetTypeData(world[player.x][player.y + gravity]).getProp(TypeProps::Liquid)) 
+        { if(GET_GLOBAL_FRAME() % 2 == 0) player.y += gravity; }
         else player.y += gravity; 
     } 
 }
@@ -465,7 +433,7 @@ IntType Game::loadWorld(const IntType inLevel)
 // Render Game
 const Byte* Game::returnWorldPixels()
 {
-    const bool smog = GetGameTypeData(world[player.x][player.y]).smog;    
+    const bool smog = GetTypeData(world[player.x][player.y]).getProp(TypeProps::Smog);    
     for(IntType y = 0; y < GAME_HEIGHT; y++)
     {
         for(IntType x = 0; x < GAME_WIDTH; x++)
@@ -473,12 +441,14 @@ const Byte* Game::returnWorldPixels()
             IntType R, G, B;
             if(cameraX + x == player.x && y == player.y)
             {
-                R = 200; G = 255; B = 200;
+                R = PLAYER_COLOR.r; 
+                G = PLAYER_COLOR.g; 
+                B = PLAYER_COLOR.b;
             } else 
             {
                 // Current Pixel
                 const GameType gamePixel = world[cameraX + x][y];
-                const GameTypeData pixelData = GetGameTypeData(gamePixel);
+                const GameTypeData pixelData = GetTypeData(gamePixel);
 
                 // Values to feed into buffer
                 R = pixelData.color.r; 
@@ -530,19 +500,29 @@ const Byte* Game::returnWorldPixels()
 /*****************************/
 
 IntType Game::getCameraX() const 
-{ return cameraX; }
+{ 
+    return cameraX; 
+}
 
 IntType Game::getLevel() const 
-{ return level; }
+{ 
+    return level; 
+}
 
 IntType Game::getDeaths() const
-{ return deaths; }
+{ 
+    return deaths; 
+}
 
 IntType Game::getFinalLevel() const 
-{ return finalLevel; }
+{ 
+    return finalLevel; 
+}
 
 IntType Game::getFrame() const
-{ return frame; }
+{ 
+    return frame; 
+}
 
 IntType Game::getLevelFrame(IntType level) const 
 { 
@@ -552,13 +532,19 @@ IntType Game::getLevelFrame(IntType level) const
 }
 
 bool Game::getCheater() const 
-{ return hasCheated; }
-
-void Game::setCheater() 
-{ hasCheated = true; }
+{ 
+    return hasCheated; 
+}
 
 bool Game::getWinner() const 
-{ return level == 0; }
+{ 
+    return level == 0; 
+}
+
+void Game::setCheater() 
+{ 
+    hasCheated = true; 
+}
 
 
 

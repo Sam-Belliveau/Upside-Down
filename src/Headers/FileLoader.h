@@ -8,7 +8,7 @@ namespace Loader
     struct HeaderData
     {
     private: 
-        static void SaveNumber(Byte* arr, UIntType num)
+        static void SaveNumber(Byte* arr, RawIntType num)
         {
             arr[0] = (num >> 0)  & 0xff;
             arr[1] = (num >> 8)  & 0xff;
@@ -16,9 +16,9 @@ namespace Loader
             arr[3] = (num >> 24) & 0xff;
         }
 
-        static UIntType ReadNumber(const Byte* arr)
+        static RawIntType ReadNumber(const Byte* arr)
         {
-            UIntType out = 0;
+            RawIntType out = 0;
             out |= arr[0] << 0;
             out |= arr[1] << 8;
             out |= arr[2] << 16;
@@ -30,7 +30,7 @@ namespace Loader
 
     public: 
         HeaderData() {}
-        HeaderData(UIntType magicNumber, UIntType height, UIntType length)
+        HeaderData(RawIntType magicNumber, RawIntType height, RawIntType length)
         {
             SaveNumber(&header[0], magicNumber);
             SaveNumber(&header[4], height);
@@ -39,9 +39,9 @@ namespace Loader
 
         char* getHeaderData() { return reinterpret_cast<char*>(header); }
         const char* getHeaderData() const { return reinterpret_cast<const char*>(header); }
-        UIntType getMagicNumber() const { return ReadNumber(&header[0]); }
-        UIntType getHeight() const { return ReadNumber(&header[4]); }
-        UIntType getLength() const { return ReadNumber(&header[8]); }
+        RawIntType getMagicNumber() const { return ReadNumber(&header[0]); }
+        RawIntType getHeight() const { return ReadNumber(&header[4]); }
+        RawIntType getLength() const { return ReadNumber(&header[8]); }
     };
 
     static bool LoadWorld(const IntType inLevel, GameType world[][GAME_HEIGHT], bool clearWorld = true)
@@ -64,20 +64,20 @@ namespace Loader
             } else
             {
                 // If Not, do conversions
-                const UIntType HeaderLength = header.getLength();
-                const UIntType HeaderHeight = header.getHeight();
-                const UIntType GameLength = std::min(GAME_LENGTH, HeaderLength);
-                const UIntType GameHeight = std::min(GAME_HEIGHT, HeaderHeight);
-                for(UIntType x = 0; x < GAME_LENGTH; ++x)
+                const RawIntType HeaderLength = header.getLength();
+                const RawIntType HeaderHeight = header.getHeight();
+                const RawIntType GameLength = std::min(GAME_LENGTH, HeaderLength);
+                const RawIntType GameHeight = std::min(GAME_HEIGHT, HeaderHeight);
+                for(RawIntType x = 0; x < GAME_LENGTH; ++x)
                 {
                     if(x < GameLength)
                     {
                         levelFile.read(reinterpret_cast<char*>(&world[x][0]), GameHeight);
-                        for(UIntType y = GameHeight; y < GAME_HEIGHT; ++y)
+                        for(RawIntType y = GameHeight; y < GAME_HEIGHT; ++y)
                             world[x][y] = GameType::Trap; 
                     } else 
                     {
-                        for(UIntType y = 0; y < GAME_HEIGHT; ++y)
+                        for(RawIntType y = 0; y < GAME_HEIGHT; ++y)
                             world[x][y] = GameType::Goal;
                     }
 
@@ -90,8 +90,8 @@ namespace Loader
         } else 
         {
             if(clearWorld)
-                for(UIntType x = 0; x < GAME_LENGTH; ++x)
-                    for(UIntType y = 0; y < GAME_HEIGHT; ++y)
+                for(RawIntType x = 0; x < GAME_LENGTH; ++x)
+                    for(RawIntType y = 0; y < GAME_HEIGHT; ++y)
                         world[x][y] = GameType::Sky;
             levelFile.close();
             return false;

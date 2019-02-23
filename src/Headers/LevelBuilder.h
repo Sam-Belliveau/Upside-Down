@@ -11,7 +11,7 @@
 namespace LevelBuilder
 {
     static void updateBuffer(Byte buffer[][GAME_WIDTH][4], const GameType world[][GAME_HEIGHT], 
-                             const IntType cameraX, const GameType userItem, const sf::Vector2i mousePos)
+                             IntType cameraX, GameType userItem, sf::Vector2i mousePos)
     {
         for(IntType y = 0; y < GAME_HEIGHT; y++)
         {
@@ -25,7 +25,7 @@ namespace LevelBuilder
                 { gamePixel = userItem; }
 
                 // Current Pixel
-                const Game::GameTypeData pixelData = Game::GetGameTypeData(gamePixel);
+                const Game::GameTypeData pixelData = Game::GetTypeData(gamePixel);
 
                 // Values to feed into buffer
                 IntType R = pixelData.color.r; 
@@ -50,6 +50,13 @@ namespace LevelBuilder
                 buffer[y][x][3] = 255; // Alpha
             }
         }
+    }
+
+    static IntType loopTypeIndex(IntType index)
+    {
+        while(index < 0) index += GameTypeCount;
+        index %= GameTypeCount;
+        return index;
     }
 
     struct UndoData
@@ -79,8 +86,19 @@ namespace LevelBuilder
         );
 
         sf::Text Block = SavedIcon;
-        Block.setPosition(GAME_SCALE/2,GAME_SCALE*(GAME_HEIGHT-2));
-        Block.setScale(sf::Vector2f(2/TEXT_SCALE, 2/TEXT_SCALE));
+        Block.setPosition(GAME_SCALE / 2,GAME_SCALE * (GAME_HEIGHT - 3));
+        Block.setScale(sf::Vector2f(2 / TEXT_SCALE, 2 / TEXT_SCALE));
+
+        sf::Text BlockDown = Block;
+        BlockDown.setPosition(GAME_SCALE / 2, GAME_SCALE * (GAME_HEIGHT - 1));
+        BlockDown.setScale(sf::Vector2f(1/TEXT_SCALE, 1/TEXT_SCALE));
+
+        sf::Text BlocksUp[BLOCK_LIST_SIZE];
+        for(IntType i = 0; i < BLOCK_LIST_SIZE; ++i)
+        {
+            BlocksUp[i] = BlockDown;
+            BlocksUp[i].setPosition(GAME_SCALE / 2, GAME_SCALE * (GAME_HEIGHT - (4 + i)));
+        }
 
         std::stack<UndoData> undoList;
         GameType world[GAME_LENGTH][GAME_HEIGHT] = {};
@@ -145,12 +163,19 @@ namespace LevelBuilder
             { break; }
 
             // Loop Items
-            item += GameTypeCount;
-            item %= GameTypeCount;
+            item = loopTypeIndex(item);
 
             // Indicate Item
-            Block.setString(Game::GameTypeList[item].data.name);
-            Block.setFillColor(Game::GameTypeList[item].data.color);
+            for(IntType i = 0; i < BLOCK_LIST_SIZE; ++i)
+            {
+                BlocksUp[i].setString(Game::GameTypeList[loopTypeIndex(item - (i + 1))].data.name);
+                BlocksUp[i].setFillColor(Game::GameTypeList[loopTypeIndex(item - (i + 1))].data.color);
+            }
+
+            Block.setString(Game::GameTypeList[loopTypeIndex(item - 0)].data.name);
+            Block.setFillColor(Game::GameTypeList[loopTypeIndex(item - 0)].data.color);
+            BlockDown.setString(Game::GameTypeList[loopTypeIndex(item + 1)].data.name);
+            BlockDown.setFillColor(Game::GameTypeList[loopTypeIndex(item + 1)].data.color);
 
             // Reverting
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
@@ -253,7 +278,12 @@ namespace LevelBuilder
             // Draw Text
             app.draw(SavedIcon);
             app.draw(Help);
+
+            for(sf::Text& BlockText : BlocksUp)
+                app.draw(BlockText);
+
             app.draw(Block);
+            app.draw(BlockDown);
 
             // Update Title
             if(level == 0) app.setTitle("Upside Down Level Editor (End Level)");

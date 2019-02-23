@@ -7,6 +7,7 @@
 #include <stack> // Undo in level editor
 #include <string> // File Names, Times 
 #include <cstdint> // Fixed Width Types
+#include <chrono> // Global frame count
 #include <sstream> // Building leaderboard
 #include <iomanip> // Building leaderboard
 #include <cmath> // Misc. Math
@@ -14,32 +15,46 @@
 // Game Types
 using Byte = std::uint8_t;
 using IntType = std::int_fast32_t;
-using UIntType = std::uint_fast32_t;
+using RawIntType = std::uint32_t;
 
 // Game Size / Pixel Measurements
 static const IntType GAME_WIDTH = 42;
-static const UIntType GAME_HEIGHT = 24;
-static const UIntType GAME_LENGTH = 256;
+static const RawIntType GAME_HEIGHT = 24;
+static const RawIntType GAME_LENGTH = 256;
 
 static const IntType GAME_SCALE = 24;
 static const IntType GAME_FPS = 24;
 static const IntType START_SIZE = 9;
+static const sf::Color PLAYER_COLOR = sf::Color(196, 255, 196);
+
+// Global frames
+static const auto START_DURATION = std::chrono::steady_clock::now();
+static IntType GET_GLOBAL_FRAME()
+{
+    auto now = std::chrono::steady_clock::now();
+    std::uint64_t t = std::chrono::duration_cast<std::chrono::microseconds>(now - START_DURATION).count();
+    t *= GAME_FPS;
+    t /= 1000000;
+    return IntType(t);
+}
 
 // Game Peices / File Loading
-static const UIntType MAGIC_NUMBER = 0x01020304;
-static constexpr IntType GameTypeCount = 9;
+static const RawIntType MAGIC_NUMBER = 0x53616d42; // "SamB"
+static constexpr IntType GameTypeCount = 11;
 enum GameType : Byte 
 { 
     // Here are the IDs for each block
-    Sky        = 0x00, 
-    Ground     = 0x01, 
-    Trap       = 0x02,
-    Bounce     = 0x03,
-    Mud        = 0x04,
-    Water      = 0x05,
-    Smog       = 0x06,
-    LowGravity = 0x07,
-    Goal       = 0x08,
+    Sky        = 0, 
+    Ground     = 1, 
+    Trap       = 2,
+    Bounce     = 3,
+    Mud        = 4,
+    Water      = 5,
+    Smog       = 6,
+    LowGravity = 7,
+    MoveRight  = 8,
+    MoveLeft   = 9,
+    Goal       = 0xff
 };
 
 // Game Text
@@ -60,7 +75,7 @@ static const float X_JOYSTICK_DEAD_ZONE = 40;
 static const double SMOG_SIZE = 4;
 
 // Left Wall Trap
-static const IntType TRAP_START = -8;
+static const IntType TRAP_START = -240;
 static const double TRAP_SMOOTH = 8;
 static const double TRAP_SPEED = 4;
 static const IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED);
@@ -94,6 +109,7 @@ static sf::Text GET_DEFAULT_TEXT()
 
 // Level Editor
 static const IntType EDITOR_CAMERA_SPEED = 2;
+static const IntType BLOCK_LIST_SIZE = 8;
 
 // Random Number Generation
 static const IntType BBS_RNG_P = 4091;
