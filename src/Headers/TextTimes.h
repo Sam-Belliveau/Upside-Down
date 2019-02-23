@@ -14,13 +14,15 @@ namespace TextTimes
             text.setString(
                 "(Manipulated) " + 
                 (std::to_string(double(game.getFrame()) / double(GAME_FPS)).substr(0,7)) +
-                "s"
+                "s\n" +
+                "Deaths: " + std::to_string(game.getDeaths())
             );
         } else {
             text.setFillColor(GOOD_COLOR);
             text.setString(
                 std::to_string(double(game.getFrame()) / double(GAME_FPS)).substr(0,7) + 
-                "s"
+                "s\n" +
+                "Deaths: " + std::to_string(game.getDeaths())
             );
         }
     }

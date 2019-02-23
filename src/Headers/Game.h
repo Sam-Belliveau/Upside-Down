@@ -78,6 +78,7 @@ public: // Getters
     IntType getCameraX() const;
     IntType getFinalLevel() const;
     IntType getLevel() const;
+    IntType getDeaths() const;
     IntType getFrame() const;
     IntType getLevelFrame(IntType) const;
     bool getWinner() const;
@@ -86,7 +87,7 @@ public: // Getters
 
 private: // Member Variables
     IntType finalLevel;
-    IntType level, frame;
+    IntType level, frame, deaths;
     IntType levelFrames[MAX_LEVEL_COUNT];
 
     sf::Vector2<IntType> player; 

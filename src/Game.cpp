@@ -359,7 +359,7 @@ void Game::trapLoop()
     if(player.y == 0 || player.y == GAME_HEIGHT - 1 
     || GetGameTypeData(world[player.x][player.y]).trap
     || player.x + TRAP_SMOOTH - 1 <= trapX/TRAP_SPEED)
-    { reset(); return; }
+    { ++deaths; reset(); return; }
 
     if(!getWinner() && GetGameTypeData(world[player.x][player.y]).storm)
     {
@@ -441,7 +441,7 @@ void Game::reset()
 
     if(level == START_LEVEL) {
         hasCheated = false;
-        frame = 0;
+        frame = 0; deaths = 0;
     }
 }
 
@@ -534,6 +534,9 @@ IntType Game::getCameraX() const
 
 IntType Game::getLevel() const 
 { return level; }
+
+IntType Game::getDeaths() const
+{ return deaths; }
 
 IntType Game::getFinalLevel() const 
 { return finalLevel; }
