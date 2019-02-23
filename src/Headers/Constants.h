@@ -95,7 +95,7 @@ static sf::Font DEFAULT_GAME_FONT;
 
 static sf::Text GET_DEFAULT_TEXT()
 {
-    const std::string ttfFile = "./GameFont.ttf";
+    const std::string ttfFile = "./src/GameFont.ttf";
     if(!DEFAULT_GAME_FONT.loadFromFile(ttfFile)) { return sf::Text(); }
 
     sf::Text defaultText;
