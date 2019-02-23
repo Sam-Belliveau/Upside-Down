@@ -2,13 +2,14 @@
 
 ## To compile, cd to the root of this project folder on your computer, and run
 
-Linux: `clang++ -o UpsideDown.out ./src/*.cpp -lsfml-window -lsfml-system -lsfml-graphics -std=c++17 -O3` 
+**Linux:** `clang++ -o UpsideDown.out ./src/*.cpp -lsfml-window -lsfml-system -lsfml-graphics -std=c++17 -O3` 
 
-Mac: `clang++ -o UpsideDown.out ./src/*.cpp -framework sfml-window -framework sfml-graphics -framework sfml-system -std=c++17 -O3`
+**Mac:** `clang++ -o UpsideDown.out ./src/*.cpp -framework sfml-window -framework sfml-graphics -framework sfml-system -std=c++17 -O3`
 
-Cross Compile Linux to Windows: `i686-w64-mingw32-g++ -O3 -o UpsideDown.o ./src/*.cpp -o UpsideDown.exe -static-libgcc -static-libstdc++ -static -mwindows -L /usr/i686-w64-mingw32/lib/ -I /usr/i686-w64-mingw32/include/ -lpthread -DSFML_STATIC -lsfml-graphics-s -lsfml-window-s -lsfml-system-s`
-OR 
-Windows: Extract the DLLs into the root of the project and run the exe.
+**Windows:** Extract the DLLs into the root of the project and run the exe.
+
+**Cross Compile Linux to Windows:** `i686-w64-mingw32-g++ -O3 -o UpsideDown.o ./src/*.cpp -o UpsideDown.exe -static-libgcc -static-libstdc++ -static -mwindows -L /usr/i686-w64-mingw32/lib/ -I /usr/i686-w64-mingw32/include/ -lpthread -DSFML_STATIC -lsfml-graphics-s -lsfml-window-s -lsfml-system-s`
+
 
 To run the game run `./UpsideDown.out` 
 
