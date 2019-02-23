@@ -10,7 +10,7 @@
 
 **Cross Compile Linux to Windows:** `i686-w64-mingw32-g++ -O3 ./src/*.cpp -o UpsideDown.exe -static-libgcc -static-libstdc++ -lsfml-graphics -lsfml-window -lsfml-system`
 
-To run the game run `./UpsideDown` 
+To run the game run `./UpsideDown.out` 
 
 #### You will need https://www.sfml-dev.org/download.php to compile the game
 
