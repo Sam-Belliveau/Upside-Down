@@ -14,16 +14,16 @@ To run the game run `./UpsideDown.out`
 
 #### You will need https://www.sfml-dev.org/download.php to compile the game
 
-## What is a `.udl`
+## What is a `.lvl`
 
 I don't have all day to be making this game and its levels, so I made a level editor. 
 
 You can access this by pressing `Ctrl + Shift + E`. 
 
-A `.udl` Is the file type that stores these levels. Here is a diagram of a `.udl` file:
+A `.lvl` Is the file type that stores these levels. Here is a diagram of a `.lvl` file:
 
 ```
-[32bit Magic Number] = 0x53616d42
+[32bit Magic Number] = 0x53616d42 // Spells "SamB" <--- My Initials
 [32bit Height]
 [32bit Length]
 [GAME DATA] ...

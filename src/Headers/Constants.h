@@ -127,6 +127,6 @@ static const IntType BBS_RNG_SALT[16] =
 // Level Names
 static const std::string LEVEL_FOLDER = "./Levels/";
 static const std::string LEVEL_PREFIX = "L";
-static const std::string LEVEL_EXTENTION = ".udl"; // u(pside)d(own)l(evel)
+static const std::string LEVEL_EXTENTION = ".lvl";
 
 #endif // CONSTANTS_H_INCLUDED
