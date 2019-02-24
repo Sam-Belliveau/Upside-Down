@@ -4,12 +4,12 @@
 #include <SFML/Graphics.hpp>
 
 #include <fstream> // Loading and saving levels
-#include <stack> // Undo in level editor
-#include <string> // File Names, Times 
 #include <cstdint> // Fixed Width Types
-#include <chrono> // Global frame count
 #include <sstream> // Building leaderboard
 #include <iomanip> // Building leaderboard
+#include <chrono> // Global frame count
+#include <string> // File Names, Times 
+#include <stack> // Undo in level editor
 #include <cmath> // Misc. Math
 
 // Game Types
@@ -98,7 +98,7 @@ static const IntType TEXT_X = 1;
 static const IntType TEXT_Y = 9;
 static const sf::Color GOOD_COLOR = sf::Color(0xE0,0xFF,0xE0);
 static const sf::Color BAD_COLOR = sf::Color(0xFF,0x80,0x80);
-static const char* ttfFile = "./src/GameFont.ttf";
+static const std::string ttfFile = "./src/GameFont.ttf";
 static sf::Font DEFAULT_GAME_FONT;
 
 static sf::Text GET_DEFAULT_TEXT()
@@ -109,7 +109,7 @@ static sf::Text GET_DEFAULT_TEXT()
     defaultText.setFont(DEFAULT_GAME_FONT);
     defaultText.setFillColor(sf::Color::White);
     defaultText.setOutlineColor(sf::Color::Black);
-    defaultText.setOutlineThickness(2.5*TEXT_SCALE);
+    defaultText.setOutlineThickness(2*TEXT_SCALE);
     defaultText.setCharacterSize(TEXT_SCALE*GAME_SCALE/1.5);
     defaultText.setScale(sf::Vector2f(1/TEXT_SCALE,1/TEXT_SCALE));
     return defaultText;
@@ -117,7 +117,7 @@ static sf::Text GET_DEFAULT_TEXT()
 
 // Level Editor
 static const IntType EDITOR_CAMERA_SPEED = 2;
-static const IntType BLOCK_LIST_SIZE = 6;
+static const IntType BLOCK_LIST_SIZE = 8;
 
 // Sorting Blocks By Brightness
 static const IntType R_LUMINANCE = 2126;

@@ -7,24 +7,17 @@
 // Used to randomize colors, Overkill if you ask me.
 IntType Game::randomize(IntType n)
 {
-    // The output will be the sum
-    // of every round of RNG
-    IntType pool = 0;
-
     // 16 rounds of Modified Blum Blum Shub
-    for(IntType i = 0; i < 16; ++i)
+    for(IntType i = 0; i < 256; ++i)
     {
         // Blum Blum Shub (N = N^2 % M)
         n = n*n % BBS_RNG_M;
 
         // Salt is used to fix issue around 0
         n += BBS_RNG_SALT[i%16];
-
-        // Add to entropy pool
-        pool += n;
     }
     
-    return std::abs(pool);
+    return std::abs(n);
 }
 
 bool Game::GameTypeData::getProp(RawIntType prop) const

@@ -57,6 +57,13 @@ namespace LevelBuilder
         index %= GameTypeCount;
         return index;
     }
+    
+    static IntType GetTypeIndex(Game::GameTypeLink *list, GameType block)
+    {
+        for(IntType i = 0; i < GameTypeCount; ++i)
+            if(block == list[i].type) return i;
+        return 0;
+    }
 
     struct UndoData
     {
@@ -80,6 +87,7 @@ namespace LevelBuilder
             "\n   Ctrl + Shift + Z = Revert To Save"
             "\n          Up + Down = Change Block"
             "\n         Left Click = Place Block"
+            "\n        Right Click = Copy Block"
             "\n       Left + Right = Move Camera" 
             "\nCtrl + Left + Right = Change Level"    
         );
@@ -266,13 +274,13 @@ namespace LevelBuilder
             mouse.x += cameraX;
 
             // Mouse and Updating screen
-            if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
+            if(sf::Mouse::getPosition(app).x >= 0 
+            && sf::Mouse::getPosition(app).x < app.getSize().x)
             {
-                if(sf::Mouse::getPosition(app).x >= 0 
-                && sf::Mouse::getPosition(app).x < app.getSize().x)
+                if(sf::Mouse::getPosition(app).y >= 0 
+                && sf::Mouse::getPosition(app).y < app.getSize().y)
                 {
-                    if(sf::Mouse::getPosition(app).y >= 0 
-                    && sf::Mouse::getPosition(app).y < app.getSize().y)
+                    if(sf::Mouse::isButtonPressed(sf::Mouse::Left))
                     {
                         // Only update if block is different
                         if(world[mouse.x][mouse.y] != sortedTypeList[item].type)
@@ -282,8 +290,11 @@ namespace LevelBuilder
                             world[mouse.x][mouse.y] = sortedTypeList[item].type;
                         }
                     }
+
+                    if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
+                        item = GetTypeIndex(sortedTypeList, world[mouse.x][mouse.y]);
                 }
-            } 
+            }
 
             // Draw World
             updateBuffer(buffer, world, cameraX, sortedTypeList[item].type, mouse);
