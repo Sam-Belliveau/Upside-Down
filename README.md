@@ -8,7 +8,7 @@
 
 **Windows:** Extract the DLLs into the root of the project and run the exe.
 
-**Cross Compile Linux to Windows:** `i686-w64-mingw32-g++ -O3 ./src/*.cpp -o UpsideDown.exe -static-libgcc -static-libstdc++ -lsfml-graphics -lsfml-window -lsfml-system`
+*This game relys on other files in the project folder, keep everything where it is*
 
 To run the game run `./UpsideDown.out` 
 
@@ -34,3 +34,7 @@ A `.lvl` Is the file type that stores these levels. Here is a diagram of a `.lvl
 ```
 
 The game data is a series of 8bit numbers that indicate what type of block they are. Data in the file is stored in little endian, and thus needs conversion for most prossesors.
+
+## DEV ONLY
+
+**Cross Compile Linux to Windows:** `i686-w64-mingw32-g++ -O3 ./src/*.cpp -o UpsideDown.exe -static-libgcc -static-libstdc++ -lsfml-graphics -lsfml-window -lsfml-system`
