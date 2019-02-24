@@ -4,14 +4,15 @@
 /***** STATIC MEMBERS *****/
 /**************************/
 
+// Used to randomize colors, Overkill if you ask me.
 IntType Game::randomize(IntType n)
 {
     // The output will be the sum
     // of every round of RNG
     IntType pool = 0;
 
-    // 256 rounds of Modified Blum Blum Shub
-    for(IntType i = 0; i < 256; ++i)
+    // 16 rounds of Modified Blum Blum Shub
+    for(IntType i = 0; i < 16; ++i)
     {
         // Blum Blum Shub (N = N^2 % M)
         n = n*n % BBS_RNG_M;
@@ -81,12 +82,12 @@ const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
     }, {
         GameType::Mud, 
         {"Mud", sf::Color(130, 60, 10), -12, 1.0, 0.0,
-            TypeProps::Solid
+            TypeProps::Solid | TypeProps::Slow
         }
     }, {
         GameType::Water, 
         {"Water", sf::Color(0, 64, 255), 8, -1.0/2.0, 0.1,
-            TypeProps::Liquid | TypeProps::Jumpable
+            TypeProps::LowGravity | TypeProps::Jumpable
         }
     }, {
         GameType::Smog, 
@@ -96,7 +97,7 @@ const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
     }, {
         GameType::LowGravity, 
         {"Low Gravity", sf::Color(100, 0, 100), 8, 1.0/3.0, 1.0/GAME_FPS,
-            TypeProps::Liquid
+            TypeProps::LowGravity
         }
     }, {
         GameType::MoveRight, 
@@ -107,6 +108,11 @@ const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
         GameType::MoveLeft, 
         {"Move Left", sf::Color(64, 196, 0), 64, 0, -1.0/3.0,
             TypeProps::MoveLeft
+        }
+    }, {
+        GameType::Honey, 
+        {"Honey", sf::Color(192, 128, 16), 16, 1.0/3.0, 1.0/GAME_FPS,
+            TypeProps::Slow | TypeProps::LowGravity
         }
     }, {
         GameType::Goal, 
@@ -220,8 +226,9 @@ bool Game::editorCheatKey()
 
 void Game::gameLoop()
 {
-    // Update Type data for player block
-    playerTypeData = GetTypeData(world[player.x][player.y]);
+    // Update Type data for player blocks
+    playerBlockData = GetTypeData(world[player.x][player.y]);
+    groundBlockData = GetTypeData(world[player.x][player.y + gravity]);
 
     // Check for game reset command
     resetKeyLoop();
@@ -268,16 +275,20 @@ void Game::resetKeyLoop()
 
 void Game::frameTimeLoop()
 {
+    ++rawFrame; // Used for game mechanics, must always tick
     if(player.x > START_SIZE && !getWinner()) 
         levelFrames[level] = ++frame;
     else if(level == START_LEVEL) 
+    {
+        hasCheated = false;
         frame = 0; 
+    }
 }
 
 void Game::goalLoop()
 {
     if(player.x >= GAME_LENGTH 
-    || playerTypeData.getProp(TypeProps::Goal)) 
+    || playerBlockData.getProp(TypeProps::Goal)) 
         loadWorld(level + 1);
 }
 
@@ -325,11 +336,11 @@ void Game::trapLoop()
 {
     // Trap Detection
     if(player.y <= 0 || player.y == GAME_HEIGHT - 1
-    || playerTypeData.getProp(TypeProps::Trap)
+    || playerBlockData.getProp(TypeProps::Trap)
     || player.x - 1 <= trapX/TRAP_SPEED - TRAP_SMOOTH)
     { ++deaths; reset(); return; }
 
-    if(!getWinner() && !playerTypeData.getProp(TypeProps::StopStorm))
+    if(!getWinner() && !playerBlockData.getProp(TypeProps::StopStorm))
     {
         // Move trap and start timer if player has moved from start
         if(player.x > START_SIZE) { ++trapX; }
@@ -344,7 +355,7 @@ void Game::jumpLoop()
 {
     if(jumpKey(gravity))
     {
-        if(GetTypeData(world[player.x][player.y + gravity]).getProp(TypeProps::Jumpable))
+        if(groundBlockData.getProp(TypeProps::Jumpable))
         { 
             if(canJump) gravity = GravityType(-gravity);
             canJump = false;
@@ -354,8 +365,8 @@ void Game::jumpLoop()
 
 void Game::bounceLoop()
 {
-    if(GetTypeData(world[player.x][player.y + gravity]).getProp(TypeProps::Bounce)
-    || playerTypeData.getProp(TypeProps::Bounce))
+    if(groundBlockData.getProp(TypeProps::Bounce)
+    || playerBlockData.getProp(TypeProps::Bounce))
     { 
         if(canBounce) gravity = GravityType(-gravity);
         canBounce = false; 
@@ -365,13 +376,27 @@ void Game::bounceLoop()
 
 void Game::movementLoop()
 {
-    if((player.x > 0 && leftKey()) || playerTypeData.getProp(TypeProps::MoveLeft))
-        if(!GetTypeData(world[player.x - 1][player.y]).getProp(TypeProps::Solid)) 
-            player.x--;
+    if(groundBlockData.getProp(TypeProps::Slow) 
+    || playerBlockData.getProp(TypeProps::Slow))
+        if(rawFrame % 2 != 0) return;
 
-    if(rightKey() || playerTypeData.getProp(TypeProps::MoveRight)) 
+    if((player.x > 0 && leftKey()) || playerBlockData.getProp(TypeProps::MoveLeft))
+    {
+        if(!GetTypeData(world[player.x - 1][player.y]).getProp(TypeProps::Solid)) 
+        {
+            player.x--;
+            groundBlockData = GetTypeData(world[player.x][player.y + gravity]);
+        }
+    }
+
+    if(rightKey() || playerBlockData.getProp(TypeProps::MoveRight)) 
+    {
         if(!GetTypeData(world[player.x + 1][player.y]).getProp(TypeProps::Solid)) 
+        {
             player.x++; 
+            groundBlockData = GetTypeData(world[player.x][player.y + gravity]);
+        }    
+    }
 }
 
 void Game::cameraLoop()
@@ -392,20 +417,21 @@ void Game::cameraLoop()
 
 void Game::gravityLoop()
 {
-    liquidState = !liquidState; // You move in liquid every other frame
-    if(!GetTypeData(world[player.x][player.y + gravity]).getProp(TypeProps::Solid))
+    // You cant use ground block data as player moved in the movement loop
+    if(!groundBlockData.getProp(TypeProps::Solid))
     {
-        if(GetTypeData(world[player.x][player.y + gravity]).getProp(TypeProps::Liquid)) 
-        { if(liquidState) player.y += gravity; }
+        if(groundBlockData.getProp(TypeProps::LowGravity)) 
+        { if(rawFrame % 2 == 0) player.y += gravity; }
         else player.y += gravity; 
     } 
 }
 
 void Game::reset()
 {
-    player = sf::Vector2<IntType>(5, 18);
+    player = sf::Vector2<IntType>(GAME_START_X, GAME_START_Y);
     gravity = GravityType::Down; 
     trapX = TRAP_START;
+    rawFrame = 0;
     cameraX = 0;
 
     if(level == START_LEVEL) {

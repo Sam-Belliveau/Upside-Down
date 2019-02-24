@@ -21,27 +21,34 @@ using RawIntType = std::uint32_t;
 static const IntType GAME_WIDTH = 42;
 static const RawIntType GAME_HEIGHT = 24;
 static const RawIntType GAME_LENGTH = 256;
+static const IntType START_SIZE = 9;
+
+static const IntType GAME_START_X = START_SIZE/2;
+static const IntType GAME_START_Y = 18;
 
 static const IntType GAME_SCALE = 24;
 static const IntType GAME_FPS = 24;
-static const IntType START_SIZE = 9;
 static const double LOST_FOCUS_COLOR = 1.5;
 static const sf::Color PLAYER_COLOR = sf::Color(196, 255, 196);
 
 // Global frames
-static const auto START_DURATION = std::chrono::steady_clock::now();
+using CHRONO_CLOCK = std::chrono::steady_clock;
+using CHRONO_UNIT = std::chrono::nanoseconds;
+static const std::uintmax_t CHONO_UNIT_PER_SEC = 1000000000;
+static const auto START_DURATION = CHRONO_CLOCK::now();
 static IntType GET_GLOBAL_FRAME()
 {
-    auto now = std::chrono::steady_clock::now();
-    std::uint64_t t = std::chrono::duration_cast<std::chrono::microseconds>(now - START_DURATION).count();
+    auto now = CHRONO_CLOCK::now();
+    auto t = std::chrono::duration_cast<CHRONO_UNIT>(now - START_DURATION).count();
     t *= GAME_FPS;
-    t /= 1000000;
+    t += CHONO_UNIT_PER_SEC/2; // Rounding
+    t /= CHONO_UNIT_PER_SEC;
     return IntType(t);
 }
 
 // Game Peices / File Loading
 static const RawIntType MAGIC_NUMBER = 0x53616d42; // "SamB"
-static constexpr IntType GameTypeCount = 11;
+static constexpr IntType GameTypeCount = 12;
 enum GameType : Byte 
 { 
     // Here are the IDs for each block
@@ -55,6 +62,7 @@ enum GameType : Byte
     LowGravity = 7,
     MoveRight  = 8,
     MoveLeft   = 9,
+    Honey      = 10,
     Goal       = 0xff
 };
 
@@ -83,8 +91,7 @@ static const IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED);
 
 // Level Data / Image Processing
 static const IntType START_LEVEL = 1;
-static const IntType MAX_LEVEL_COUNT = 256;
-static const std::uint8_t COLOR_THRESHOLD = 128;
+static const IntType MAX_LEVEL_COUNT = 100;
 
 // Text
 static const IntType TEXT_X = 1;
@@ -111,6 +118,18 @@ static sf::Text GET_DEFAULT_TEXT()
 // Level Editor
 static const IntType EDITOR_CAMERA_SPEED = 2;
 static const IntType BLOCK_LIST_SIZE = 6;
+
+// Sorting Blocks By Brightness
+static const IntType R_LUMINANCE = 2126;
+static const IntType G_LUMINANCE = 7152;
+static const IntType B_LUMINANCE = 722;
+static IntType GetLuminance(sf::Color in)
+{
+    IntType r = in.r * in.r * R_LUMINANCE;
+    IntType g = in.g * in.g * G_LUMINANCE;
+    IntType b = in.b * in.b * B_LUMINANCE;
+    return r + g + b;
+}
 
 // Random Number Generation
 static const IntType BBS_RNG_P = 4091;

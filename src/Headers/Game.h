@@ -14,16 +14,17 @@ public: // Static methods and enums
     enum TypeProps : RawIntType 
     { 
         None = 0x00, // Blank
-        Solid     = RawIntType(1) << 0, // Stops player from passing through
-        Liquid    = RawIntType(1) << 1, // Slows gravity to 1/2
-        Trap      = RawIntType(1) << 2, // Kills Player
-        Jumpable  = RawIntType(1) << 3, // Player can jump off of
-        Bounce    = RawIntType(1) << 4, // Player bounces off of
-        Smog      = RawIntType(1) << 5, // Hinders Visibility
-        StopStorm = RawIntType(1) << 6, // Moves the storm
-        MoveRight = RawIntType(1) << 7, // Moves player right
-        MoveLeft  = RawIntType(1) << 8, // Moves player left
-        Goal      = RawIntType(1) << 31 // Goes To Next Level
+        Solid      = RawIntType(1) << 0, // Stops player from passing through
+        LowGravity = RawIntType(1) << 1, // Slows gravity to 1/2
+        Trap       = RawIntType(1) << 2, // Kills Player
+        Jumpable   = RawIntType(1) << 3, // Player can jump off of
+        Bounce     = RawIntType(1) << 4, // Player bounces off of
+        Slow       = RawIntType(1) << 5, // Slows Down User
+        Smog       = RawIntType(1) << 6, // Hinders Visibility
+        StopStorm  = RawIntType(1) << 7, // Moves the storm
+        MoveRight  = RawIntType(1) << 8, // Moves player right
+        MoveLeft   = RawIntType(1) << 9, // Moves player left
+        Goal       = RawIntType(1) << 31 // Goes To Next Level
     };
 
     struct GameTypeData
@@ -98,6 +99,7 @@ public: // Getters
     void setCheater();
 
 private: // Member Variables
+    RawIntType rawFrame; // Used for game mechanics, always ticks
     IntType finalLevel;
     IntType level, frame, deaths;
     IntType levelFrames[MAX_LEVEL_COUNT];
@@ -107,9 +109,9 @@ private: // Member Variables
     
     GravityType gravity = GravityType::Down; 
     bool canJump = true, canBounce = true;
-    bool hasCheated = false, liquidState = false;
+    bool hasCheated = false;
 
-    GameTypeData playerTypeData;
+    GameTypeData playerBlockData, groundBlockData;
     GameType world[GAME_LENGTH][GAME_HEIGHT];
     Byte buffer[GAME_HEIGHT][GAME_WIDTH][4];
 };

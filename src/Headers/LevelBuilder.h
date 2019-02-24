@@ -51,7 +51,7 @@ namespace LevelBuilder
         }
     }
 
-    static IntType loopTypeIndex(IntType index)
+    static IntType LoopTypeIndex(IntType index)
     {
         while(index < 0) index += GameTypeCount;
         index %= GameTypeCount;
@@ -99,6 +99,17 @@ namespace LevelBuilder
             BlocksUp[i].setPosition(GAME_SCALE / 2, GAME_SCALE * (GAME_HEIGHT - (4 + i)));
         }
 
+        Game::GameTypeLink sortedTypeList[GameTypeCount];
+        for(IntType i = 0; i < GameTypeCount; ++i)
+            sortedTypeList[i] = Game::GameTypeList[i];
+
+        std::stable_sort(std::begin(sortedTypeList), std::end(sortedTypeList),
+            [](const Game::GameTypeLink& a, const Game::GameTypeLink& b) -> bool 
+            {   
+                return GetLuminance(a.data.color) < GetLuminance(b.data.color);
+            }
+        );
+        
         std::stack<UndoData> undoList;
         GameType world[GAME_LENGTH][GAME_HEIGHT] = {};
         Byte buffer[GAME_HEIGHT][GAME_WIDTH][4] = {};
@@ -161,19 +172,19 @@ namespace LevelBuilder
             { break; }
 
             // Loop Items
-            item = loopTypeIndex(item);
+            item = LoopTypeIndex(item);
 
             // Indicate Item
             for(IntType i = 0; i < BLOCK_LIST_SIZE; ++i)
             {
-                BlocksUp[i].setString(Game::GameTypeList[loopTypeIndex(item - (i + 1))].data.name);
-                BlocksUp[i].setFillColor(Game::GameTypeList[loopTypeIndex(item - (i + 1))].data.color);
+                BlocksUp[i].setString(sortedTypeList[LoopTypeIndex(item - (i + 1))].data.name);
+                BlocksUp[i].setFillColor(sortedTypeList[LoopTypeIndex(item - (i + 1))].data.color);
             }
 
-            Block.setString(Game::GameTypeList[loopTypeIndex(item - 0)].data.name);
-            Block.setFillColor(Game::GameTypeList[loopTypeIndex(item - 0)].data.color);
-            BlockDown.setString(Game::GameTypeList[loopTypeIndex(item + 1)].data.name);
-            BlockDown.setFillColor(Game::GameTypeList[loopTypeIndex(item + 1)].data.color);
+            Block.setString(sortedTypeList[LoopTypeIndex(item - 0)].data.name);
+            Block.setFillColor(sortedTypeList[LoopTypeIndex(item - 0)].data.color);
+            BlockDown.setString(sortedTypeList[LoopTypeIndex(item + 1)].data.name);
+            BlockDown.setFillColor(sortedTypeList[LoopTypeIndex(item + 1)].data.color);
 
             // Reverting
             if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
@@ -264,18 +275,18 @@ namespace LevelBuilder
                     && sf::Mouse::getPosition(app).y < app.getSize().y)
                     {
                         // Only update if block is different
-                        if(world[mouse.x][mouse.y] != Game::GameTypeList[item].type)
+                        if(world[mouse.x][mouse.y] != sortedTypeList[item].type)
                         {
                             edits = true;
                             undoList.push({mouse, world[mouse.x][mouse.y]});
-                            world[mouse.x][mouse.y] = Game::GameTypeList[item].type;
+                            world[mouse.x][mouse.y] = sortedTypeList[item].type;
                         }
                     }
                 }
             } 
 
             // Draw World
-            updateBuffer(buffer, world, cameraX, Game::GameTypeList[item].type, mouse);
+            updateBuffer(buffer, world, cameraX, sortedTypeList[item].type, mouse);
             Graphics::pushRGBA(app, reinterpret_cast<const Byte*>(buffer));
 
             // Draw Text
