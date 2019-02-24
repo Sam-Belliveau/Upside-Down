@@ -98,7 +98,7 @@ static const IntType TEXT_X = 1;
 static const IntType TEXT_Y = 9;
 static const sf::Color GOOD_COLOR = sf::Color(0xE0,0xFF,0xE0);
 static const sf::Color BAD_COLOR = sf::Color(0xFF,0x80,0x80);
-static const std::string ttfFile = "./src/GameFont.ttf";
+static const std::string ttfFile = "./GameFiles/GameFont.ttf";
 static sf::Font DEFAULT_GAME_FONT;
 
 static sf::Text GET_DEFAULT_TEXT()
