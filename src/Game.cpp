@@ -362,7 +362,8 @@ void Game::bounceLoop()
     || playerBlockData.getProp(TypeProps::Bounce))
     { 
         if(canBounce) gravity = GravityType(-gravity);
-        canBounce = false; 
+        if(playerBlockData.getProp(TypeProps::Bounce))
+            canBounce = false; 
     }
     else { canBounce = true; }
 }
