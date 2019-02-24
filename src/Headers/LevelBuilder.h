@@ -75,10 +75,10 @@ namespace LevelBuilder
     {
         app.setFramerateLimit(60);
         sf::Text SavedIcon = GET_DEFAULT_TEXT();
-        SavedIcon.setPosition((GAME_WIDTH-11)*GAME_SCALE,GAME_SCALE * (GAME_HEIGHT - 8));
+        SavedIcon.setPosition((GAME_WIDTH-11)*GAME_SCALE,GAME_SCALE * (GAME_HEIGHT - 9));
 
         sf::Text Help = SavedIcon;
-        Help.setPosition((GAME_WIDTH-14)*GAME_SCALE,GAME_SCALE * (GAME_HEIGHT - 8));
+        Help.setPosition((GAME_WIDTH-14)*GAME_SCALE,GAME_SCALE * (GAME_HEIGHT - 9));
         Help.setString( 
             "\n             Escape = Exit Editor"
             "\n      Ctrl + Escape = Force Exit"
