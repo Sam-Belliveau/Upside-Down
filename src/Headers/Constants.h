@@ -14,14 +14,14 @@
 
 // Game Types
 using Byte = std::uint8_t;
-using IntType = std::int_fast32_t;
+using IntType = std::int32_t;
 using RawIntType = std::uint32_t;
 
 // Game FPS
 static const IntType GAME_FPS = 24;
 
 // Game Version
-static const std::string GAME_VERSION = "v1.1";
+static const std::string GAME_VERSION = "v1.2";
 
 // Game Size / Pixel Measurements
 static const IntType GAME_WIDTH = 42;

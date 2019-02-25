@@ -5,7 +5,8 @@
 /**************************/
 
 // Used to randomize colors, Overkill if you ask me.
-IntType Game::randomize(IntType n)
+template<class T>
+T Game::randomize(T n)
 {
     // 16 rounds of Modified Blum Blum Shub
     for(IntType i = 0; i < 256; ++i)
@@ -17,7 +18,7 @@ IntType Game::randomize(IntType n)
         n += BBS_RNG_SALT[i%16];
     }
     
-    return std::abs(n);
+    return n;
 }
 
 bool Game::GameTypeData::getProp(RawIntType prop) const
@@ -34,7 +35,7 @@ IntType Game::GameTypeData::randomize(IntType cx, IntType x, IntType y) const
         const IntType XRand = Game::randomize(IntType(cx * cameraSpeed - GET_GLOBAL_FRAME() * textureSpeed + 0.5) + x);
         const IntType YRand = Game::randomize(y);
         
-        return Game::randomize(XRand + YRand) % randomness;
+        return std::abs(Game::randomize(XRand + YRand)) % randomness;
     }
 
     return IntType(0);
@@ -484,12 +485,12 @@ const Byte* Game::returnWorldPixels(bool focus)
                 // Smog
                 if(smog)
                 {
+                    IntType random = std::abs(randomize(frame*(x+1)*(y+1))%4);
                     double dis = std::max(
                         1.0, 
                         std::hypot(double(player.x - (x + cameraX)), double(player.y - y)) - SMOG_SIZE
                     );
                     R /= dis*dis;  G /= dis*dis;  B /= dis*dis;
-                    IntType random = randomize(frame*(x+1)*(y+1))%4;
                     R += random; G += random; B += random; 
                 } 
             }
@@ -558,6 +559,29 @@ IntType Game::getLevelFrame(IntType level) const
     level = std::max(level, IntType(0));
     level = std::min(level, MAX_LEVEL_COUNT);
     return levelFrames[level]; 
+}
+
+std::uint64_t Game::getLevelHash() const
+{
+    std::uint64_t hash = 0;
+    GameType hashWorld[GAME_LENGTH][GAME_HEIGHT];
+    for(IntType i = 0; i < MAX_LEVEL_COUNT; ++i)
+    {
+        if(Loader::LoadWorld(i, hashWorld, false))
+        {
+            for(IntType x = 0; x < GAME_LENGTH; ++x)
+            {
+                for(IntType y = 0; y < GAME_HEIGHT; ++y)
+                {
+                    hash = (hash << 13) + (hash << 7) + (hash >> 3);
+                    hash = (hash << 11) ^ (hash << 5) ^ (hash >> 1);
+                    hash += randomize<std::uint64_t>(hash);
+                    hash += randomize<std::uint64_t>(hashWorld[x][y]);
+                }
+            }
+        }
+    }
+    return hash;
 }
 
 bool Game::getCheater() const 

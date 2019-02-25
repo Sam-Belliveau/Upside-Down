@@ -9,7 +9,8 @@ class Game
 {
 public: // Static methods and enums
     // Enums and static methods
-    static IntType randomize(IntType n);
+    template<class T>
+    static T randomize(T n);
 
     enum TypeProps : RawIntType 
     { 
@@ -94,6 +95,7 @@ public: // Getters
     IntType getDeaths() const;
     IntType getFrame() const;
     IntType getLevelFrame(IntType) const;
+    std::uint64_t getLevelHash() const;
     bool getWinner() const;
     bool getCheater() const;
     void setCheater();

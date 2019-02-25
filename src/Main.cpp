@@ -16,13 +16,13 @@ int main()
     sf::Text timer = GET_DEFAULT_TEXT(1);
     timer.setPosition(6, 0);
 
-    sf::Text version = GET_DEFAULT_TEXT(2);
-    version.setPosition(6, GAME_SCALE*(GAME_HEIGHT - 1.8));
-    version.setString(GAME_VERSION);
-
     Game game;
     bool focus = true;
     game.loadWorld(START_LEVEL);
+
+    sf::Text version = GET_DEFAULT_TEXT(1);
+    version.setPosition(6, GAME_SCALE*(GAME_HEIGHT - 1));
+    TextTimes::UpdateHash(game, version);
 
     while (app.isOpen())
     {
@@ -44,6 +44,7 @@ int main()
             game.setCheater();
             game.loadWorld(LevelBuilder::Loop(app, game.getLevel(), game.getCameraX()));
             while(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape));
+            TextTimes::UpdateHash(game, version);
         }
 
         TextTimes::UpdateLeaderboard(game, leaderboard);

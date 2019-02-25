@@ -6,6 +6,14 @@
 
 namespace TextTimes
 {
+    static void UpdateHash(const Game& game, sf::Text& text)
+    {
+        // Setup string buffer
+        std::ostringstream stream;
+        stream << std::hex << GAME_VERSION << " : " << game.getLevelHash();
+        text.setString(stream.str());
+    }
+
     static void UpdateTimer(const Game& game, sf::Text& text)
     {
         if(game.getCheater())
