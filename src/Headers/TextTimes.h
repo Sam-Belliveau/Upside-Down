@@ -6,12 +6,18 @@
 
 namespace TextTimes
 {
+    const char* Base64 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/";
     static void UpdateHash(const Game& game, sf::Text& text)
     {
         // Setup string buffer
         std::ostringstream stream;
-        stream << std::hex << GAME_VERSION << " : " 
-        << std::uint32_t(game.getLevelHash() ^ (game.getLevelHash() >> 32));
+        stream << GAME_VERSION << " : ";
+        HashType gameHash = game.getLevelHash();
+        while(gameHash != 0)
+        {
+            stream << Base64[gameHash & 0x3f];
+            gameHash >>= 6;
+        }
         text.setString(stream.str());
     }
 
