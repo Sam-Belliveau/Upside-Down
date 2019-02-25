@@ -6,7 +6,7 @@
 
 namespace TextTimes
 {
-    const char* Base64 = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/";
+    const char* Base32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
     static void UpdateHash(const Game& game, sf::Text& text)
     {
         // Setup string buffer
@@ -15,8 +15,8 @@ namespace TextTimes
         HashType gameHash = game.getLevelHash();
         while(gameHash != 0)
         {
-            stream << Base64[gameHash & 0x3f];
-            gameHash >>= 6;
+            stream << Base32[gameHash & 0x1f];
+            gameHash >>= 5;
         }
         text.setString(stream.str());
     }
