@@ -8,7 +8,9 @@
 template<class T>
 T Game::randomize(T n)
 {
-    // 16 rounds of Modified Blum Blum Shub
+    T pool = 0;
+
+    // 256 rounds of Modified Blum Blum Shub
     for(IntType i = 0; i < 256; ++i)
     {
         // Blum Blum Shub (N = N^2 % M)
@@ -16,9 +18,11 @@ T Game::randomize(T n)
 
         // Salt is used to fix issue around 0
         n += BBS_RNG_SALT[i%16];
+
+        pool += n;
     }
     
-    return n;
+    return pool;
 }
 
 bool Game::GameTypeData::getProp(RawIntType prop) const
@@ -574,7 +578,6 @@ std::uint64_t Game::getLevelHash() const
                 for(IntType y = 0; y < GAME_HEIGHT; ++y)
                 {
                     hash = (hash << 13) + (hash << 7) + (hash >> 3);
-                    hash = (hash << 11) ^ (hash << 5) ^ (hash >> 1);
                     hash += randomize<std::uint64_t>(hash);
                     hash += randomize<std::uint64_t>(hashWorld[x][y]);
                 }
