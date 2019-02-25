@@ -472,8 +472,9 @@ const Byte* Game::returnWorldPixels(bool focus)
                         1.0, 
                         std::hypot(double(player.x - (x + cameraX)), double(player.y - y)) - SMOG_SIZE
                     );
+                    IntType smogRand = RANDOMIZE(frame*(x+cameraX+1)*(y+1))%4;
                     R /= dis*dis;  G /= dis*dis;  B /= dis*dis;
-                    R += random; G += random; B += random; 
+                    R += smogRand; G += smogRand; B += smogRand; 
                 } 
             }
 
