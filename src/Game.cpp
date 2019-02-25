@@ -4,27 +4,6 @@
 /***** STATIC MEMBERS *****/
 /**************************/
 
-// Used to randomize colors, Overkill if you ask me.
-template<class T>
-T Game::randomize(T n)
-{
-    T pool = 0;
-
-    // 256 rounds of Modified Blum Blum Shub
-    for(IntType i = 0; i < 256; ++i)
-    {
-        // Blum Blum Shub (N = N^2 % M)
-        n = n*n % BBS_RNG_M;
-
-        // Salt is used to fix issue around 0
-        n += BBS_RNG_SALT[i%16];
-
-        pool += n;
-    }
-    
-    return pool;
-}
-
 bool Game::GameTypeData::getProp(RawIntType prop) const
 {
     // This allows for testing of more than
@@ -36,10 +15,10 @@ IntType Game::GameTypeData::randomize(IntType cx, IntType x, IntType y) const
 {
     if(randomness != 0) 
     {
-        const IntType XRand = Game::randomize(IntType(cx * cameraSpeed - GET_GLOBAL_FRAME() * textureSpeed + 0.5) + x);
-        const IntType YRand = Game::randomize(y);
+        const IntType XRand = RANDOMIZE(IntType(cx * cameraSpeed - GET_GLOBAL_FRAME() * textureSpeed + 0.5) + x);
+        const IntType YRand = RANDOMIZE(y);
         
-        return std::abs(Game::randomize(XRand + YRand)) % randomness;
+        return std::abs(RANDOMIZE(XRand + YRand)) % randomness;
     }
 
     return IntType(0);
@@ -489,7 +468,6 @@ const Byte* Game::returnWorldPixels(bool focus)
                 // Smog
                 if(smog)
                 {
-                    IntType random = std::abs(randomize(frame*(x+1)*(y+1))%4);
                     double dis = std::max(
                         1.0, 
                         std::hypot(double(player.x - (x + cameraX)), double(player.y - y)) - SMOG_SIZE
@@ -577,13 +555,26 @@ std::uint64_t Game::getLevelHash() const
             {
                 for(IntType y = 0; y < GAME_HEIGHT; ++y)
                 {
-                    hash = (hash << 13) + (hash << 7) + (hash >> 3);
-                    hash += randomize<std::uint64_t>(hash);
-                    hash += randomize<std::uint64_t>(hashWorld[x][y]);
+                    hash += ROTATE(hash, 7);
+                    hash += ROTATE(hash, 13);
+                    hash += ROTATE(hash, 37);
+                    hash += ROTATE(hash, 16 + i%16);
+                    hash += RANDOMIZE<std::uint64_t>(hashWorld[x][y]);
+                    hash += RANDOMIZE<std::uint64_t>(hash);
                 }
+            }
+        } else 
+        {
+            for(IntType i = 0; i < BBS_RNG_ROUNDS; ++i)
+            {
+                hash += ROTATE(hash, 7);
+                hash += ROTATE(hash, 13);
+                hash += ROTATE(hash, 37);
+                hash += RANDOMIZE<std::uint64_t>(hash);
             }
         }
     }
+
     return hash;
 }
 

@@ -17,11 +17,11 @@ int main()
     timer.setPosition(6, 0);
 
     Game game;
-    bool focus = true;
+    bool focus = true, won = false;
     game.loadWorld(START_LEVEL);
 
     sf::Text version = GET_DEFAULT_TEXT(1);
-    version.setPosition(6, GAME_SCALE*(GAME_HEIGHT - 1));
+    version.setPosition(6, 6 + GAME_SCALE*(GAME_HEIGHT - 1));
     TextTimes::UpdateHash(game, version);
 
     while (app.isOpen())
@@ -46,6 +46,13 @@ int main()
             while(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape));
             TextTimes::UpdateHash(game, version);
         }
+
+        // Update hash when game is won
+        if(game.getWinner())
+        {
+            if(!won) { TextTimes::UpdateHash(game, version); }
+            won = true;
+        } else { won = false; }
 
         TextTimes::UpdateLeaderboard(game, leaderboard);
         TextTimes::UpdateTimer(game, timer);
