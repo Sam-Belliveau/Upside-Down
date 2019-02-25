@@ -10,7 +10,8 @@ namespace TextTimes
     {
         // Setup string buffer
         std::ostringstream stream;
-        stream << std::hex << GAME_VERSION << " : " << game.getLevelHash();
+        stream << std::hex << GAME_VERSION << " : " 
+        << std::uint32_t(game.getLevelHash() ^ (game.getLevelHash() >> 32));
         text.setString(stream.str());
     }
 

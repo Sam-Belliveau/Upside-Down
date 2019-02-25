@@ -557,8 +557,8 @@ std::uint64_t Game::getLevelHash() const
                 {
                     hash += ROTATE(hash, 7);
                     hash += ROTATE(hash, 13);
-                    hash += ROTATE(hash, 37);
-                    hash += ROTATE(hash, 16 + i%16);
+                    hash += ROTATE(hash, 49);
+                    hash += ROTATE(hash, 16 + i%32);
                     hash += RANDOMIZE<std::uint64_t>(hashWorld[x][y]);
                     hash += RANDOMIZE<std::uint64_t>(hash);
                 }
