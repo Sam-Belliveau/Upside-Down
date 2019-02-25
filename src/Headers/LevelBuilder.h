@@ -74,10 +74,10 @@ namespace LevelBuilder
     static IntType Loop(sf::RenderWindow &app, IntType level, IntType cameraX)
     {
         app.setFramerateLimit(60);
-        sf::Text SavedIcon = GET_DEFAULT_TEXT();
+        sf::Text SavedIcon = GET_DEFAULT_TEXT(1);
         SavedIcon.setPosition((GAME_WIDTH-11)*GAME_SCALE,GAME_SCALE * (GAME_HEIGHT - 9));
 
-        sf::Text Help = SavedIcon;
+        sf::Text Help = GET_DEFAULT_TEXT(1);
         Help.setPosition((GAME_WIDTH-14)*GAME_SCALE,GAME_SCALE * (GAME_HEIGHT - 9));
         Help.setString( 
             "\n             Escape = Exit Editor"
@@ -92,13 +92,11 @@ namespace LevelBuilder
             "\nCtrl + Left + Right = Change Level"    
         );
 
-        sf::Text Block = SavedIcon;
+        sf::Text Block = GET_DEFAULT_TEXT(2.5);
         Block.setPosition(GAME_SCALE / 2,GAME_SCALE * (GAME_HEIGHT - 3));
-        Block.setScale(sf::Vector2f(2 / TEXT_SCALE, 2 / TEXT_SCALE));
 
-        sf::Text BlockDown = Block;
+        sf::Text BlockDown = GET_DEFAULT_TEXT(1.25);
         BlockDown.setPosition(GAME_SCALE / 2, GAME_SCALE * (GAME_HEIGHT - 1));
-        BlockDown.setScale(sf::Vector2f(1/TEXT_SCALE, 1/TEXT_SCALE));
 
         sf::Text BlocksUp[BLOCK_LIST_SIZE];
         for(IntType i = 0; i < BLOCK_LIST_SIZE; ++i)

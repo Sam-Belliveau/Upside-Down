@@ -17,6 +17,12 @@ using Byte = std::uint8_t;
 using IntType = std::int_fast32_t;
 using RawIntType = std::uint32_t;
 
+// Game FPS
+static const IntType GAME_FPS = 24;
+
+// Game Version
+static const std::string GAME_VERSION = "v1.1";
+
 // Game Size / Pixel Measurements
 static const IntType GAME_WIDTH = 42;
 static const RawIntType GAME_HEIGHT = 24;
@@ -26,8 +32,7 @@ static const IntType START_SIZE = 9;
 static const IntType GAME_START_X = START_SIZE/2;
 static const IntType GAME_START_Y = 18;
 
-static const IntType GAME_SCALE = 24;
-static const IntType GAME_FPS = 24;
+static const IntType GAME_SCALE = 32;
 static const double LOST_FOCUS_COLOR = 1.5;
 static const sf::Color PLAYER_COLOR = sf::Color(196, 255, 196);
 
@@ -101,7 +106,7 @@ static const sf::Color BAD_COLOR = sf::Color(0xFF,0x80,0x80);
 static const std::string ttfFile = "./GameFiles/GameFont.ttf";
 static sf::Font DEFAULT_GAME_FONT;
 
-static sf::Text GET_DEFAULT_TEXT()
+static sf::Text GET_DEFAULT_TEXT(double size)
 {
     if(!DEFAULT_GAME_FONT.loadFromFile(ttfFile)) { return sf::Text(); }
 
@@ -109,9 +114,9 @@ static sf::Text GET_DEFAULT_TEXT()
     defaultText.setFont(DEFAULT_GAME_FONT);
     defaultText.setFillColor(sf::Color::White);
     defaultText.setOutlineColor(sf::Color::Black);
-    defaultText.setOutlineThickness(2*TEXT_SCALE);
-    defaultText.setCharacterSize(TEXT_SCALE*GAME_SCALE/1.5);
-    defaultText.setScale(sf::Vector2f(1/TEXT_SCALE,1/TEXT_SCALE));
+    defaultText.setOutlineThickness(size*2*TEXT_SCALE);
+    defaultText.setCharacterSize(size*TEXT_SCALE*GAME_SCALE/1.5);
+    defaultText.setScale(sf::Vector2f(1.0/TEXT_SCALE,1.0/TEXT_SCALE));
     return defaultText;
 }
 

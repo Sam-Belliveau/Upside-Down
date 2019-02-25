@@ -11,9 +11,14 @@ int main()
     app.setFramerateLimit(GAME_FPS);
 
     // Text class used to display times
-    sf::Text leaderboard = GET_DEFAULT_TEXT();
-    sf::Text timer = GET_DEFAULT_TEXT();
+    sf::Text leaderboard = GET_DEFAULT_TEXT(1);
+
+    sf::Text timer = GET_DEFAULT_TEXT(1);
     timer.setPosition(6, 0);
+
+    sf::Text version = GET_DEFAULT_TEXT(2);
+    version.setPosition(6, GAME_SCALE*(GAME_HEIGHT - 1.8));
+    version.setString(GAME_VERSION);
 
     Game game;
     bool focus = true;
@@ -45,6 +50,7 @@ int main()
         TextTimes::UpdateTimer(game, timer);
         app.draw(leaderboard);
         app.draw(timer);
+        app.draw(version);
         
         app.display();
     }
