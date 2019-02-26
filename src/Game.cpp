@@ -561,7 +561,7 @@ HashType Game::getLevelHash() const
                     hash += ROTATE(hash, 49);
                     hash += ROTATE(hash, 16 + lvl%32);
                     
-                    HashType word = hashWorld[x][y];
+                    HashType word = 0;
                     word |= hashWorld[x][std::min(RawIntType(y + 0), GAME_HEIGHT - 1)] << 0;
                     word |= hashWorld[x][std::min(RawIntType(y + 1), GAME_HEIGHT - 1)] << 8;
                     hash += RANDOMIZE<HashType>(word);
