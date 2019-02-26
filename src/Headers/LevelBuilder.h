@@ -211,8 +211,7 @@ namespace LevelBuilder
                     if(!edits)
                     { 
                         cameraX = 0; 
-                        if(level == 0) level = MAX_LEVEL_COUNT - 1;
-                        else --level;
+                        if(level != 0) --level;
                         
                         edits = false;
                         Loader::LoadWorld(level, world); 
@@ -233,7 +232,7 @@ namespace LevelBuilder
                     if(!edits)
                     { 
                         cameraX = 0; 
-                        ++level; level %= MAX_LEVEL_COUNT;
+                        if(level < MAX_LEVEL_COUNT - 1) ++level;
 
                         edits = false;
                         Loader::LoadWorld(level, world); 
@@ -246,14 +245,6 @@ namespace LevelBuilder
                 }
             }
 
-            // Saving 
-            if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
-            && sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-            {
-                Loader::SaveWorld(level, world);
-                edits = false;
-            }
-
             if(!edits)
             {
                 if(level == 0) SavedIcon.setString("      (End Level Saved)");
@@ -263,6 +254,14 @@ namespace LevelBuilder
                 if(level == 0) SavedIcon.setString("      (End Level Not Saved)");
                 else SavedIcon.setString("      (Level " + std::to_string(level) + " Not Saved)");
                 SavedIcon.setFillColor(sf::Color::Red);
+
+                // Saving 
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::LControl)
+                && sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+                {
+                    Loader::SaveWorld(level, world);
+                    edits = false;
+                }
             }
 
             // Calculate mouse pixel
