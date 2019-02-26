@@ -35,7 +35,7 @@ public: // Static methods and enums
         IntType randomness; // randomness of block color
         double cameraSpeed; // paralax
         double textureSpeed; // how fast block color moves
-        RawIntType propertys; // game propertys
+        RawIntType propertys; // game properties
 
         bool getProp(RawIntType) const;
         IntType randomize(IntType, IntType, IntType) const;
@@ -95,7 +95,7 @@ public: // Getters
     IntType getDeaths() const;
     IntType getFrame() const;
     IntType getLevelFrame(IntType) const;
-    std::uint64_t getLevelHash() const;
+    HashType getLevelHash() const;
     bool getWinner() const;
     bool getCheater() const;
     void setCheater();

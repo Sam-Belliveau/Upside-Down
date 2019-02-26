@@ -24,7 +24,7 @@ IntType Game::GameTypeData::randomize(IntType cx, IntType x, IntType y) const
     return IntType(0);
 }
 
-// Game types and their propertys    
+// Game types and their properties    
 /* ***** TYPE DATA STRUCTURE *****
  * GameType::XXXXX, <--- Game Type
  * {"[Block Name]", [Block Color], [1*], [2*], [3*],
@@ -544,9 +544,9 @@ IntType Game::getLevelFrame(IntType level) const
     return levelFrames[level]; 
 }
 
-std::uint64_t Game::getLevelHash() const
+HashType Game::getLevelHash() const
 {
-    std::uint64_t hash = 0;
+    HashType hash = 0;
     GameType hashWorld[GAME_LENGTH][GAME_HEIGHT];
     for(IntType lvl = 0; lvl < MAX_LEVEL_COUNT; ++lvl)
     {
@@ -560,8 +560,8 @@ std::uint64_t Game::getLevelHash() const
                     hash += ROTATE(hash, 13);
                     hash += ROTATE(hash, 49);
                     hash += ROTATE(hash, 16 + lvl%32);
-                    hash += RANDOMIZE<std::uint64_t>(hashWorld[x][y]);
-                    hash += RANDOMIZE<std::uint64_t>(hash);
+                    hash += RANDOMIZE<HashType>(hashWorld[x][y]);
+                    hash += RANDOMIZE<HashType>(hash);
                 }
             }
         } else 
