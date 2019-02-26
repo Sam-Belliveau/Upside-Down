@@ -548,9 +548,9 @@ std::uint64_t Game::getLevelHash() const
 {
     std::uint64_t hash = 0;
     GameType hashWorld[GAME_LENGTH][GAME_HEIGHT];
-    for(IntType i = 0; i < MAX_LEVEL_COUNT; ++i)
+    for(IntType lvl = 0; lvl < MAX_LEVEL_COUNT; ++lvl)
     {
-        if(Loader::LoadWorld(i, hashWorld, false))
+        if(Loader::LoadWorld(lvl, hashWorld, false))
         {
             for(IntType x = 0; x < GAME_LENGTH; ++x)
             {
@@ -559,18 +559,19 @@ std::uint64_t Game::getLevelHash() const
                     hash += ROTATE(hash, 7);
                     hash += ROTATE(hash, 13);
                     hash += ROTATE(hash, 49);
-                    hash += ROTATE(hash, 16 + i%32);
+                    hash += ROTATE(hash, 16 + lvl%32);
                     hash += RANDOMIZE<std::uint64_t>(hashWorld[x][y]);
                     hash += RANDOMIZE<std::uint64_t>(hash);
                 }
             }
         } else 
         {
-            for(IntType i = 0; i < BBS_RNG_ROUNDS; ++i)
+            for(IntType r = 0; r < BBS_RNG_ROUNDS; ++r)
             {
                 hash += ROTATE(hash, 7);
                 hash += ROTATE(hash, 13);
-                hash += ROTATE(hash, 37);
+                hash += ROTATE(hash, 49);
+                hash += ROTATE(hash, 16 + r%32);
                 hash += RANDOMIZE<std::uint64_t>(hash);
             }
         }

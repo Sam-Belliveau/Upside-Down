@@ -21,7 +21,7 @@ using RawIntType = std::uint32_t;
 static const IntType GAME_FPS = 24;
 
 // Game Version
-static const std::string GAME_VERSION = "v1.3.4";
+static const std::string GAME_VERSION = "v1.4";
 
 // Game Size / Pixel Measurements
 static const IntType GAME_WIDTH = 42;
@@ -143,7 +143,7 @@ static HashType ROTATE(HashType in, IntType rot)
     return (in << rot) | (in >> (sizeof(in)*8 - rot)); 
 }
 
-static const HashType BBS_RNG_ROUNDS = 32;
+static const HashType BBS_RNG_ROUNDS = 23;
 static const HashType BBS_RNG_P = 59747; // cousin primes 
 static const HashType BBS_RNG_Q = 59751;
 static const HashType BBS_RNG_M = BBS_RNG_P*BBS_RNG_Q;
