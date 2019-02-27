@@ -559,7 +559,10 @@ HashType Game::getLevelHash() const
                 {
                     hash += ROTATE(hash, 7);
                     hash += ROTATE(hash, 20 + (19*lvl)%23);
-                    hash += LookUp::PiTable[Byte(hashWorld[x][y])];
+                    hash += LookUp::PiTable[(
+                        x*GAME_HEIGHT +
+                        y + hashWorld[x][y]
+                    ) & 0xff];
                     hash += ROTATE(hash, 43);
                 }
             }
