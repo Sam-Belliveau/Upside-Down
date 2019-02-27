@@ -21,7 +21,7 @@ using RawIntType = std::uint32_t;
 static const IntType GAME_FPS = 24;
 
 // Game Version
-static const std::string GAME_VERSION = "v1.5";
+static const std::string GAME_VERSION = "v1.6";
 
 // Game Size / Pixel Measurements
 static const IntType GAME_WIDTH = 42;
@@ -44,7 +44,7 @@ static const auto START_DURATION = CHRONO_CLOCK::now();
 static IntType GET_GLOBAL_FRAME()
 {
     auto now = CHRONO_CLOCK::now();
-    auto t = std::chrono::duration_cast<CHRONO_UNIT>(now - START_DURATION).count();
+    auto t = now.time_since_epoch().count();
     t *= GAME_FPS;
     t += CHONO_UNIT_PER_SEC/2; // Rounding
     t /= CHONO_UNIT_PER_SEC;
@@ -89,10 +89,10 @@ static const float X_JOYSTICK_DEAD_ZONE = 40;
 static const double SMOG_SIZE = 4;
 
 // Left Wall Trap
-static const IntType TRAP_START = -240;
 static const double TRAP_SMOOTH = 8;
-static const double TRAP_SPEED = 4;
-static const IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED);
+static const double TRAP_SPEED = 3;
+static const IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED*1.25);
+static const IntType TRAP_START = -TRAP_LEAD;
 
 // Level Data / Image Processing
 static const IntType START_LEVEL = 1;
@@ -143,35 +143,23 @@ static HashType ROTATE(HashType in, IntType rot)
     return (in << rot) | (in >> (sizeof(in)*8 - rot)); 
 }
 
-static const HashType BBS_RNG_ROUNDS = 23;
-static const HashType BBS_RNG_P = 59747; // cousin primes 
-static const HashType BBS_RNG_Q = 59751;
-static const HashType BBS_RNG_M = BBS_RNG_P*BBS_RNG_Q;
-static const HashType BBS_RNG_SALT[19] = 
+static const IntType BBS_RNG_P = 43; // cousin primes 
+static const IntType BBS_RNG_Q = 47;
+static const IntType BBS_RNG_M = BBS_RNG_P*BBS_RNG_Q;
+
+static IntType RANDOMIZE(IntType n)
 {
-    0x5A04, 0xABFC, 0x800B, 0xCADC,
-    0x9E44, 0x7A2E, 0xC345, 0x3484,
-    0xFDD5, 0x6705, 0x0E1E, 0x9EC9, 
-    0xDB73, 0xDBD3, 0x1055, 0x88CD,
-    0x675F, 0xDA79, 0xE367
-};
-
-template<class T>
-T RANDOMIZE(T number)
-{
-    const IntType offset = number%T(19);
-    HashType n = static_cast<HashType>(number);
-
-    // Modified Blum Blum Shub
-    for(IntType i = 0; i < BBS_RNG_ROUNDS; ++i)
-    {
-        n = n*n % BBS_RNG_M;
-
-        // Salt is used to fix issue around 0
-        n += BBS_RNG_SALT[(i + n)%19];
-    }
-    
-    return static_cast<T>(n);
+    // 8 Rounds of Blum Blum Shub
+    n %= BBS_RNG_M;
+    n = n*n % BBS_RNG_M; 
+    n = n*n % BBS_RNG_M; 
+    n = n*n % BBS_RNG_M;
+    n = n*n % BBS_RNG_M; 
+    n = n*n % BBS_RNG_M; 
+    n = n*n % BBS_RNG_M;
+    n = n*n % BBS_RNG_M; 
+    n = n*n % BBS_RNG_M; 
+    return n;
 }
 
 // Level Names

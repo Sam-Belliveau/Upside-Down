@@ -15,10 +15,11 @@ IntType Game::GameTypeData::randomize(IntType cx, IntType x, IntType y) const
 {
     if(randomness != 0) 
     {
-        const IntType XRand = RANDOMIZE(IntType(cx * cameraSpeed - GET_GLOBAL_FRAME() * textureSpeed + 0.5) + x);
-        const IntType YRand = RANDOMIZE(y);
+        const IntType XRand = 1 + x + // Add texture offset
+            (cx * cameraSpeed - GET_GLOBAL_FRAME() * textureSpeed + 0.5);
+        const IntType YRand = 1 + y;
         
-        return std::abs(RANDOMIZE(XRand + YRand)) % randomness;
+        return std::abs(RANDOMIZE(XRand * YRand)) % randomness;
     }
 
     return IntType(0);
@@ -557,30 +558,29 @@ HashType Game::getLevelHash() const
                 for(IntType y = 0; y < GAME_HEIGHT; ++y)
                 {
                     hash += ROTATE(hash, 7);
-                    hash += ROTATE(hash, 16 + lvl%32);
-                    hash += ROTATE(hash, 43);
+                    hash += ROTATE(hash, 20 + (19*lvl)%23);
                     hash += LookUp::PiTable[Byte(hashWorld[x][y])];
-                    hash += RANDOMIZE<HashType>(hash);
+                    hash += ROTATE(hash, 43);
                 }
             }
         } else {
-            for(IntType r = 0; r < 0x100; ++r)
+            for(IntType round = 0; round < 0x100; ++round)
             {
                 hash += ROTATE(hash, 7);
-                hash += ROTATE(hash, 16 + r%32);
+                hash += ROTATE(hash, 20 + (19*lvl)%23);
+                hash += LookUp::PiTable[Byte(round)];
                 hash += ROTATE(hash, 43);
-                hash += RANDOMIZE<HashType>(hash);
             }
         }
     }
 
     // Final Mix
-    for(IntType r = 0; r < 0x10000; ++r)
+    for(IntType round = 0; round < 0x100; ++round)
     {
         hash += ROTATE(hash, 7);
-        hash += ROTATE(hash, 16 + r%32);
+        hash += ROTATE(hash, 20 + (19*round)%23);
+        hash += LookUp::PiTable[Byte(round)];
         hash += ROTATE(hash, 43);
-        hash += RANDOMIZE<HashType>(hash);
     }
 
     return hash;
