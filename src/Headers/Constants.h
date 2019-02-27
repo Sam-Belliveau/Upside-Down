@@ -21,7 +21,7 @@ using RawIntType = std::uint32_t;
 static const IntType GAME_FPS = 24;
 
 // Game Version
-static const std::string GAME_VERSION = "v1.4.2";
+static const std::string GAME_VERSION = "v1.5";
 
 // Game Size / Pixel Measurements
 static const IntType GAME_WIDTH = 42;
@@ -147,18 +147,20 @@ static const HashType BBS_RNG_ROUNDS = 23;
 static const HashType BBS_RNG_P = 59747; // cousin primes 
 static const HashType BBS_RNG_Q = 59751;
 static const HashType BBS_RNG_M = BBS_RNG_P*BBS_RNG_Q;
-static const HashType BBS_RNG_SALT[16] = 
+static const HashType BBS_RNG_SALT[19] = 
 {
-    0x248d, 0x41c5, 0xa061, 0x342b,
-    0x5142, 0x75cf, 0x95c2, 0xce40, 
-    0x0e96, 0x3f2f, 0x1a69, 0xd765, 
-    0x40eb, 0x5b6b, 0x64c2, 0x6b50 
+    0x5A04, 0xABFC, 0x800B, 0xCADC,
+    0x9E44, 0x7A2E, 0xC345, 0x3484,
+    0xFDD5, 0x6705, 0x0E1E, 0x9EC9, 
+    0xDB73, 0xDBD3, 0x1055, 0x88CD,
+    0x675F, 0xDA79, 0xE367
 };
 
 template<class T>
 T RANDOMIZE(T number)
 {
-    HashType pool = 0, n = static_cast<HashType>(number);
+    const IntType offset = number%T(19);
+    HashType n = static_cast<HashType>(number);
 
     // Modified Blum Blum Shub
     for(IntType i = 0; i < BBS_RNG_ROUNDS; ++i)
@@ -166,12 +168,10 @@ T RANDOMIZE(T number)
         n = n*n % BBS_RNG_M;
 
         // Salt is used to fix issue around 0
-        n += BBS_RNG_SALT[i%16];
-
-        pool += n;
+        n += BBS_RNG_SALT[(i + n)%19];
     }
     
-    return static_cast<T>(pool);
+    return static_cast<T>(n);
 }
 
 // Level Names

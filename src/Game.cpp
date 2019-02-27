@@ -557,24 +557,30 @@ HashType Game::getLevelHash() const
                 for(IntType y = 0; y < GAME_HEIGHT; ++y)
                 {
                     hash += ROTATE(hash, 7);
-                    hash += ROTATE(hash, 13);
-                    hash += ROTATE(hash, 49);
                     hash += ROTATE(hash, 16 + lvl%32);
-                    hash += RANDOMIZE<HashType>(hashWorld[x][y]);
+                    hash += ROTATE(hash, 43);
+                    hash += LookUp::PiTable[Byte(hashWorld[x][y])];
                     hash += RANDOMIZE<HashType>(hash);
                 }
             }
-        } else 
-        {
-            for(IntType r = 0; r < BBS_RNG_ROUNDS; ++r)
+        } else {
+            for(IntType r = 0; r < 0x100; ++r)
             {
                 hash += ROTATE(hash, 7);
-                hash += ROTATE(hash, 13);
-                hash += ROTATE(hash, 49);
                 hash += ROTATE(hash, 16 + r%32);
-                hash += RANDOMIZE<std::uint64_t>(hash);
+                hash += ROTATE(hash, 43);
+                hash += RANDOMIZE<HashType>(hash);
             }
         }
+    }
+
+    // Final Mix
+    for(IntType r = 0; r < 0x10000; ++r)
+    {
+        hash += ROTATE(hash, 7);
+        hash += ROTATE(hash, 16 + r%32);
+        hash += ROTATE(hash, 43);
+        hash += RANDOMIZE<HashType>(hash);
     }
 
     return hash;

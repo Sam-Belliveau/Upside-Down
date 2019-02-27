@@ -2,6 +2,7 @@
 #define GAME_H
 
 // File Loader uses this part of the game file
+#include "NumberLookup.h"
 #include "Constants.h"
 #include "FileLoader.h"
 
