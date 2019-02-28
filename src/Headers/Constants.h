@@ -21,7 +21,7 @@ using RawIntType = std::uint32_t;
 static const IntType GAME_FPS = 24;
 
 // Game Version
-static const std::string GAME_VERSION = "v1.6";
+static const std::string GAME_VERSION = "v1.7";
 
 // Game Size / Pixel Measurements
 static const IntType GAME_WIDTH = 42;
@@ -166,5 +166,6 @@ static IntType RANDOMIZE(IntType n)
 static const std::string LEVEL_FOLDER = "./Levels/";
 static const std::string LEVEL_PREFIX = "L";
 static const std::string LEVEL_EXTENTION = ".lvl";
+static const IntType LEVEL_HASH_TIME = GAME_FPS*4;
 
 #endif // CONSTANTS_H_INCLUDED

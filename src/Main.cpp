@@ -17,7 +17,7 @@ int main()
     timer.setPosition(6, 0);
 
     Game game;
-    bool focus = true, won = false;
+    bool focus = true;
     game.loadWorld(START_LEVEL);
 
     sf::Text version = GET_DEFAULT_TEXT(1);
@@ -35,25 +35,22 @@ int main()
             if (event.type == sf::Event::LostFocus) focus = false;
         }
 
-        if(focus) game.gameLoop();
+        if(focus) 
+        {
+            game.gameLoop();
+            if(Game::editorCheatKey())
+            {
+                game.setCheater();
+                game.loadWorld(LevelBuilder::Loop(app, game.getLevel(), game.getCameraX()));
+                while(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape));
+                TextTimes::UpdateHash(game, version);
+            }
+        }
 
         Graphics::pushRGBA(app, game.returnWorldPixels(focus));
 
-        if(Game::editorCheatKey())
-        {
-            game.setCheater();
-            game.loadWorld(LevelBuilder::Loop(app, game.getLevel(), game.getCameraX()));
-            while(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape));
-            TextTimes::UpdateHash(game, version);
-        }
-
-        // Update hash when game is won
-        if(game.getWinner())
-        {
-            if(!won) { TextTimes::UpdateHash(game, version); }
-            won = true;
-        } else { won = false; }
-
+        if(GET_GLOBAL_FRAME() % LEVEL_HASH_TIME == 0)
+        { TextTimes::UpdateHash(game, version); }
         TextTimes::UpdateLeaderboard(game, leaderboard);
         TextTimes::UpdateTimer(game, timer);
         app.draw(leaderboard);
