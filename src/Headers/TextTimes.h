@@ -27,16 +27,14 @@ namespace TextTimes
         { 
             text.setFillColor(BAD_COLOR);
             text.setString(
-                std::string("(Manipulated)\n") +
+                "(Cheats Used)\n" 
                 "Time: " + (std::to_string(double(game.getFrame()) / double(GAME_FPS)).substr(0,7)) + "s\n" +
-                "Frames: " + std::to_string(game.getFrame()) + " / " + std::to_string(GAME_FPS) + "fps\n" +
                 "Deaths: " + std::to_string(game.getDeaths())
             );
         } else {
             text.setFillColor(GOOD_COLOR);
             text.setString(
                 "Time: " + (std::to_string(double(game.getFrame()) / double(GAME_FPS)).substr(0,7)) + "s\n" +
-                "Frames: " + std::to_string(game.getFrame()) + " / " + std::to_string(GAME_FPS) + "fps\n" +
                 "Deaths: " + std::to_string(game.getDeaths())
             );
         }
@@ -53,17 +51,11 @@ namespace TextTimes
             // Setup string buffer
             std::ostringstream stream;
             stream << std::setprecision(2) << std::fixed;
+            stream << "Times:\n"; 
             
             if(game.getCheater())
-            {
-                text.setFillColor(BAD_COLOR); 
-                stream << "Manipulated Times:\n"; 
-            } 
-            else 
-            { 
-                text.setFillColor(GOOD_COLOR); 
-                stream << "Times:\n"; 
-            }
+                text.setFillColor(BAD_COLOR);
+            else text.setFillColor(GOOD_COLOR); 
 
             if(game.getWinner())
             {

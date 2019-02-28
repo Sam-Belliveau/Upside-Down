@@ -431,10 +431,10 @@ IntType Game::loadWorld(const IntType inLevel)
 
     if(!Loader::LoadWorld(level, world, false))
         return loadWorld(level + 1);
-    reset();
 
     if(level != 0) finalLevel = level;
     updateLevelHash();
+    reset();
     return level;
 }
 
@@ -512,6 +512,7 @@ const Byte* Game::returnWorldPixels(bool focus)
 
 HashType Game::updateLevelHash() 
 {
+    HashType oldHash = hash;
     hash = 0;
     GameType hashWorld[GAME_LENGTH][GAME_HEIGHT];
     for(IntType lvl = 0; lvl < MAX_LEVEL_COUNT; ++lvl)
@@ -551,6 +552,7 @@ HashType Game::updateLevelHash()
         hash += ROTATE(hash, 43);
     }
 
+    if(hash != oldHash) setCheater();
     return hash;
 }
 

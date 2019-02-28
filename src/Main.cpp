@@ -33,7 +33,11 @@ int main()
         {
             // Close window : exit
             if (event.type == sf::Event::Closed) app.close();
-            if (event.type == sf::Event::GainedFocus) focus = true;
+            if (event.type == sf::Event::GainedFocus) 
+            {
+                game.updateLevelHash();
+                focus = true;
+            }
             if (event.type == sf::Event::LostFocus) focus = false;
         }
 

@@ -18,10 +18,10 @@ using IntType = std::int32_t;
 using RawIntType = std::uint32_t;
 
 // Game FPS
-static const IntType GAME_FPS = 24;
+static const IntType GAME_FPS = 25;
 
 // Game Version
-static const std::string GAME_VERSION = "v1.7";
+static const std::string GAME_VERSION = "v2.0";
 
 // Game Size / Pixel Measurements
 static const IntType GAME_WIDTH = 42;
@@ -91,7 +91,7 @@ static const double SMOG_SIZE = 4;
 // Left Wall Trap
 static const double TRAP_SMOOTH = 8;
 static const double TRAP_SPEED = 3;
-static const IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED*1.25);
+static const IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED*2);
 static const IntType TRAP_START = -TRAP_LEAD;
 
 // Level Data / Image Processing
@@ -101,8 +101,8 @@ static const IntType MAX_LEVEL_COUNT = 100;
 // Text
 static const IntType TEXT_X = 1;
 static const IntType TEXT_Y = 9;
-static const sf::Color GOOD_COLOR = sf::Color(0xE0,0xFF,0xE0);
-static const sf::Color BAD_COLOR = sf::Color(0xFF,0x80,0x80);
+static const sf::Color GOOD_COLOR = sf::Color(196,255,196);
+static const sf::Color BAD_COLOR = sf::Color(255,196,196);
 static const std::string ttfFile = "./GameFiles/GameFont.ttf";
 static sf::Font DEFAULT_GAME_FONT;
 
