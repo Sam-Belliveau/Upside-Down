@@ -609,9 +609,3 @@ void Game::setCheater()
 { 
     hasCheated = true; 
 }
-
-
-
-
-
-
