@@ -434,6 +434,7 @@ IntType Game::loadWorld(const IntType inLevel)
     reset();
 
     if(level != 0) finalLevel = level;
+    updateLevelHash();
     return level;
 }
 
@@ -509,45 +510,9 @@ const Byte* Game::returnWorldPixels(bool focus)
     return reinterpret_cast<const Byte*>(buffer);
 }
 
-/*****************************/
-/***** GETTERS / SETTERS *****/
-/*****************************/
-
-IntType Game::getCameraX() const 
-{ 
-    return cameraX; 
-}
-
-IntType Game::getLevel() const 
-{ 
-    return level; 
-}
-
-IntType Game::getDeaths() const
-{ 
-    return deaths; 
-}
-
-IntType Game::getFinalLevel() const 
-{ 
-    return finalLevel; 
-}
-
-IntType Game::getFrame() const
-{ 
-    return frame; 
-}
-
-IntType Game::getLevelFrame(IntType level) const 
-{ 
-    level = std::max(level, IntType(0));
-    level = std::min(level, MAX_LEVEL_COUNT);
-    return levelFrames[level]; 
-}
-
-HashType Game::getLevelHash() const
+HashType Game::updateLevelHash() 
 {
-    HashType hash = 0;
+    hash = 0;
     GameType hashWorld[GAME_LENGTH][GAME_HEIGHT];
     for(IntType lvl = 0; lvl < MAX_LEVEL_COUNT; ++lvl)
     {
@@ -586,6 +551,47 @@ HashType Game::getLevelHash() const
         hash += ROTATE(hash, 43);
     }
 
+    return hash;
+}
+
+/*****************************/
+/***** GETTERS / SETTERS *****/
+/*****************************/
+
+IntType Game::getCameraX() const 
+{ 
+    return cameraX; 
+}
+
+IntType Game::getLevel() const 
+{ 
+    return level; 
+}
+
+IntType Game::getDeaths() const
+{ 
+    return deaths; 
+}
+
+IntType Game::getFinalLevel() const 
+{ 
+    return finalLevel; 
+}
+
+IntType Game::getFrame() const
+{ 
+    return frame; 
+}
+
+IntType Game::getLevelFrame(IntType level) const 
+{ 
+    level = std::max(level, IntType(0));
+    level = std::min(level, MAX_LEVEL_COUNT);
+    return levelFrames[level]; 
+}
+
+HashType Game::getLevelHash() const 
+{
     return hash;
 }
 

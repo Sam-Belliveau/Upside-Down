@@ -88,6 +88,7 @@ private: // Subunits of Game Loop
 public: // World/Rendering
     IntType loadWorld(const IntType);
     const Byte* returnWorldPixels(bool);
+    HashType updateLevelHash();
 
 public: // Getters
     IntType getCameraX() const;
@@ -102,6 +103,7 @@ public: // Getters
     void setCheater();
 
 private: // Member Variables
+    HashType hash;
     RawIntType rawFrame; // Used for game mechanics, always ticks
     IntType finalLevel;
     IntType level, frame, deaths;

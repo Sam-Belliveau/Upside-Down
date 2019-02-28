@@ -43,14 +43,12 @@ int main()
                 game.setCheater();
                 game.loadWorld(LevelBuilder::Loop(app, game.getLevel(), game.getCameraX()));
                 while(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape));
-                TextTimes::UpdateHash(game, version);
             }
         }
 
         Graphics::pushRGBA(app, game.returnWorldPixels(focus));
 
-        if(GET_GLOBAL_FRAME() % LEVEL_HASH_TIME == 0)
-        { TextTimes::UpdateHash(game, version); }
+        TextTimes::UpdateHash(game, version);
         TextTimes::UpdateLeaderboard(game, leaderboard);
         TextTimes::UpdateTimer(game, timer);
         app.draw(leaderboard);
