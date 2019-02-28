@@ -114,7 +114,7 @@ static sf::Text GET_DEFAULT_TEXT(double size)
     defaultText.setFont(DEFAULT_GAME_FONT);
     defaultText.setFillColor(sf::Color::White);
     defaultText.setOutlineColor(sf::Color::Black);
-    defaultText.setOutlineThickness(size*2*TEXT_SCALE);
+    defaultText.setOutlineThickness(size*2.5*TEXT_SCALE);
     defaultText.setCharacterSize(size*TEXT_SCALE*GAME_SCALE/1.5);
     defaultText.setScale(sf::Vector2f(1.0/TEXT_SCALE,1.0/TEXT_SCALE));
     return defaultText;

@@ -7,7 +7,9 @@
 int main()
 {
     // Game Window
-    sf::RenderWindow app(sf::VideoMode(GAME_WIDTH*GAME_SCALE, GAME_HEIGHT*GAME_SCALE), "Upside Down");
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 16;
+    sf::RenderWindow app(sf::VideoMode(GAME_WIDTH*GAME_SCALE, GAME_HEIGHT*GAME_SCALE), "Upside Down", 7U, settings);
     app.setFramerateLimit(GAME_FPS);
 
     // Text class used to display times
