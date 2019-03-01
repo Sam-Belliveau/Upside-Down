@@ -21,7 +21,7 @@ using RawIntType = std::uint32_t;
 static const IntType GAME_FPS = 25;
 
 // Game Version
-static const std::string GAME_VERSION = "v2.0";
+static const std::string GAME_VERSION = "v0.2beta";
 
 // Game Size / Pixel Measurements
 static const IntType GAME_WIDTH = 42;
