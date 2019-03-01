@@ -359,7 +359,8 @@ void Game::movementLoop()
     || playerBlockData.getProp(TypeProps::Slow))
         if(rawFrame % 2 != 0) return;
 
-    if((player.x > 0 && leftKey()) || playerBlockData.getProp(TypeProps::MoveLeft))
+    if(((player.x > 0 && leftKey()) || playerBlockData.getProp(TypeProps::MoveLeft))
+    && !GetTypeData(world[player.x - 1][player.y]).getProp(TypeProps::MoveRight))
     {
         if(!GetTypeData(world[player.x - 1][player.y]).getProp(TypeProps::Solid)) 
         {
@@ -368,7 +369,8 @@ void Game::movementLoop()
         }
     }
 
-    if(rightKey() || playerBlockData.getProp(TypeProps::MoveRight)) 
+    if((rightKey() || playerBlockData.getProp(TypeProps::MoveRight)) 
+    && !GetTypeData(world[player.x + 1][player.y]).getProp(TypeProps::MoveLeft))
     {
         if(!GetTypeData(world[player.x + 1][player.y]).getProp(TypeProps::Solid)) 
         {
