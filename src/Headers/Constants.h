@@ -2,6 +2,7 @@
 #define CONSTANTS_H_INCLUDED
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 
 #include <fstream> // Loading and saving levels
 #include <cstdint> // Fixed Width Types
@@ -37,6 +38,25 @@ static const IntType GAME_START_Y = 18;
 static const IntType GAME_SCALE = 32;
 static const double LOST_FOCUS_COLOR = 1.5;
 static const sf::Color PLAYER_COLOR = sf::Color(196, 255, 196);
+
+// Sounds
+static const double COIN_PITCH = 1;
+static const double COIN_VOL = 100;
+
+static const double JUMP_PITCH = 0.9;
+static const double JUMP_VOL = 75;
+
+static const double BOUNCE_PITCH = 1.75;
+static const double BOUNCE_VOL = 75;
+
+static const double DEATH_PITCH = 1.5;
+static const double DEATH_VOL = 100;
+
+static const double OVERWORLD_PITCH = 1;
+static const double OVERWORLD_VOL = 60;
+
+static const double LOWGRAVITY_PITCH = 1.5;
+static const double SMOG_PITCH = 0.75;
 
 // Global frames
 using CHRONO_CLOCK = std::chrono::steady_clock;

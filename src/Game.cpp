@@ -119,6 +119,35 @@ const Game::GameTypeData Game::GetTypeData(GameType input)
 Game::Game() 
 {
     loadWorld(START_LEVEL); 
+    coinBuffer.loadFromFile("./GameFiles/Coin.wav");
+    coinSound.setBuffer(coinBuffer);
+    coinSound.setPitch(COIN_PITCH);
+    coinSound.setVolume(COIN_VOL);
+    coinSound.setLoop(false);
+
+    jumpBuffer.loadFromFile("./GameFiles/Jump.wav");
+    jumpSound.setBuffer(jumpBuffer);
+    jumpSound.setPitch(JUMP_PITCH);
+    jumpSound.setVolume(JUMP_VOL);
+    jumpSound.setLoop(false);
+
+    bounceBuffer.loadFromFile("./GameFiles/Bounce.wav");
+    bounceSound.setBuffer(bounceBuffer);
+    bounceSound.setPitch(BOUNCE_PITCH);
+    bounceSound.setVolume(BOUNCE_VOL);
+    bounceSound.setLoop(false);
+    
+    deathBuffer.loadFromFile("./GameFiles/Death.wav");
+    deathSound.setBuffer(deathBuffer);
+    deathSound.setPitch(DEATH_PITCH);
+    deathSound.setVolume(DEATH_VOL);
+    deathSound.setLoop(false);
+
+    overworldMusic.openFromFile("./GameFiles/Overworld.wav");
+    overworldMusic.setPitch(OVERWORLD_PITCH);
+    overworldMusic.setVolume(OVERWORLD_VOL);
+    overworldMusic.setLoop(true);
+    overworldMusic.play();
 }
 
 /********************/
@@ -249,6 +278,9 @@ void Game::gameLoop()
     // Check if player is touching coin
     // Check this last so it gets replaced fastest
     coinLoop();
+
+    // Change Sounds
+    soundLoop();
 }
 
 /********************************/
@@ -327,7 +359,10 @@ void Game::trapLoop()
     || player.x - 1 <= trapX/TRAP_SPEED - TRAP_SMOOTH)
     { 
         if(player.x >= START_SIZE && !getWinner())
-        { ++deaths; }
+        { 
+            deathSound.play();
+            ++deaths; 
+        }
 
         if(level == START_LEVEL)
         { loadWorld(START_LEVEL); }
@@ -352,7 +387,11 @@ void Game::jumpLoop()
     {
         if(groundBlockData.getProp(TypeProps::Jumpable))
         { 
-            if(canJump) gravity = GravityType(-gravity);
+            if(canJump) 
+            {
+                jumpSound.play();
+                gravity = GravityType(-gravity);
+            }
             canJump = false;
         } 
     } else { canJump = true; }
@@ -363,7 +402,11 @@ void Game::bounceLoop()
     if(groundBlockData.getProp(TypeProps::Bounce)
     || playerBlockData.getProp(TypeProps::Bounce))
     { 
-        if(canBounce) gravity = GravityType(-gravity);
+        if(canBounce) 
+        {
+            bounceSound.play();
+            gravity = GravityType(-gravity);
+        }
         if(playerBlockData.getProp(TypeProps::Bounce))
             canBounce = false; 
     }
@@ -438,6 +481,8 @@ void Game::coinLoop()
 {
     if(playerBlockData.getProp(TypeProps::Coin))
     {
+        coinSound.play();
+
         // Count Coin
         ++coins;
         ++levelCoins[level];
@@ -463,6 +508,25 @@ void Game::coinLoop()
         { 
             world[player.x][player.y] = GameType::Sky; 
         }
+    }
+}
+void Game::soundLoop()
+{
+    if(playerBlockData.getProp(TypeProps::LowGravity))
+    {
+        overworldMusic.setPitch(OVERWORLD_PITCH / LOWGRAVITY_PITCH);
+        jumpSound.setPitch(JUMP_PITCH / LOWGRAVITY_PITCH);
+        bounceSound.setPitch(BOUNCE_PITCH / LOWGRAVITY_PITCH);
+    } else if(playerBlockData.getProp(TypeProps::Smog))
+    {
+        overworldMusic.setPitch(OVERWORLD_PITCH / SMOG_PITCH);
+        jumpSound.setPitch(JUMP_PITCH / SMOG_PITCH);
+        bounceSound.setPitch(BOUNCE_PITCH / SMOG_PITCH);
+    } else 
+    {
+        overworldMusic.setPitch(OVERWORLD_PITCH);
+        jumpSound.setPitch(JUMP_PITCH);
+        bounceSound.setPitch(BOUNCE_PITCH);
     }
 }
 

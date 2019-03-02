@@ -85,6 +85,7 @@ private: // Subunits of Game Loop
     void cameraLoop();
     void gravityLoop();
     void coinLoop();
+    void soundLoop();
     void reset();
 
 public: // World/Rendering
@@ -107,6 +108,21 @@ public: // Getters
     bool getWinner() const;
     bool getCheater() const;
     void setCheater();
+
+public: // Sounds
+    sf::SoundBuffer coinBuffer;
+    sf::Sound coinSound;
+
+    sf::SoundBuffer jumpBuffer;
+    sf::Sound jumpSound;
+
+    sf::SoundBuffer bounceBuffer;
+    sf::Sound bounceSound;
+
+    sf::SoundBuffer deathBuffer;
+    sf::Sound deathSound;
+
+    sf::Music overworldMusic;
 
 private: // Member Variables
     HashType hash, maxCoins;
