@@ -142,6 +142,12 @@ Game::Game()
     deathSound.setPitch(DEATH_PITCH);
     deathSound.setVolume(DEATH_VOL);
     deathSound.setLoop(false);
+    
+    winBuffer.loadFromFile("./GameFiles/Win.wav");
+    winSound.setBuffer(winBuffer);
+    winSound.setPitch(WIN_PITCH);
+    winSound.setVolume(WIN_VOL);
+    winSound.setLoop(false);
 
     overworldMusic.openFromFile("./GameFiles/Overworld.wav");
     overworldMusic.setPitch(OVERWORLD_PITCH);
@@ -308,7 +314,10 @@ void Game::goalLoop()
 {
     if(player.x >= GAME_LENGTH 
     || playerBlockData.getProp(TypeProps::Goal)) 
+    {
+        winSound.play();
         loadWorld(level + 1);
+    }
 }
 
 // Return if player has cheated

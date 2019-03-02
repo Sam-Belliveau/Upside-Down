@@ -52,6 +52,9 @@ static const double BOUNCE_VOL = 75;
 static const double DEATH_PITCH = 1.5;
 static const double DEATH_VOL = 100;
 
+static const double WIN_PITCH = 1;
+static const double WIN_VOL = 100;
+
 static const double OVERWORLD_PITCH = 1;
 static const double OVERWORLD_VOL = 60;
 

@@ -122,6 +122,9 @@ public: // Sounds
     sf::SoundBuffer deathBuffer;
     sf::Sound deathSound;
 
+    sf::SoundBuffer winBuffer;
+    sf::Sound winSound;
+
     sf::Music overworldMusic;
 
 private: // Member Variables

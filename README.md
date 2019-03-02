@@ -2,9 +2,9 @@
 
 ## To compile, run this command at the root of the folder
 
-**Linux (SFML REQUIRED):** `clang++ -o UpsideDown.out ./src/*.cpp -lsfml-window -lsfml-system -lsfml-graphics -std=c++17 -O3` 
+**Linux (SFML REQUIRED):** `clang++ -o UpsideDown.out ./src/*.cpp -lsfml-window -lsfml-system -lsfml-graphics -lsfml-audio -std=c++17 -O3` 
 
-**Mac (SFML REQUIRED):** `clang++ -o UpsideDown.out ./src/*.cpp -framework sfml-window -framework sfml-graphics -framework sfml-system -std=c++17 -O3`
+**Mac (SFML REQUIRED):** `clang++ -o UpsideDown.out ./src/*.cpp -framework sfml-window -framework sfml-graphics -framework sfml-system -framework sfml-graphics -std=c++17 -O3`
 
 **Windows:** Extract the DLLs into the root of the project and run the exe.
 
@@ -37,4 +37,4 @@ The game data is a series of 8bit numbers that indicate what type of block they 
 
 ## DEV ONLY
 
-**Cross Compile Linux to Windows:** `i686-w64-mingw32-g++ -O3 ./src/*.cpp -o UpsideDown.exe -static-libgcc -static-libstdc++ -lsfml-graphics -lsfml-window -lsfml-system`
+**Cross Compile Linux to Windows:** `i686-w64-mingw32-g++ -O3 ./src/*.cpp -o UpsideDown.exe -static-libgcc -static-libstdc++ -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio`
