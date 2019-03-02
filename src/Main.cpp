@@ -9,21 +9,18 @@ int main()
     // Game Window
     sf::ContextSettings settings;
     settings.antialiasingLevel = 16;
-    sf::RenderWindow app(sf::VideoMode(GAME_WIDTH*GAME_SCALE, GAME_HEIGHT*GAME_SCALE), "Upside Down", 7U, settings);
+    sf::RenderWindow app(sf::VideoMode(GAME_WIDTH*GAME_SCALE, GAME_HEIGHT*GAME_SCALE), 
+                         "Upside Down", sf::Style::Default, settings);
     app.setFramerateLimit(GAME_FPS);
-
-    // Text class used to display times
-    sf::Text leaderboard = GET_DEFAULT_TEXT(1);
-
-    sf::Text timer = GET_DEFAULT_TEXT(1);
-    timer.setPosition(6, 0);
 
     Game game;
     bool focus = true;
     game.loadWorld(START_LEVEL);
 
+    // Text class used to display times
+    sf::Text leaderboard = GET_DEFAULT_TEXT(1);
+    sf::Text timer = GET_DEFAULT_TEXT(1);
     sf::Text version = GET_DEFAULT_TEXT(1);
-    version.setPosition(6, 6 + GAME_SCALE*(GAME_HEIGHT - 1));
     TextTimes::UpdateHash(game, version);
 
     while (app.isOpen())

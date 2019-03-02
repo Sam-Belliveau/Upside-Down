@@ -16,12 +16,14 @@
 using Byte = std::uint8_t;
 using IntType = std::int32_t;
 using RawIntType = std::uint32_t;
+using HashType = std::uint64_t;
+using TypePropsType = std::uint64_t;
 
 // Game FPS
 static const IntType GAME_FPS = 25;
 
 // Game Version
-static const std::string GAME_VERSION = "v0.2beta";
+static const std::string GAME_VERSION = "v0.4b";
 
 // Game Size / Pixel Measurements
 static const IntType GAME_WIDTH = 42;
@@ -53,7 +55,7 @@ static IntType GET_GLOBAL_FRAME()
 
 // Game Peices / File Loading
 static const RawIntType MAGIC_NUMBER = 0x53616d42; // "SamB"
-static constexpr IntType GameTypeCount = 12;
+static constexpr IntType GameTypeCount = 13;
 enum GameType : Byte 
 { 
     // Here are the IDs for each block
@@ -68,8 +70,14 @@ enum GameType : Byte
     MoveRight  = 8,
     MoveLeft   = 9,
     Honey      = 10,
+    Coin       = 11,
     Goal       = 0xff
 };
+
+static constexpr TypePropsType TypePropsBit(IntType bit) 
+{ 
+    return TypePropsType(0x1) << bit;
+}
 
 // Game Text
 static const double TEXT_SCALE = 4;
@@ -90,8 +98,8 @@ static const double SMOG_SIZE = 4;
 
 // Left Wall Trap
 static const double TRAP_SMOOTH = 8;
-static const double TRAP_SPEED = 3;
-static const IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED*2);
+static const double TRAP_SPEED = 4;
+static const IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED*1.5);
 static const IntType TRAP_START = -TRAP_LEAD;
 
 // Level Data / Image Processing
@@ -137,7 +145,6 @@ static IntType GetLuminance(sf::Color in)
 }
 
 // Random Number Generation
-using HashType = std::uint64_t;
 static HashType ROTATE(HashType in, IntType rot) 
 {
     return (in << rot) | (in >> (sizeof(in)*8 - rot)); 

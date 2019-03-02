@@ -93,8 +93,13 @@ const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
             TypeProps::Slow | TypeProps::LowGravity
         }
     }, {
+        GameType::Coin, 
+        {"Coin", sf::Color(255, 200, 16), 32, 0, 5.0/GAME_FPS,
+            TypeProps::Coin
+        }
+    }, {
         GameType::Goal, 
-        {"Goal", sf::Color(255, 255, 0), 0, 0.0, 0.0,
+        {"Goal", sf::Color(196, 255, 16), 0, 0.0, 0.0,
             TypeProps::Goal
         }
     }
@@ -104,7 +109,7 @@ const Game::GameTypeData Game::GetTypeData(GameType input)
 {
     for(const GameTypeLink& entry : GameTypeList)
         if(input == entry.type) return entry.data;
-    return {"Error", (time(0)&1) ? sf::Color(255,0,255) : sf::Color(0,0,0), 0, 0, 0};
+    return GameTypeList[RANDOMIZE(GET_GLOBAL_FRAME())%GameTypeCount].data;
 }
 
 /****************************/
@@ -240,6 +245,10 @@ void Game::gameLoop()
 
     // Update player using gravity
     gravityLoop();
+
+    // Check if player is touching coin
+    // Check this last so it gets replaced fastest
+    coinLoop();
 }
 
 /********************************/
@@ -316,7 +325,15 @@ void Game::trapLoop()
     if(player.y <= 0 || player.y == GAME_HEIGHT - 1
     || playerBlockData.getProp(TypeProps::Trap)
     || player.x - 1 <= trapX/TRAP_SPEED - TRAP_SMOOTH)
-    { ++deaths; reset(); return; }
+    { 
+        if(player.x >= START_SIZE && !getWinner())
+        { ++deaths; }
+
+        if(level == START_LEVEL)
+        { loadWorld(START_LEVEL); }
+        else { reset(); }
+        return; 
+    }
 
     if(!getWinner() && !playerBlockData.getProp(TypeProps::StopStorm))
     {
@@ -365,6 +382,9 @@ void Game::movementLoop()
         if(!GetTypeData(world[player.x - 1][player.y]).getProp(TypeProps::Solid)) 
         {
             player.x--;
+
+            // Update Block Data Info
+            playerBlockData = GetTypeData(world[player.x][player.y]);
             groundBlockData = GetTypeData(world[player.x][player.y + gravity]);
         }
     }
@@ -375,6 +395,9 @@ void Game::movementLoop()
         if(!GetTypeData(world[player.x + 1][player.y]).getProp(TypeProps::Solid)) 
         {
             player.x++; 
+
+            // Update Block Data Info
+            playerBlockData = GetTypeData(world[player.x][player.y]);
             groundBlockData = GetTypeData(world[player.x][player.y + gravity]);
         }    
     }
@@ -404,7 +427,43 @@ void Game::gravityLoop()
         if(groundBlockData.getProp(TypeProps::LowGravity)) 
         { if(rawFrame % 2 == 0) player.y += gravity; }
         else player.y += gravity; 
+
+        // Update Block Data Info
+        playerBlockData = GetTypeData(world[player.x][player.y]);
+        groundBlockData = GetTypeData(world[player.x][player.y + gravity]);
     } 
+}
+
+void Game::coinLoop()
+{
+    if(playerBlockData.getProp(TypeProps::Coin))
+    {
+        // Count Coin
+        ++coins;
+        ++levelCoins[level];
+
+        // Replace coin block
+        const GameTypeData leftBlock   = GetTypeData(world[player.x - 1][player.y]);
+        const GameTypeData rightBlock  = GetTypeData(world[player.x + 1][player.y]);
+        const GameTypeData topBlock    = GetTypeData(world[player.x][player.y - gravity]);
+        
+        // Guess Using Rules what block should take the coins place
+        if(!leftBlock.getProp(TypeProps::Solid)
+        && !rightBlock.getProp(TypeProps::Solid)
+        && world[player.x - 1][player.y] == world[player.x + 1][player.y])
+        {
+            world[player.x][player.y] = world[player.x - 1][player.y];
+        } else if(!topBlock.getProp(TypeProps::Solid))
+        {
+            world[player.x][player.y] = world[player.x][player.y - gravity];
+        } else if(!groundBlockData.getProp(TypeProps::Solid))
+        {
+            world[player.x][player.y] = world[player.x][player.y + gravity];
+        } else 
+        { 
+            world[player.x][player.y] = GameType::Sky; 
+        }
+    }
 }
 
 void Game::reset()
@@ -416,9 +475,12 @@ void Game::reset()
     cameraX = 0;
 
     if(level == START_LEVEL) {
+        frame = 0; 
+        deaths = 0;
+        coins = 0;
         hasCheated = false;
-        frame = 0; deaths = 0;
         for(IntType& t : levelFrames) t = 0;
+        for(IntType& t : levelCoins) t = 0;
     }
 }
 
@@ -434,7 +496,6 @@ IntType Game::loadWorld(const IntType inLevel)
     if(!Loader::LoadWorld(level, world, false))
         return loadWorld(level + 1);
 
-    if(level != 0) finalLevel = level;
     updateLevelHash();
     reset();
     return level;
@@ -514,17 +575,27 @@ const Byte* Game::returnWorldPixels(bool focus)
 
 HashType Game::updateLevelHash() 
 {
-    HashType oldHash = hash;
-    hash = 0;
+    HashType oldHash = hash; hash = 0; 
+    HashType oldCoins = maxCoins; maxCoins = 0;
+    HashType oldFinalLevel = finalLevel; finalLevel = 0;
+    for(IntType& t : levelMaxCoins) t = 0;
+    
     GameType hashWorld[GAME_LENGTH][GAME_HEIGHT];
     for(IntType lvl = 0; lvl < MAX_LEVEL_COUNT; ++lvl)
     {
         if(Loader::LoadWorld(lvl, hashWorld, false))
         {
+            if(finalLevel < lvl) { finalLevel = lvl; }
             for(IntType x = 0; x < GAME_LENGTH; ++x)
             {
                 for(IntType y = 0; y < GAME_HEIGHT; ++y)
                 {
+                    if(GetTypeData(hashWorld[x][y]).getProp(TypeProps::Coin))
+                    { 
+                        ++levelMaxCoins[lvl];
+                        ++maxCoins; 
+                    }
+
                     hash += ROTATE(hash, 7);
                     hash += ROTATE(hash, 20 + (19*lvl)%23);
                     hash += LookUp::PiTable[(
@@ -554,7 +625,9 @@ HashType Game::updateLevelHash()
         hash += ROTATE(hash, 43);
     }
 
-    if(hash != oldHash) setCheater();
+    if(hash != oldHash 
+    || maxCoins != oldCoins
+    || finalLevel != oldFinalLevel) setCheater();
     return hash;
 }
 
@@ -575,6 +648,30 @@ IntType Game::getLevel() const
 IntType Game::getDeaths() const
 { 
     return deaths; 
+}
+
+IntType Game::getCoins() const
+{
+    return coins;
+}
+
+IntType Game::getMaxCoins() const
+{
+    return maxCoins;
+}
+
+IntType Game::getLevelCoins(IntType level) const
+{    
+    level = std::max(level, IntType(0));
+    level = std::min(level, MAX_LEVEL_COUNT);
+    return levelCoins[level];
+}
+
+IntType Game::getLevelMaxCoins(IntType level) const
+{    
+    level = std::max(level, IntType(0));
+    level = std::min(level, MAX_LEVEL_COUNT);
+    return levelMaxCoins[level];
 }
 
 IntType Game::getFinalLevel() const 

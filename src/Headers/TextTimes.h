@@ -18,28 +18,35 @@ namespace TextTimes
             stream << Base32[gameHash & 0x1f];
             gameHash >>= 5;
         }
+
+        text.setPosition(6, 6 + GAME_SCALE*(GAME_HEIGHT - 1));
         text.setString(stream.str());
     }
 
     static void UpdateTimer(const Game& game, sf::Text& text)
     {
+        std::ostringstream stream;
         if(game.getCheater())
         { 
             text.setFillColor(BAD_COLOR);
-            text.setString(
-                "(Cheats Used)\n" 
-                "Time: " + (std::to_string(double(game.getFrame()) / double(GAME_FPS)).substr(0,7)) + "s\n" +
-                "Frames: " + std::to_string(game.getFrame()) + " / " + std::to_string(GAME_FPS) + "fps\n" +
-                "Deaths: " + std::to_string(game.getDeaths())
-            );
+            stream << "(Cheats Used)\n";
         } else {
             text.setFillColor(GOOD_COLOR);
-            text.setString(
-                "Time: " + (std::to_string(double(game.getFrame()) / double(GAME_FPS)).substr(0,7)) + "s\n" +
-                "Frames: " + std::to_string(game.getFrame()) + " / " + std::to_string(GAME_FPS) + "fps\n" +
-                "Deaths: " + std::to_string(game.getDeaths())
-            );
         }
+
+        stream << std::setprecision(4) << std::fixed;
+        stream << "Time: " << (double(game.getFrame()) / double(GAME_FPS)) << "s\n";
+        stream << "Total Coins: " << game.getCoins() << " / " << game.getMaxCoins() << '\n';
+        if(!game.getWinner())
+        {   
+            stream << "Level Coins: " 
+                << game.getLevelCoins(game.getLevel()) << " / " 
+                << game.getLevelMaxCoins(game.getLevel())  << '\n';
+        }
+
+        stream << "Deaths: " << game.getDeaths() << '\n';
+        text.setString(stream.str());
+        text.setPosition(6 + std::max(GAME_SCALE * (1 + START_SIZE - game.getCameraX()), 0), 0);
     }
 
     static void UpdateLeaderboard(const Game& game, sf::Text& text)
@@ -59,32 +66,21 @@ namespace TextTimes
                 text.setFillColor(BAD_COLOR);
             else text.setFillColor(GOOD_COLOR); 
 
-            if(game.getWinner())
-            {
-                for(std::size_t i = std::max(game.getFinalLevel() - 10, IntType(1)); 
-                    i <= game.getFinalLevel(); ++i)
-                {
-                    // Balance Level Sign
-                    stream << "Level " << i << ": ";
-                    if(i < 10) { stream << " "; }
-                    
-                    // Calculate Time
-                    stream << double(game.getLevelFrame(i)) / double(GAME_FPS) << "s\n";
-                }
-            } else 
-            {
-                for(std::size_t i = std::max(game.getLevel() - 10, IntType(1)); 
-                    i < game.getLevel(); ++i)
-                {
-                    // Balance Level Sign
-                    stream << "Level " << i << ": ";
-                    if(i < 10) { stream << " "; }
-                    
-                    // Calculate Time
-                    stream << double(game.getLevelFrame(i)) / double(GAME_FPS) << "s\n";
-                }
-            }
+            const IntType startLevel = std::max(game.getFinalLevel() - 10, IntType(1));
+            const IntType endLevel = game.getWinner() ? game.getFinalLevel() : game.getLevel() - 1;
             
+            for(IntType i = startLevel; i <= endLevel; ++i)
+            {
+                // Balance Level Sign
+                stream << "L" << i << ": ";
+                if(i < 10) { stream << " "; }
+                
+                // Calculate Time
+                stream << double(game.getLevelFrame(i)) / double(GAME_FPS) << 's';
+                stream << " (" << game.getLevelCoins(i) << " / " << game.getLevelMaxCoins(i) << ')';
+                stream << '\n';
+            }
+
             // Print times to leader board
             text.setString(stream.str());
         } else

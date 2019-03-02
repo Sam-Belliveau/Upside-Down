@@ -13,20 +13,21 @@ public: // Static methods and enums
     template<class T>
     static T randomize(T n);
 
-    enum TypeProps : RawIntType 
+    enum TypeProps : TypePropsType 
     { 
         None = 0x00, // Blank
-        Solid      = RawIntType(1) << 0, // Stops player from passing through
-        LowGravity = RawIntType(1) << 1, // Slows gravity to 1/2
-        Trap       = RawIntType(1) << 2, // Kills Player
-        Jumpable   = RawIntType(1) << 3, // Player can jump off of
-        Bounce     = RawIntType(1) << 4, // Player bounces off of
-        Slow       = RawIntType(1) << 5, // Slows Down User
-        Smog       = RawIntType(1) << 6, // Hinders Visibility
-        StopStorm  = RawIntType(1) << 7, // Moves the storm
-        MoveRight  = RawIntType(1) << 8, // Moves player right
-        MoveLeft   = RawIntType(1) << 9, // Moves player left
-        Goal       = RawIntType(1) << 31 // Goes To Next Level
+        Solid      = TypePropsBit(0x00), // Stops player from passing through
+        LowGravity = TypePropsBit(0x01), // Slows gravity to 1/2
+        Trap       = TypePropsBit(0x02), // Kills Player
+        Jumpable   = TypePropsBit(0x03), // Player can jump off of
+        Bounce     = TypePropsBit(0x04), // Player bounces off of
+        Slow       = TypePropsBit(0x05), // Slows Down User
+        Smog       = TypePropsBit(0x06), // Hinders Visibility
+        StopStorm  = TypePropsBit(0x07), // Moves the storm
+        MoveRight  = TypePropsBit(0x08), // Moves player right
+        MoveLeft   = TypePropsBit(0x09), // Moves player left
+        Coin       = TypePropsBit(0x0A), // Collectable Coin
+        Goal       = TypePropsBit(0x0B)  // Goes To Next Level
     };
 
     struct GameTypeData
@@ -83,6 +84,7 @@ private: // Subunits of Game Loop
     void movementLoop();
     void cameraLoop();
     void gravityLoop();
+    void coinLoop();
     void reset();
 
 public: // World/Rendering
@@ -95,6 +97,10 @@ public: // Getters
     IntType getFinalLevel() const;
     IntType getLevel() const;
     IntType getDeaths() const;
+    IntType getCoins() const;
+    IntType getMaxCoins() const;
+    IntType getLevelCoins(IntType) const;
+    IntType getLevelMaxCoins(IntType) const;
     IntType getFrame() const;
     IntType getLevelFrame(IntType) const;
     HashType getLevelHash() const;
@@ -103,11 +109,13 @@ public: // Getters
     void setCheater();
 
 private: // Member Variables
-    HashType hash;
+    HashType hash, maxCoins;
     RawIntType rawFrame; // Used for game mechanics, always ticks
-    IntType finalLevel;
-    IntType level, frame, deaths;
+    IntType finalLevel; // Used to count number of levels
+    IntType level, frame, deaths, coins;
     IntType levelFrames[MAX_LEVEL_COUNT];
+    IntType levelCoins[MAX_LEVEL_COUNT];
+    IntType levelMaxCoins[MAX_LEVEL_COUNT];
 
     sf::Vector2<IntType> player; 
     IntType cameraX, trapX;
