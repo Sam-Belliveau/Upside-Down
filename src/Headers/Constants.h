@@ -56,7 +56,7 @@ static const double OVERWORLD_PITCH = 1;
 static const double OVERWORLD_VOL = 60;
 
 static const double LOWGRAVITY_PITCH = 1.5;
-static const double SMOG_PITCH = 0.75;
+static const double SMOG_PITCH = 1;
 
 // Global frames
 using CHRONO_CLOCK = std::chrono::steady_clock;
