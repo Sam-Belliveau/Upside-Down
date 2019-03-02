@@ -32,10 +32,15 @@ int main()
             if (event.type == sf::Event::Closed) app.close();
             if (event.type == sf::Event::GainedFocus) 
             {
+                game.overworldMusic.setVolume(OVERWORLD_VOL);
                 game.updateLevelHash();
                 focus = true;
             }
-            if (event.type == sf::Event::LostFocus) focus = false;
+            if (event.type == sf::Event::LostFocus) 
+            {
+                game.overworldMusic.setVolume(OVERWORLD_VOL/5);
+                focus = false;
+            }
         }
 
         if(focus) 
@@ -43,9 +48,11 @@ int main()
             game.gameLoop();
             if(Game::editorCheatKey())
             {
+                game.overworldMusic.setPitch(0.8);
                 game.setCheater();
                 game.loadWorld(LevelBuilder::Loop(app, game.getLevel(), game.getCameraX()));
                 while(sf::Keyboard::isKeyPressed(sf::Keyboard::Escape));
+                game.overworldMusic.setPitch(1);
             }
         }
 

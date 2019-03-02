@@ -125,7 +125,8 @@ public: // Sounds
     sf::SoundBuffer winBuffer;
     sf::Sound winSound;
 
-    sf::Music overworldMusic;
+    sf::SoundBuffer overworldBuffer;
+    sf::Sound overworldMusic;
 
 private: // Member Variables
     HashType hash, maxCoins;

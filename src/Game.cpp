@@ -8,7 +8,7 @@ bool Game::GameTypeData::getProp(RawIntType prop) const
 {
     // This allows for testing of more than
     // One property at a time
-    return (propertys & prop) == prop;
+    return propertys & prop;
 }
 
 IntType Game::GameTypeData::randomize(IntType cx, IntType x, IntType y) const
@@ -85,7 +85,7 @@ const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
     }, {
         GameType::MoveLeft, 
         {"Move Left", sf::Color(64, 196, 0), 64, 0, -1.0/3.0,
-            TypeProps::MoveLeft
+            TypeProps::MoveLeft | TypeProps::StopStorm
         }
     }, {
         GameType::Honey, 
@@ -94,7 +94,7 @@ const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
         }
     }, {
         GameType::Coin, 
-        {"Coin", sf::Color(255, 200, 16), 32, 0, 5.0/GAME_FPS,
+        {"Coin", sf::Color(255, 200, 16), 56, 0, 4.0/GAME_FPS,
             TypeProps::Coin
         }
     }, {
@@ -149,7 +149,8 @@ Game::Game()
     winSound.setVolume(WIN_VOL);
     winSound.setLoop(false);
 
-    overworldMusic.openFromFile("./GameFiles/Overworld.wav");
+    overworldBuffer.loadFromFile("./GameFiles/Overworld.wav");
+    overworldMusic.setBuffer(overworldBuffer);
     overworldMusic.setPitch(OVERWORLD_PITCH);
     overworldMusic.setVolume(OVERWORLD_VOL);
     overworldMusic.setLoop(true);
@@ -415,6 +416,7 @@ void Game::bounceLoop()
         {
             bounceSound.play();
             gravity = GravityType(-gravity);
+            canJump = false;
         }
         if(playerBlockData.getProp(TypeProps::Bounce))
             canBounce = false; 
@@ -502,15 +504,15 @@ void Game::coinLoop()
         const GameTypeData topBlock    = GetTypeData(world[player.x][player.y - gravity]);
         
         // Guess Using Rules what block should take the coins place
-        if(!leftBlock.getProp(TypeProps::Solid)
-        && !rightBlock.getProp(TypeProps::Solid)
+        if(!leftBlock.getProp(TypeProps::Solid | TypeProps::Coin)
+        && !rightBlock.getProp(TypeProps::Solid | TypeProps::Coin)
         && world[player.x - 1][player.y] == world[player.x + 1][player.y])
         {
             world[player.x][player.y] = world[player.x - 1][player.y];
-        } else if(!topBlock.getProp(TypeProps::Solid))
+        } else if(!topBlock.getProp(TypeProps::Solid | TypeProps::Coin))
         {
             world[player.x][player.y] = world[player.x][player.y - gravity];
-        } else if(!groundBlockData.getProp(TypeProps::Solid))
+        } else if(!groundBlockData.getProp(TypeProps::Solid | TypeProps::Coin))
         {
             world[player.x][player.y] = world[player.x][player.y + gravity];
         } else 
@@ -526,11 +528,6 @@ void Game::soundLoop()
         overworldMusic.setPitch(OVERWORLD_PITCH / LOWGRAVITY_PITCH);
         jumpSound.setPitch(JUMP_PITCH / LOWGRAVITY_PITCH);
         bounceSound.setPitch(BOUNCE_PITCH / LOWGRAVITY_PITCH);
-    } else if(playerBlockData.getProp(TypeProps::Smog))
-    {
-        overworldMusic.setPitch(OVERWORLD_PITCH / SMOG_PITCH);
-        jumpSound.setPitch(JUMP_PITCH / SMOG_PITCH);
-        bounceSound.setPitch(BOUNCE_PITCH / SMOG_PITCH);
     } else 
     {
         overworldMusic.setPitch(OVERWORLD_PITCH);

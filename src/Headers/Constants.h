@@ -24,7 +24,7 @@ using TypePropsType = std::uint64_t;
 static const IntType GAME_FPS = 25;
 
 // Game Version
-static const std::string GAME_VERSION = "v0.4b";
+static const std::string GAME_VERSION = "v1.0beta";
 
 // Game Size / Pixel Measurements
 static const IntType GAME_WIDTH = 42;
@@ -37,33 +37,31 @@ static const IntType GAME_START_Y = 18;
 
 static const IntType GAME_SCALE = 32;
 static const double LOST_FOCUS_COLOR = 1.5;
-static const sf::Color PLAYER_COLOR = sf::Color(196, 255, 196);
+static const sf::Color PLAYER_COLOR = sf::Color(192, 64, 64);
 
 // Sounds
 static const double COIN_PITCH = 1;
 static const double COIN_VOL = 100;
 
-static const double JUMP_PITCH = 0.9;
+static const double JUMP_PITCH = 0.75;
 static const double JUMP_VOL = 75;
 
-static const double BOUNCE_PITCH = 1.75;
-static const double BOUNCE_VOL = 75;
+static const double BOUNCE_PITCH = 1;
+static const double BOUNCE_VOL = 60;
 
-static const double DEATH_PITCH = 1.5;
+static const double DEATH_PITCH = 2;
 static const double DEATH_VOL = 100;
 
 static const double WIN_PITCH = 1;
 static const double WIN_VOL = 100;
 
 static const double OVERWORLD_PITCH = 1;
-static const double OVERWORLD_VOL = 60;
+static const double OVERWORLD_VOL = 50;
 
 static const double LOWGRAVITY_PITCH = 1.5;
-static const double SMOG_PITCH = 1;
 
 // Global frames
 using CHRONO_CLOCK = std::chrono::steady_clock;
-using CHRONO_UNIT = std::chrono::nanoseconds;
 static const std::uintmax_t CHONO_UNIT_PER_SEC = 1000000000;
 static const auto START_DURATION = CHRONO_CLOCK::now();
 static IntType GET_GLOBAL_FRAME()
