@@ -540,6 +540,7 @@ void Game::reset()
 {
     player = sf::Vector2<IntType>(GAME_START_X, GAME_START_Y);
     gravity = GravityType::Down; 
+    canJump = false;
     trapX = TRAP_START;
     rawFrame = 0;
     cameraX = 0;
