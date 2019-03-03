@@ -4,11 +4,11 @@
 /***** STATIC MEMBERS *****/
 /**************************/
 
-bool Game::GameTypeData::getProp(RawIntType prop) const
+bool Game::GameTypeData::getProp(TypePropsType prop) const
 {
     // This allows for testing of more than
     // One property at a time
-    return propertys & prop;
+    return (propertys & prop) != 0;
 }
 
 IntType Game::GameTypeData::randomize(IntType cx, IntType x, IntType y) const
@@ -245,10 +245,6 @@ bool Game::editorCheatKey()
 
 void Game::gameLoop()
 {
-    // Update Type data for player blocks
-    playerBlockData = GetTypeData(world[player.x][player.y]);
-    groundBlockData = GetTypeData(world[player.x][player.y + gravity]);
-
     // Check for game reset command
     resetKeyLoop();
 
@@ -314,7 +310,7 @@ void Game::frameTimeLoop()
 void Game::goalLoop()
 {
     if(player.x >= GAME_LENGTH 
-    || playerBlockData.getProp(TypeProps::Goal)) 
+    || getWorldData(player.x, player.y).getProp(TypeProps::Goal)) 
     {
         winSound.play();
         loadWorld(level + 1);
@@ -365,7 +361,7 @@ void Game::trapLoop()
 {
     // Trap Detection
     if(player.y <= 0 || player.y == GAME_HEIGHT - 1
-    || playerBlockData.getProp(TypeProps::Trap)
+    || getWorldData(player.x, player.y).getProp(TypeProps::Trap)
     || player.x - 1 <= trapX/TRAP_SPEED - TRAP_SMOOTH)
     { 
         if(player.x >= START_SIZE && !getWinner())
@@ -380,7 +376,7 @@ void Game::trapLoop()
         return; 
     }
 
-    if(!getWinner() && !playerBlockData.getProp(TypeProps::StopStorm))
+    if(!getWinner() && !getWorldData(player.x, player.y).getProp(TypeProps::StopStorm))
     {
         // Move trap and start timer if player has moved from start
         if(player.x > START_SIZE) { ++trapX; }
@@ -395,7 +391,7 @@ void Game::jumpLoop()
 {
     if(jumpKey(gravity))
     {
-        if(groundBlockData.getProp(TypeProps::Jumpable))
+        if(getWorldData(player.x, player.y + gravity).getProp(TypeProps::Jumpable))
         { 
             if(canJump) 
             {
@@ -409,8 +405,8 @@ void Game::jumpLoop()
 
 void Game::bounceLoop()
 {
-    if(groundBlockData.getProp(TypeProps::Bounce)
-    || playerBlockData.getProp(TypeProps::Bounce))
+    if(getWorldData(player.x, player.y + gravity).getProp(TypeProps::Bounce)
+    || getWorldData(player.x, player.y).getProp(TypeProps::Bounce))
     { 
         if(canBounce) 
         {
@@ -418,7 +414,7 @@ void Game::bounceLoop()
             gravity = GravityType(-gravity);
             canJump = false;
         }
-        if(playerBlockData.getProp(TypeProps::Bounce))
+        if(getWorldData(player.x, player.y).getProp(TypeProps::Bounce))
             canBounce = false; 
     }
     else { canBounce = true; }
@@ -426,35 +422,17 @@ void Game::bounceLoop()
 
 void Game::movementLoop()
 {
-    if(groundBlockData.getProp(TypeProps::Slow) 
-    || playerBlockData.getProp(TypeProps::Slow))
+    if(getWorldData(player.x, player.y + gravity).getProp(TypeProps::Slow) 
+    || getWorldData(player.x, player.y).getProp(TypeProps::Slow))
         if(rawFrame % 2 != 0) return;
 
-    if(((player.x > 0 && leftKey()) || playerBlockData.getProp(TypeProps::MoveLeft))
-    && !GetTypeData(world[player.x - 1][player.y]).getProp(TypeProps::MoveRight))
-    {
-        if(!GetTypeData(world[player.x - 1][player.y]).getProp(TypeProps::Solid)) 
-        {
-            player.x--;
+    if(((player.x > 0 && leftKey()) || getWorldData(player.x, player.y).getProp(TypeProps::MoveLeft))
+    && !getWorldData(player.x - 1, player.y).getProp(TypeProps::MoveRight | TypeProps::Solid))
+        player.x--;
 
-            // Update Block Data Info
-            playerBlockData = GetTypeData(world[player.x][player.y]);
-            groundBlockData = GetTypeData(world[player.x][player.y + gravity]);
-        }
-    }
-
-    if((rightKey() || playerBlockData.getProp(TypeProps::MoveRight)) 
-    && !GetTypeData(world[player.x + 1][player.y]).getProp(TypeProps::MoveLeft))
-    {
-        if(!GetTypeData(world[player.x + 1][player.y]).getProp(TypeProps::Solid)) 
-        {
-            player.x++; 
-
-            // Update Block Data Info
-            playerBlockData = GetTypeData(world[player.x][player.y]);
-            groundBlockData = GetTypeData(world[player.x][player.y + gravity]);
-        }    
-    }
+    if((rightKey() || getWorldData(player.x, player.y).getProp(TypeProps::MoveRight)) 
+    && !getWorldData(player.x + 1, player.y).getProp(TypeProps::MoveLeft | TypeProps::Solid))
+        player.x++; 
 }
 
 void Game::cameraLoop()
@@ -476,54 +454,46 @@ void Game::cameraLoop()
 void Game::gravityLoop()
 {
     // You cant use ground block data as player moved in the movement loop
-    if(!groundBlockData.getProp(TypeProps::Solid))
+    if(!getWorldData(player.x, player.y + gravity).getProp(TypeProps::Solid))
     {
-        if(groundBlockData.getProp(TypeProps::LowGravity)) 
+        if(getWorldData(player.x, player.y + gravity).getProp(TypeProps::LowGravity)) 
         { if(rawFrame % 2 == 0) player.y += gravity; }
         else player.y += gravity; 
-
-        // Update Block Data Info
-        playerBlockData = GetTypeData(world[player.x][player.y]);
-        groundBlockData = GetTypeData(world[player.x][player.y + gravity]);
     } 
 }
 
 void Game::coinLoop()
 {
-    if(playerBlockData.getProp(TypeProps::Coin))
+    if(getWorldData(player.x, player.y).getProp(TypeProps::Coin))
     {
         coinSound.play();
 
         // Count Coin
         ++coins;
         ++levelCoins[level];
-
-        // Replace coin block
-        const GameTypeData leftBlock   = GetTypeData(world[player.x - 1][player.y]);
-        const GameTypeData rightBlock  = GetTypeData(world[player.x + 1][player.y]);
-        const GameTypeData topBlock    = GetTypeData(world[player.x][player.y - gravity]);
         
         // Guess Using Rules what block should take the coins place
-        if(!leftBlock.getProp(TypeProps::Solid | TypeProps::Coin)
-        && !rightBlock.getProp(TypeProps::Solid | TypeProps::Coin)
+        if(!getWorldData(player.x - 1, player.y).getProp(TypeProps::Solid | TypeProps::Coin)
+        && !getWorldData(player.x + 1, player.y).getProp(TypeProps::Solid | TypeProps::Coin)
         && world[player.x - 1][player.y] == world[player.x + 1][player.y])
         {
             world[player.x][player.y] = world[player.x - 1][player.y];
-        } else if(!topBlock.getProp(TypeProps::Solid | TypeProps::Coin))
+        } else if(!getWorldData(player.x, player.y - 1).getProp(TypeProps::Solid | TypeProps::Coin))
         {
-            world[player.x][player.y] = world[player.x][player.y - gravity];
-        } else if(!groundBlockData.getProp(TypeProps::Solid | TypeProps::Coin))
+            world[player.x][player.y] = world[player.x][player.y - 1];
+        } else if(!getWorldData(player.x, player.y + 1).getProp(TypeProps::Solid | TypeProps::Coin))
         {
-            world[player.x][player.y] = world[player.x][player.y + gravity];
+            world[player.x][player.y] = world[player.x][player.y + 1];
         } else 
         { 
             world[player.x][player.y] = GameType::Sky; 
         }
     }
 }
+
 void Game::soundLoop()
 {
-    if(playerBlockData.getProp(TypeProps::LowGravity))
+    if(getWorldData(player.x, player.y).getProp(TypeProps::LowGravity))
     {
         overworldMusic.setPitch(OVERWORLD_PITCH / LOWGRAVITY_PITCH);
         jumpSound.setPitch(JUMP_PITCH / LOWGRAVITY_PITCH);
@@ -575,7 +545,7 @@ IntType Game::loadWorld(const IntType inLevel)
 // Render Game
 const Byte* Game::returnWorldPixels(bool focus)
 {
-    const bool smog = GetTypeData(world[player.x][player.y]).getProp(TypeProps::Smog);    
+    const bool smog = getWorldData(player.x, player.y).getProp(TypeProps::Smog);    
     for(IntType y = 0; y < GAME_HEIGHT; y++)
     {
         for(IntType x = 0; x < GAME_WIDTH; x++)
@@ -589,8 +559,7 @@ const Byte* Game::returnWorldPixels(bool focus)
             } else 
             {
                 // Current Pixel
-                const GameType gamePixel = world[cameraX + x][y];
-                const GameTypeData pixelData = GetTypeData(gamePixel);
+                const GameTypeData pixelData = getWorldData(cameraX + x, y);
 
                 // Values to feed into buffer
                 R = pixelData.color.r; 
@@ -760,6 +729,14 @@ IntType Game::getLevelFrame(IntType level) const
     level = std::max(level, IntType(0));
     level = std::min(level, MAX_LEVEL_COUNT);
     return levelFrames[level]; 
+}
+
+Game::GameTypeData Game::getWorldData(IntType x, IntType y) const
+{
+    return GetTypeData(world
+        [std::min(std::max(x, 0), IntType(GAME_LENGTH-1))]
+        [std::min(std::max(y, 0), IntType(GAME_HEIGHT-1))]
+    );
 }
 
 HashType Game::getLevelHash() const 

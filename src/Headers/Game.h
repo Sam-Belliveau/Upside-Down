@@ -16,18 +16,18 @@ public: // Static methods and enums
     enum TypeProps : TypePropsType 
     { 
         None = 0x00, // Blank
-        Solid      = TypePropsBit(0x00), // Stops player from passing through
-        LowGravity = TypePropsBit(0x01), // Slows gravity to 1/2
-        Trap       = TypePropsBit(0x02), // Kills Player
-        Jumpable   = TypePropsBit(0x03), // Player can jump off of
-        Bounce     = TypePropsBit(0x04), // Player bounces off of
-        Slow       = TypePropsBit(0x05), // Slows Down User
-        Smog       = TypePropsBit(0x06), // Hinders Visibility
-        StopStorm  = TypePropsBit(0x07), // Moves the storm
-        MoveRight  = TypePropsBit(0x08), // Moves player right
-        MoveLeft   = TypePropsBit(0x09), // Moves player left
-        Coin       = TypePropsBit(0x0A), // Collectable Coin
-        Goal       = TypePropsBit(0x0B)  // Goes To Next Level
+        Solid      = TypePropsBit(0), // Stops player from passing through
+        LowGravity = TypePropsBit(1), // Slows gravity to 1/2
+        Trap       = TypePropsBit(2), // Kills Player
+        Jumpable   = TypePropsBit(3), // Player can jump off of
+        Bounce     = TypePropsBit(4), // Player bounces off of
+        Slow       = TypePropsBit(5), // Slows Down User
+        Smog       = TypePropsBit(6), // Hinders Visibility
+        StopStorm  = TypePropsBit(7), // Moves the storm
+        MoveRight  = TypePropsBit(8), // Moves player right
+        MoveLeft   = TypePropsBit(9), // Moves player left
+        Coin       = TypePropsBit(10), // Collectable Coin
+        Goal       = TypePropsBit(11)  // Goes To Next Level
     };
 
     struct GameTypeData
@@ -37,9 +37,9 @@ public: // Static methods and enums
         IntType randomness; // randomness of block color
         double cameraSpeed; // paralax
         double textureSpeed; // how fast block color moves
-        RawIntType propertys; // game properties
+        TypePropsType propertys; // game properties
 
-        bool getProp(RawIntType) const;
+        bool getProp(TypePropsType) const;
         IntType randomize(IntType, IntType, IntType) const;
     };
 
@@ -104,6 +104,7 @@ public: // Getters
     IntType getLevelMaxCoins(IntType) const;
     IntType getFrame() const;
     IntType getLevelFrame(IntType) const;
+    GameTypeData getWorldData(IntType x, IntType y) const;
     HashType getLevelHash() const;
     bool getWinner() const;
     bool getCheater() const;
@@ -144,7 +145,6 @@ private: // Member Variables
     bool canJump = true, canBounce = true;
     bool hasCheated = false;
 
-    GameTypeData playerBlockData, groundBlockData;
     GameType world[GAME_LENGTH][GAME_HEIGHT];
     Byte buffer[GAME_HEIGHT][GAME_WIDTH][4];
 };
