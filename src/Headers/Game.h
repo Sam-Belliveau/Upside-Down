@@ -95,17 +95,26 @@ public: // World/Rendering
 
 public: // Getters
     IntType getCameraX() const;
-    IntType getFinalLevel() const;
+
     IntType getLevel() const;
+    IntType getFinalLevel() const;
+    HashType getLevelHash() const;
+
     IntType getDeaths() const;
+
     IntType getCoins() const;
     IntType getMaxCoins() const;
     IntType getLevelCoins(IntType) const;
     IntType getLevelMaxCoins(IntType) const;
+
     IntType getFrame() const;
     IntType getLevelFrame(IntType) const;
-    GameTypeData getWorldData(IntType x, IntType y) const;
-    HashType getLevelHash() const;
+
+    GameType getWorld(IntType, IntType) const;
+    GameType& getWorldRef(IntType, IntType);
+    GameTypeData getWorldData(IntType, IntType) const;
+    GameTypeData getPlayerData(IntType = 0, IntType = 0) const;
+
     bool getWinner() const;
     bool getCheater() const;
     void setCheater();

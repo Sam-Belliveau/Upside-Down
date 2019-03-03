@@ -310,7 +310,7 @@ void Game::frameTimeLoop()
 void Game::goalLoop()
 {
     if(player.x >= GAME_LENGTH 
-    || getWorldData(player.x, player.y).getProp(TypeProps::Goal)) 
+    || getPlayerData().getProp(TypeProps::Goal)) 
     {
         winSound.play();
         loadWorld(level + 1);
@@ -361,7 +361,7 @@ void Game::trapLoop()
 {
     // Trap Detection
     if(player.y <= 0 || player.y == GAME_HEIGHT - 1
-    || getWorldData(player.x, player.y).getProp(TypeProps::Trap)
+    || getPlayerData().getProp(TypeProps::Trap)
     || player.x - 1 <= trapX/TRAP_SPEED - TRAP_SMOOTH)
     { 
         if(player.x >= START_SIZE && !getWinner())
@@ -376,7 +376,7 @@ void Game::trapLoop()
         return; 
     }
 
-    if(!getWinner() && !getWorldData(player.x, player.y).getProp(TypeProps::StopStorm))
+    if(!getWinner() && !getPlayerData().getProp(TypeProps::StopStorm))
     {
         // Move trap and start timer if player has moved from start
         if(player.x > START_SIZE) { ++trapX; }
@@ -391,7 +391,7 @@ void Game::jumpLoop()
 {
     if(jumpKey(gravity))
     {
-        if(getWorldData(player.x, player.y + gravity).getProp(TypeProps::Jumpable))
+        if(getPlayerData(0, gravity).getProp(TypeProps::Jumpable))
         { 
             if(canJump) 
             {
@@ -405,8 +405,8 @@ void Game::jumpLoop()
 
 void Game::bounceLoop()
 {
-    if(getWorldData(player.x, player.y + gravity).getProp(TypeProps::Bounce)
-    || getWorldData(player.x, player.y).getProp(TypeProps::Bounce))
+    if(getPlayerData(0, gravity).getProp(TypeProps::Bounce)
+    || getPlayerData().getProp(TypeProps::Bounce))
     { 
         if(canBounce) 
         {
@@ -414,24 +414,25 @@ void Game::bounceLoop()
             gravity = GravityType(-gravity);
             canJump = false;
         }
-        if(getWorldData(player.x, player.y).getProp(TypeProps::Bounce))
-            canBounce = false; 
+
+        if(getPlayerData().getProp(TypeProps::Bounce))
+        { canBounce = false; }
     }
     else { canBounce = true; }
 }
 
 void Game::movementLoop()
 {
-    if(getWorldData(player.x, player.y + gravity).getProp(TypeProps::Slow) 
-    || getWorldData(player.x, player.y).getProp(TypeProps::Slow))
+    if(getPlayerData(0, gravity).getProp(TypeProps::Slow) 
+    || getPlayerData().getProp(TypeProps::Slow))
         if(rawFrame % 2 != 0) return;
 
-    if(((player.x > 0 && leftKey()) || getWorldData(player.x, player.y).getProp(TypeProps::MoveLeft))
-    && !getWorldData(player.x - 1, player.y).getProp(TypeProps::MoveRight | TypeProps::Solid))
+    if(((player.x > 0 && leftKey()) || getPlayerData().getProp(TypeProps::MoveLeft))
+    && !getPlayerData(-1, 0).getProp(TypeProps::MoveRight | TypeProps::Solid))
         player.x--;
 
-    if((rightKey() || getWorldData(player.x, player.y).getProp(TypeProps::MoveRight)) 
-    && !getWorldData(player.x + 1, player.y).getProp(TypeProps::MoveLeft | TypeProps::Solid))
+    if((rightKey() || getPlayerData().getProp(TypeProps::MoveRight)) 
+    && !getPlayerData(1, 0).getProp(TypeProps::MoveLeft | TypeProps::Solid))
         player.x++; 
 }
 
@@ -454,9 +455,9 @@ void Game::cameraLoop()
 void Game::gravityLoop()
 {
     // You cant use ground block data as player moved in the movement loop
-    if(!getWorldData(player.x, player.y + gravity).getProp(TypeProps::Solid))
+    if(!getPlayerData(0, gravity).getProp(TypeProps::Solid))
     {
-        if(getWorldData(player.x, player.y + gravity).getProp(TypeProps::LowGravity)) 
+        if(getPlayerData(0, gravity).getProp(TypeProps::LowGravity)) 
         { if(rawFrame % 2 == 0) player.y += gravity; }
         else player.y += gravity; 
     } 
@@ -464,7 +465,7 @@ void Game::gravityLoop()
 
 void Game::coinLoop()
 {
-    if(getWorldData(player.x, player.y).getProp(TypeProps::Coin))
+    if(getPlayerData().getProp(TypeProps::Coin))
     {
         coinSound.play();
 
@@ -472,19 +473,28 @@ void Game::coinLoop()
         ++coins;
         ++levelCoins[level];
         
-        // Guess Using Rules what block should take the coins place
-        if(!getWorldData(player.x - 1, player.y).getProp(TypeProps::Solid | TypeProps::Coin)
-        && !getWorldData(player.x + 1, player.y).getProp(TypeProps::Solid | TypeProps::Coin)
-        && world[player.x - 1][player.y] == world[player.x + 1][player.y])
+        // If left and right block are the same, and non-solid/non-coin use that
+        if(!getPlayerData(-1, 0).getProp(TypeProps::Solid | TypeProps::Coin)
+        && !getPlayerData(1, 0).getProp(TypeProps::Solid | TypeProps::Coin)
+        && getWorld(player.x - 1, player.y) == getWorld(player.x + 1, player.y))
         {
-            world[player.x][player.y] = world[player.x - 1][player.y];
-        } else if(!getWorldData(player.x, player.y - 1).getProp(TypeProps::Solid | TypeProps::Coin))
+            getWorldRef(player.x, player.y) = getWorld(player.x - 1, player.y);
+        } 
+
+        // If top block is non-solid/non-coin, use that
+        else if(!getPlayerData(0, -1).getProp(TypeProps::Solid | TypeProps::Coin))
         {
-            world[player.x][player.y] = world[player.x][player.y - 1];
-        } else if(!getWorldData(player.x, player.y + 1).getProp(TypeProps::Solid | TypeProps::Coin))
+            getWorldRef(player.x, player.y) = getWorld(player.x, player.y - 1);
+        } 
+        
+        // If bottom block is non-solid/non-coin, use that
+        else if(!getPlayerData(0, 1).getProp(TypeProps::Solid | TypeProps::Coin))
         {
-            world[player.x][player.y] = world[player.x][player.y + 1];
-        } else 
+            getWorldRef(player.x, player.y) = getWorld(player.x, player.y + 1);
+        } 
+        
+        // Use sky as backup
+        else 
         { 
             world[player.x][player.y] = GameType::Sky; 
         }
@@ -493,7 +503,7 @@ void Game::coinLoop()
 
 void Game::soundLoop()
 {
-    if(getWorldData(player.x, player.y).getProp(TypeProps::LowGravity))
+    if(getPlayerData().getProp(TypeProps::LowGravity))
     {
         overworldMusic.setPitch(OVERWORLD_PITCH / LOWGRAVITY_PITCH);
         jumpSound.setPitch(JUMP_PITCH / LOWGRAVITY_PITCH);
@@ -508,6 +518,7 @@ void Game::soundLoop()
 
 void Game::reset()
 {
+    // Start Level Reset
     player = sf::Vector2<IntType>(GAME_START_X, GAME_START_Y);
     gravity = GravityType::Down; 
     canJump = false;
@@ -515,6 +526,7 @@ void Game::reset()
     rawFrame = 0;
     cameraX = 0;
 
+    // Total Reset
     if(level == START_LEVEL) {
         frame = 0; 
         deaths = 0;
@@ -545,7 +557,7 @@ IntType Game::loadWorld(const IntType inLevel)
 // Render Game
 const Byte* Game::returnWorldPixels(bool focus)
 {
-    const bool smog = getWorldData(player.x, player.y).getProp(TypeProps::Smog);    
+    const bool smog = getPlayerData().getProp(TypeProps::Smog);    
     for(IntType y = 0; y < GAME_HEIGHT; y++)
     {
         for(IntType x = 0; x < GAME_WIDTH; x++)
@@ -666,7 +678,6 @@ HashType Game::updateLevelHash()
     }
 
     if(hash != oldHash 
-    || maxCoins != oldCoins
     || finalLevel != oldFinalLevel) setCheater();
     return hash;
 }
@@ -680,15 +691,28 @@ IntType Game::getCameraX() const
     return cameraX; 
 }
 
+
 IntType Game::getLevel() const 
 { 
     return level; 
 }
 
+IntType Game::getFinalLevel() const 
+{ 
+    return finalLevel; 
+}
+
+HashType Game::getLevelHash() const 
+{
+    return hash;
+}
+
+
 IntType Game::getDeaths() const
 { 
     return deaths; 
 }
+
 
 IntType Game::getCoins() const
 {
@@ -714,10 +738,6 @@ IntType Game::getLevelMaxCoins(IntType level) const
     return levelMaxCoins[level];
 }
 
-IntType Game::getFinalLevel() const 
-{ 
-    return finalLevel; 
-}
 
 IntType Game::getFrame() const
 { 
@@ -731,18 +751,29 @@ IntType Game::getLevelFrame(IntType level) const
     return levelFrames[level]; 
 }
 
-Game::GameTypeData Game::getWorldData(IntType x, IntType y) const
+
+GameType Game::getWorld(IntType x, IntType y) const
 {
-    return GetTypeData(world
-        [std::min(std::max(x, 0), IntType(GAME_LENGTH-1))]
-        [std::min(std::max(y, 0), IntType(GAME_HEIGHT-1))]
-    );
+    return world[std::min(std::max(x, 0), IntType(GAME_LENGTH-1))]
+                [std::min(std::max(y, 0), IntType(GAME_HEIGHT-1))];
 }
 
-HashType Game::getLevelHash() const 
+GameType& Game::getWorldRef(IntType x, IntType y)
 {
-    return hash;
+    return world[std::min(std::max(x, 0), IntType(GAME_LENGTH-1))]
+                [std::min(std::max(y, 0), IntType(GAME_HEIGHT-1))];
 }
+
+Game::GameTypeData Game::getWorldData(IntType x, IntType y) const
+{
+    return GetTypeData(getWorld(x, y));
+}
+
+Game::GameTypeData Game::getPlayerData(IntType relX, IntType relY) const
+{
+    return getWorldData(player.x + relX, player.y + relY);
+}
+
 
 bool Game::getCheater() const 
 { 
