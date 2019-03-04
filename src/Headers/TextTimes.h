@@ -29,7 +29,9 @@ namespace TextTimes
         if(game.getCheater())
         { 
             text.setFillColor(BAD_COLOR);
-            stream << "(Cheats Used)\n";
+            if(game.getFlying())
+                stream << "(Flying)\n";
+            else stream << "(Cheats Used)\n";
         } else {
             text.setFillColor(GOOD_COLOR);
         }
@@ -83,6 +85,20 @@ namespace TextTimes
 
             // Print times to leader board
             text.setString(stream.str());
+        } else if(game.getLevel() == START_LEVEL) 
+        {
+            // Setup string buffer
+            std::ostringstream stream;
+            stream << '\n' /* Controls */
+                << "-----= Controls =-----\n"
+                << " Space Bar = Jump\n"
+                << " WASD / Arrows = Move\n\n"
+                << " Ctrl + Shift:\n"
+                << "   + S = Toggle Sound\n"
+                << "   + M = Toggle Music\n"
+                << "   + E = Level Editor\n";
+            text.setString(stream.str());
+            text.setFillColor(GOOD_COLOR);
         } else
         { text.setString(""); }
     }

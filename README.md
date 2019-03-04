@@ -6,11 +6,11 @@
 
 **Mac (SFML REQUIRED):** `clang++ -o UpsideDown.out ./src/*.cpp -framework sfml-window -framework sfml-graphics -framework sfml-system -framework sfml-graphics -framework sfml-audio -std=c++17 -O3`
 
-**Windows:** Extract the DLLs into the root of the project and run the exe.
-
 *This game relys on other files in the project folder, keep everything where it is*
 
 To run the game run `./UpsideDown.out` 
+
+### When Changing sound files, it does not need to be `.wav`, it can be `.ogg` or `.flac`
 
 #### You will need https://www.sfml-dev.org/download.php to compile the game
 

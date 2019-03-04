@@ -79,12 +79,12 @@ const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
         }
     }, {
         GameType::MoveRight, 
-        {"Move Right", sf::Color(64, 196, 0), 64, 0, 1.0/3.0,
+        {"Move Right", sf::Color(64, 196, 0), 64, 1, 4.0/9.0,
             TypeProps::MoveRight | TypeProps::StopStorm
         }
     }, {
         GameType::MoveLeft, 
-        {"Move Left", sf::Color(64, 196, 0), 64, 0, -1.0/3.0,
+        {"Move Left", sf::Color(64, 196, 0), 64, 1, -4.0/9.0,
             TypeProps::MoveLeft | TypeProps::StopStorm
         }
     }, {
@@ -112,6 +112,14 @@ const Game::GameTypeData Game::GetTypeData(GameType input)
     return GameTypeList[RANDOMIZE(GET_GLOBAL_FRAME())%GameTypeCount].data;
 }
 
+   
+void Game::loadBufferFromFile(sf::SoundBuffer& buf, const std::string& name)
+{
+    for(const std::string& ext : SOUND_EXTENTIONS)
+        if(buf.loadFromFile(SOUND_DIRECTORY + name + ext))
+            break;
+}
+
 /****************************/
 /***** INSTANCE MEMBERS *****/
 /****************************/
@@ -119,38 +127,39 @@ const Game::GameTypeData Game::GetTypeData(GameType input)
 Game::Game() 
 {
     loadWorld(START_LEVEL); 
-    coinBuffer.loadFromFile("./GameFiles/Coin.wav");
+    loadBufferFromFile(coinBuffer, "Coin");
     coinSound.setBuffer(coinBuffer);
     coinSound.setPitch(COIN_PITCH);
     coinSound.setVolume(COIN_VOL);
     coinSound.setLoop(false);
 
-    jumpBuffer.loadFromFile("./GameFiles/Jump.wav");
+    loadBufferFromFile(jumpBuffer, "Jump");
     jumpSound.setBuffer(jumpBuffer);
     jumpSound.setPitch(JUMP_PITCH);
     jumpSound.setVolume(JUMP_VOL);
     jumpSound.setLoop(false);
 
-    bounceBuffer.loadFromFile("./GameFiles/Bounce.wav");
+    loadBufferFromFile(bounceBuffer, "Bounce");
     bounceSound.setBuffer(bounceBuffer);
     bounceSound.setPitch(BOUNCE_PITCH);
     bounceSound.setVolume(BOUNCE_VOL);
     bounceSound.setLoop(false);
     
-    deathBuffer.loadFromFile("./GameFiles/Death.wav");
+    loadBufferFromFile(deathBuffer, "Death");
     deathSound.setBuffer(deathBuffer);
     deathSound.setPitch(DEATH_PITCH);
     deathSound.setVolume(DEATH_VOL);
     deathSound.setLoop(false);
     
-    winBuffer.loadFromFile("./GameFiles/Win.wav");
+    loadBufferFromFile(winBuffer, "Win");
     winSound.setBuffer(winBuffer);
     winSound.setPitch(WIN_PITCH);
     winSound.setVolume(WIN_VOL);
     winSound.setLoop(false);
 
-    overworldBuffer.loadFromFile("./GameFiles/Overworld.wav");
-    overworldMusic.setBuffer(overworldBuffer);
+    for(const std::string& ext : SOUND_EXTENTIONS)
+        if(overworldMusic.openFromFile(SOUND_DIRECTORY + "Overworld" + ext))
+            break;
     overworldMusic.setPitch(OVERWORLD_PITCH);
     overworldMusic.setVolume(OVERWORLD_VOL);
     overworldMusic.setLoop(true);
@@ -181,30 +190,30 @@ bool Game::resetKey()
 
 bool Game::upKey()
 {
-    return sf::Keyboard::isKeyPressed(sf::Keyboard::Up)
-        || sf::Keyboard::isKeyPressed(sf::Keyboard::W)
-        || joyYAxis() < -Y_JOYSTICK_DEAD_ZONE; 
+    return (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)
+         || sf::Keyboard::isKeyPressed(sf::Keyboard::W)
+         || joyYAxis() < -Y_JOYSTICK_DEAD_ZONE) && !cheatKey(); 
 }
 
 bool Game::downKey()
 {
-    return sf::Keyboard::isKeyPressed(sf::Keyboard::Down)
-        || sf::Keyboard::isKeyPressed(sf::Keyboard::S)
-        || joyYAxis() > Y_JOYSTICK_DEAD_ZONE; 
+    return (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)
+         || sf::Keyboard::isKeyPressed(sf::Keyboard::S)
+         || joyYAxis() > Y_JOYSTICK_DEAD_ZONE) && !cheatKey(); 
 }
 
 bool Game::leftKey() 
 { 
-    return sf::Keyboard::isKeyPressed(sf::Keyboard::Left)
-        || sf::Keyboard::isKeyPressed(sf::Keyboard::A)
-        || joyXAxis() < -X_JOYSTICK_DEAD_ZONE; 
+    return (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)
+         || sf::Keyboard::isKeyPressed(sf::Keyboard::A)
+         || joyXAxis() < -X_JOYSTICK_DEAD_ZONE) && !cheatKey(); 
 }
 
 bool Game::rightKey()
 {
-    return sf::Keyboard::isKeyPressed(sf::Keyboard::Right)
-        || sf::Keyboard::isKeyPressed(sf::Keyboard::D)
-        || joyXAxis() > X_JOYSTICK_DEAD_ZONE; 
+    return (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)
+         || sf::Keyboard::isKeyPressed(sf::Keyboard::D)
+         || joyXAxis() > X_JOYSTICK_DEAD_ZONE) && !cheatKey(); 
 }
 
 bool Game::jumpKey(GravityType gravity)
@@ -237,6 +246,16 @@ bool Game::levelCheatKey()
 bool Game::editorCheatKey()
 {
     return cheatKey() && sf::Keyboard::isKeyPressed(sf::Keyboard::E);
+}
+
+bool Game::soundKey()
+{
+    return cheatKey() && sf::Keyboard::isKeyPressed(sf::Keyboard::S);
+}
+
+bool Game::musicKey()
+{
+    return cheatKey() && sf::Keyboard::isKeyPressed(sf::Keyboard::M);
 }
 
 /********************/
@@ -312,7 +331,7 @@ void Game::goalLoop()
     if(player.x >= GAME_LENGTH 
     || getPlayerData().getProp(TypeProps::Goal)) 
     {
-        winSound.play();
+        if(playSounds) winSound.play();
         loadWorld(level + 1);
     }
 }
@@ -323,34 +342,27 @@ bool Game::cheatLoop()
     // Developer Key Combos
     if(flyCheatKey())
     {
-        setCheater();
-        if(player.x > 0 && leftKey())
-            player.x -= 1; 
+        enableFly = !enableFly;
+        while(flyCheatKey()){}
+    }
 
-        if(player.x <= GAME_LENGTH && rightKey())
-            player.x += 1; 
-
-        if(player.y > 0 && upKey())
-            player.y -= 1; 
-
-        if(player.y < GAME_HEIGHT - 1 && downKey())
-            player.y += 1; 
-        
-        cameraLoop();
-        return true;
-    } else if(levelCheatKey())
+    if(enableFly)
     {
         setCheater();
-        if(leftKey()) 
-        { 
-            level--; 
-            while(leftKey()); 
-        } else if(rightKey()) 
-        { 
-            level++; 
-            while(rightKey()); 
-        }
+        if(player.x > 0 && leftKey()) player.x -= 1; 
+        if(player.x <= GAME_LENGTH && rightKey()) player.x += 1; 
+        if(player.y > 0 && upKey()) player.y -= 1; 
+        if(player.y < GAME_HEIGHT - 1 && downKey()) player.y += 1; 
+        cameraLoop();
+        return true;
+    }
+    
+    if(levelCheatKey())
+    {
+        setCheater();
+        level++;
         loadWorld(level);
+        while(levelCheatKey()) {}
         return true;
     }
 
@@ -366,7 +378,7 @@ void Game::trapLoop()
     { 
         if(player.x >= START_SIZE && !getWinner())
         { 
-            deathSound.play();
+            if(playSounds) deathSound.play();
             ++deaths; 
         }
 
@@ -395,7 +407,7 @@ void Game::jumpLoop()
         { 
             if(canJump) 
             {
-                jumpSound.play();
+                if(playSounds) jumpSound.play();
                 gravity = GravityType(-gravity);
             }
             canJump = false;
@@ -410,7 +422,7 @@ void Game::bounceLoop()
     { 
         if(canBounce) 
         {
-            bounceSound.play();
+            if(playSounds) bounceSound.play();
             gravity = GravityType(-gravity);
             canJump = false;
         }
@@ -467,7 +479,7 @@ void Game::coinLoop()
 {
     if(getPlayerData().getProp(TypeProps::Coin))
     {
-        coinSound.play();
+        if(playSounds) coinSound.play();
 
         // Count Coin
         ++coins;
@@ -503,6 +515,24 @@ void Game::coinLoop()
 
 void Game::soundLoop()
 {
+    if(soundKey())
+    {
+        playSounds = !playSounds;
+        while(soundKey()){}
+    }
+
+    if(musicKey())
+    {
+        if(overworldMusic.getStatus() == sf::Sound::Playing)
+        {
+            overworldMusic.pause();
+        } else {
+            overworldMusic.play();
+        }
+
+        while(musicKey()){}
+    }
+
     if(getPlayerData().getProp(TypeProps::LowGravity))
     {
         overworldMusic.setPitch(OVERWORLD_PITCH / LOWGRAVITY_PITCH);
@@ -550,6 +580,15 @@ IntType Game::loadWorld(const IntType inLevel)
         return loadWorld(level + 1);
 
     updateLevelHash();
+
+    if(!getWinner())
+    {
+        coins = 0;
+        levelCoins[level] = 0;
+        for(IntType i = 1; i < level; ++i)
+        { coins += levelCoins[i]; }
+    }
+
     reset();
     return level;
 }
@@ -627,6 +666,8 @@ const Byte* Game::returnWorldPixels(bool focus)
 
 HashType Game::updateLevelHash() 
 {
+    #define ROTATE(x, rot) (((x) << (rot)) | ((x) >> (sizeof(x)*8 - (rot))))
+
     HashType oldHash = hash; hash = 0; 
     HashType oldCoins = maxCoins; maxCoins = 0;
     HashType oldFinalLevel = finalLevel; finalLevel = 0;
@@ -679,12 +720,22 @@ HashType Game::updateLevelHash()
 
     if(hash != oldHash 
     || finalLevel != oldFinalLevel) setCheater();
+
+    #undef ROTATE
+
     return hash;
 }
 
 /*****************************/
 /***** GETTERS / SETTERS *****/
 /*****************************/
+void Game::setSound(bool value)
+{
+    playSounds = value;
+    if(playSounds) overworldMusic.pause();
+    else overworldMusic.play();
+}
+
 
 IntType Game::getCameraX() const 
 { 
@@ -778,6 +829,11 @@ Game::GameTypeData Game::getPlayerData(IntType relX, IntType relY) const
 bool Game::getCheater() const 
 { 
     return hasCheated; 
+}
+
+bool Game::getFlying() const 
+{ 
+    return enableFly; 
 }
 
 bool Game::getWinner() const 

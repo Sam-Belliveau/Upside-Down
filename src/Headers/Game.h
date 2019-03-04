@@ -49,6 +49,8 @@ public: // Static methods and enums
 
     enum GravityType : IntType { Up = -1, Down = 1 };
 
+    static void loadBufferFromFile(sf::SoundBuffer&, const std::string&);
+
 public:
     Game();
 
@@ -69,6 +71,8 @@ public:
     static bool flyCheatKey();
     static bool levelCheatKey();
     static bool editorCheatKey();
+    static bool soundKey();
+    static bool musicKey();
 
 public: // Game Loop
     void gameLoop();
@@ -94,6 +98,8 @@ public: // World/Rendering
     HashType updateLevelHash();
 
 public: // Getters
+    void setSound(bool);
+
     IntType getCameraX() const;
 
     IntType getLevel() const;
@@ -117,6 +123,7 @@ public: // Getters
 
     bool getWinner() const;
     bool getCheater() const;
+    bool getFlying() const;
     void setCheater();
 
 public: // Sounds
@@ -135,8 +142,7 @@ public: // Sounds
     sf::SoundBuffer winBuffer;
     sf::Sound winSound;
 
-    sf::SoundBuffer overworldBuffer;
-    sf::Sound overworldMusic;
+    sf::Music overworldMusic;
 
 private: // Member Variables
     HashType hash, maxCoins;
@@ -152,7 +158,8 @@ private: // Member Variables
     
     GravityType gravity = GravityType::Down; 
     bool canJump = true, canBounce = true;
-    bool hasCheated = false;
+    bool hasCheated = false, enableFly = false;
+    bool playSounds = true;
 
     GameType world[GAME_LENGTH][GAME_HEIGHT];
     Byte buffer[GAME_HEIGHT][GAME_WIDTH][4];

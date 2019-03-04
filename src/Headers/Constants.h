@@ -12,6 +12,7 @@
 #include <string> // File Names, Times 
 #include <stack> // Undo in level editor
 #include <cmath> // Misc. Math
+#include "NumberLookup.h"
 
 // Game Types
 using Byte = std::uint8_t;
@@ -21,49 +22,51 @@ using HashType = std::uint64_t;
 using TypePropsType = std::uint64_t;
 
 // Game FPS
-static const IntType GAME_FPS = 25;
+static constexpr IntType GAME_FPS = 25;
 
 // Game Version
-static const std::string GAME_VERSION = "v2.0beta";
+static const std::string GAME_VERSION = "v1.0";
 
 // Game Size / Pixel Measurements
-static const IntType GAME_WIDTH = 42;
-static const RawIntType GAME_HEIGHT = 24;
-static const RawIntType GAME_LENGTH = 256;
-static const IntType START_SIZE = 9;
+static constexpr IntType GAME_WIDTH = 42;
+static constexpr RawIntType GAME_HEIGHT = 24;
+static constexpr RawIntType GAME_LENGTH = 256;
+static constexpr IntType START_SIZE = 9;
 
-static const IntType GAME_START_X = START_SIZE/2;
-static const IntType GAME_START_Y = 18;
+static constexpr IntType GAME_START_X = START_SIZE/2;
+static constexpr IntType GAME_START_Y = 18;
 
-static const IntType GAME_SCALE = 32;
-static const double LOST_FOCUS_COLOR = 1.5;
-static const sf::Color PLAYER_COLOR = sf::Color(192, 64, 64);
+static constexpr IntType GAME_SCALE = 32;
+static constexpr double LOST_FOCUS_COLOR = 1.5;
+static const sf::Color PLAYER_COLOR = sf::Color(0, 0, 0);
 
 // Sounds
-static const double COIN_PITCH = 1;
-static const double COIN_VOL = 100;
+static const std::string SOUND_DIRECTORY = "./GameFiles/";
+static const std::string SOUND_EXTENTIONS[] = {".wav", ".ogg", ".flac"};
 
-static const double JUMP_PITCH = 1;
-static const double JUMP_VOL = 50;
+static constexpr double COIN_PITCH = 1;
+static constexpr double COIN_VOL = 100;
 
-static const double BOUNCE_PITCH = 1;
-static const double BOUNCE_VOL = 60;
+static constexpr double JUMP_PITCH = 1;
+static constexpr double JUMP_VOL = 50;
 
-static const double DEATH_PITCH = 1;
-static const double DEATH_VOL = 75;
+static constexpr double BOUNCE_PITCH = 1;
+static constexpr double BOUNCE_VOL = 60;
 
-static const double WIN_PITCH = 1;
-static const double WIN_VOL = 100;
+static constexpr double DEATH_PITCH = 1;
+static constexpr double DEATH_VOL = 75;
 
-static const double OVERWORLD_PITCH = 1;
-static const double OVERWORLD_VOL = 30;
+static constexpr double WIN_PITCH = 1;
+static constexpr double WIN_VOL = 100;
 
-static const double LOWGRAVITY_PITCH = 1.5;
+static constexpr double OVERWORLD_PITCH = 1;
+static constexpr double OVERWORLD_VOL = 30;
+
+static constexpr double LOWGRAVITY_PITCH = 1.5;
 
 // Global frames
 using CHRONO_CLOCK = std::chrono::steady_clock;
-static const std::uintmax_t CHONO_UNIT_PER_SEC = 1000000000;
-static const auto START_DURATION = CHRONO_CLOCK::now();
+static constexpr std::uintmax_t CHONO_UNIT_PER_SEC = 1000000000;
 static IntType GET_GLOBAL_FRAME()
 {
     auto now = CHRONO_CLOCK::now();
@@ -75,7 +78,7 @@ static IntType GET_GLOBAL_FRAME()
 }
 
 // Game Peices / File Loading
-static const RawIntType MAGIC_NUMBER = 0x53616d42; // "SamB"
+static constexpr RawIntType MAGIC_NUMBER = 0x53616d42; // "SamB"
 static constexpr IntType GameTypeCount = 13;
 enum GameType : Byte 
 { 
@@ -101,35 +104,35 @@ static constexpr TypePropsType TypePropsBit(IntType bit)
 }
 
 // Game Text
-static const double TEXT_SCALE = 4;
+static constexpr double TEXT_SCALE = 4;
 
 // Game Camera Measurements
-static const IntType RIGHT_CAMERA_BOARDER = double(GAME_WIDTH) / (std::sqrt(2) + 1);
-static const IntType LEFT_CAMERA_BOARDER = double(GAME_WIDTH) / 4;
+static constexpr IntType RIGHT_CAMERA_BOARDER = GAME_WIDTH / 2;
+static constexpr IntType LEFT_CAMERA_BOARDER = GAME_WIDTH / 3;
 
 // Controls 
-static const IntType DEFAULT_JOYSTICK_PORT = 0;
-static const IntType JUMP_BUTTONS[] = {0, 1};
-static const IntType RESET_BUTTON = 8;
-static const float Y_JOYSTICK_DEAD_ZONE = 80;
-static const float X_JOYSTICK_DEAD_ZONE = 40;
+static constexpr IntType DEFAULT_JOYSTICK_PORT = 0;
+static constexpr IntType JUMP_BUTTONS[] = {0, 1};
+static constexpr IntType RESET_BUTTON = 8;
+static constexpr float Y_JOYSTICK_DEAD_ZONE = 80;
+static constexpr float X_JOYSTICK_DEAD_ZONE = 40;
 
 // Smog Measurements
-static const double SMOG_SIZE = 4;
+static constexpr double SMOG_SIZE = 4;
 
 // Left Wall Trap
-static const double TRAP_SMOOTH = 8;
-static const double TRAP_SPEED = 5;
-static const IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED*1.25);
-static const IntType TRAP_START = -TRAP_LEAD;
+static constexpr double TRAP_SMOOTH = 8;
+static constexpr double TRAP_SPEED = 5;
+static constexpr IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED*1.5);
+static constexpr IntType TRAP_START = -TRAP_LEAD;
 
 // Level Data / Image Processing
-static const IntType START_LEVEL = 1;
-static const IntType MAX_LEVEL_COUNT = 100;
+static constexpr IntType START_LEVEL = 1;
+static constexpr IntType MAX_LEVEL_COUNT = 100;
 
 // Text
-static const IntType TEXT_X = 1;
-static const IntType TEXT_Y = 9;
+static constexpr IntType TEXT_X = 1;
+static constexpr IntType TEXT_Y = 9;
 static const sf::Color GOOD_COLOR = sf::Color(196,255,196);
 static const sf::Color BAD_COLOR = sf::Color(255,196,196);
 static const std::string ttfFile = "./GameFiles/GameFont.ttf";
@@ -150,13 +153,13 @@ static sf::Text GET_DEFAULT_TEXT(double size)
 }
 
 // Level Editor
-static const IntType EDITOR_CAMERA_SPEED = 2;
-static const IntType BLOCK_LIST_SIZE = 8;
+static constexpr IntType EDITOR_CAMERA_SPEED = 2;
+static constexpr IntType BLOCK_LIST_SIZE = 8;
 
 // Sorting Blocks By Brightness
-static const IntType R_LUMINANCE = 2126;
-static const IntType G_LUMINANCE = 7152;
-static const IntType B_LUMINANCE = 722;
+static constexpr IntType R_LUMINANCE = 2126;
+static constexpr IntType G_LUMINANCE = 7152;
+static constexpr IntType B_LUMINANCE = 722;
 static IntType GetLuminance(sf::Color in)
 {
     IntType r = in.r * in.r * R_LUMINANCE;
@@ -166,28 +169,26 @@ static IntType GetLuminance(sf::Color in)
 }
 
 // Random Number Generation
-static HashType ROTATE(HashType in, IntType rot) 
-{
-    return (in << rot) | (in >> (sizeof(in)*8 - rot)); 
-}
-
-static const IntType BBS_RNG_P = 43; // cousin primes 
-static const IntType BBS_RNG_Q = 47;
-static const IntType BBS_RNG_M = BBS_RNG_P*BBS_RNG_Q;
+static constexpr IntType BBS_RNG_P = 43; // cousin primes 
+static constexpr IntType BBS_RNG_Q = 47;
+static constexpr IntType BBS_RNG_M = BBS_RNG_P*BBS_RNG_Q;
 
 static IntType RANDOMIZE(IntType n)
 {
-    // 8 Rounds of Blum Blum Shub
+    const Byte startIndex = n & 0xff;
     n %= BBS_RNG_M;
-    n = n*n % BBS_RNG_M; 
-    n = n*n % BBS_RNG_M; 
-    n = n*n % BBS_RNG_M;
-    n = n*n % BBS_RNG_M; 
-    n = n*n % BBS_RNG_M; 
-    n = n*n % BBS_RNG_M;
-    n = n*n % BBS_RNG_M; 
-    n = n*n % BBS_RNG_M; 
-    return n;
+    IntType pool = n;
+
+    // 13 Rounds of Modified Blum Blum Shub
+    for(IntType i = 0; i < 13; ++i)
+    {
+        n *= n;
+        n += LookUp::PiTable[0xff & (startIndex + n)];
+        n %= BBS_RNG_M;
+        pool += n;
+    }
+
+    return pool % BBS_RNG_M;
 }
 
 // Level Names

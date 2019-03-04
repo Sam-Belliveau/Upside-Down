@@ -6,7 +6,7 @@
 namespace LookUp
 {
     // Digits of pi in hex
-    static const std::uint64_t PiTable[0x100]
+    static constexpr std::uint64_t PiTable[0x100]
     {
         0x243F6A8885A308D3, 0x13198A2E03707344, 0xA4093822299F31D0, 0x082EFA98EC4E6C89,
         0x452821E638D01377, 0xBE5466CF34E90C6C, 0xC0AC29B7C97C50DD, 0x3F84D5B5B5470917,
