@@ -80,7 +80,7 @@ const Game::GameTypeLink Game::GameTypeList[GameTypeCount] = {
     }, {
         GameType::MoveRight, 
         {"Move Right", sf::Color(64, 196, 0), 64, 0, 1.0/3.0,
-            TypeProps::MoveRight
+            TypeProps::MoveRight | TypeProps::StopStorm
         }
     }, {
         GameType::MoveLeft, 

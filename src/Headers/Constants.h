@@ -24,7 +24,7 @@ using TypePropsType = std::uint64_t;
 static const IntType GAME_FPS = 25;
 
 // Game Version
-static const std::string GAME_VERSION = "v1.0beta";
+static const std::string GAME_VERSION = "v2.0beta";
 
 // Game Size / Pixel Measurements
 static const IntType GAME_WIDTH = 42;
@@ -119,8 +119,8 @@ static const double SMOG_SIZE = 4;
 
 // Left Wall Trap
 static const double TRAP_SMOOTH = 8;
-static const double TRAP_SPEED = 4;
-static const IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED*1.5);
+static const double TRAP_SPEED = 5;
+static const IntType TRAP_LEAD = IntType(GAME_WIDTH*TRAP_SPEED*1.25);
 static const IntType TRAP_START = -TRAP_LEAD;
 
 // Level Data / Image Processing
