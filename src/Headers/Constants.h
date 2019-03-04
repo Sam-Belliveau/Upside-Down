@@ -44,19 +44,19 @@ static const double COIN_PITCH = 1;
 static const double COIN_VOL = 100;
 
 static const double JUMP_PITCH = 0.75;
-static const double JUMP_VOL = 75;
+static const double JUMP_VOL = 50;
 
 static const double BOUNCE_PITCH = 1;
 static const double BOUNCE_VOL = 60;
 
-static const double DEATH_PITCH = 2;
-static const double DEATH_VOL = 100;
+static const double DEATH_PITCH = 1.75;
+static const double DEATH_VOL = 75;
 
 static const double WIN_PITCH = 1;
 static const double WIN_VOL = 100;
 
 static const double OVERWORLD_PITCH = 1;
-static const double OVERWORLD_VOL = 50;
+static const double OVERWORLD_VOL = 30;
 
 static const double LOWGRAVITY_PITCH = 1.5;
 
