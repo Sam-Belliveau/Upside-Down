@@ -43,13 +43,13 @@ static const sf::Color PLAYER_COLOR = sf::Color(192, 64, 64);
 static const double COIN_PITCH = 1;
 static const double COIN_VOL = 100;
 
-static const double JUMP_PITCH = 0.75;
+static const double JUMP_PITCH = 1;
 static const double JUMP_VOL = 50;
 
 static const double BOUNCE_PITCH = 1;
 static const double BOUNCE_VOL = 60;
 
-static const double DEATH_PITCH = 1.75;
+static const double DEATH_PITCH = 1;
 static const double DEATH_VOL = 75;
 
 static const double WIN_PITCH = 1;
